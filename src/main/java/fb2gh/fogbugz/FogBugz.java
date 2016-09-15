@@ -52,7 +52,7 @@ import fb2gh.FB2GHException;
  * Otherwise, you can alternatively use:
  * 
  * <pre>
- * FogBugz fb = FogBugz(baseURL, email, password);
+ * FogBugz fb = new FogBugz(baseURL, email, password);
  * </pre>
  * 
  * After instantiating this class, you may then use
