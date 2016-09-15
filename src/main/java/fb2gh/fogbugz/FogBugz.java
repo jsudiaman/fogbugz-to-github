@@ -31,15 +31,52 @@ import org.xml.sax.SAXException;
 import fb2gh.FB2GHException;
 
 /**
- * FogBugz session.
+ * <p>
+ * This class uses the
+ * <a href="http://help.fogcreek.com/the-fogbugz-api">FogBugz API</a> to
+ * interact with the given FogBugz instance. You will need to supply the URL of
+ * your FogBugz instance, which will be referenced here as <code>baseURL</code>.
+ * </p>
+ * 
+ * <p>
+ * If you have an <a href=
+ * "http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">API
+ * token</a>, you can instantiate this class like so:
+ * 
+ * <pre>
+ * FogBugz fb = new FogBugz(baseURL, authToken);
+ * </pre>
+ * </p>
+ * 
+ * <p>
+ * Otherwise, you can alternatively use:
+ * 
+ * <pre>
+ * FogBugz fb = FogBugz(baseURL, email, password);
+ * </pre>
+ * 
+ * After instantiating this class, you may then use
+ * <code>fb.getAuthToken();</code> to obtain a valid API token for later.
+ * </p>
+ * 
+ * <p>
+ * If the constructors of this class are throwing {@link SSLHandshakeException},
+ * then your FogBugz instance is most likely using an invalid SSL certificate.
+ * This can be bypassed (at your own risk) like so:
+ * 
+ * <pre>
+ * FogBugz.trustInvalidCertificates();
+ * FogBugz fb = ...
+ * </pre>
+ * </p>
  */
 public class FogBugz {
+
+	private static final Logger logger = LoggerFactory.getLogger(FogBugz.class);
 
 	private final String baseURL;
 	private String authToken;
 	private DocumentBuilder documentBuilder;
-
-	private static final Logger logger = LoggerFactory.getLogger(FogBugz.class);
 
 	/**
 	 * Constructor which initializes <code>documentBuilder</code> and
@@ -50,8 +87,7 @@ public class FogBugz {
 	private FogBugz(String baseURL) throws FB2GHException {
 		try {
 			// Initialize documentBuilderFactory
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-			this.documentBuilder = documentBuilderFactory.newDocumentBuilder();
+			this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
 			// Remove trailing default.asp
 			while (baseURL.endsWith("/")) {
@@ -101,7 +137,7 @@ public class FogBugz {
 	public FogBugz(String baseURL, String email, String password) throws FB2GHException {
 		this(baseURL);
 		Document doc = parseApiRequest("logon", "email=" + email, "password=" + password);
-		String authToken = doc.getElementsByTagName("token").item(0).getTextContent();
+		String authToken = getTextValue(doc.getDocumentElement(), "token");
 		logger.info("Generated API token: {}", authToken);
 		setAuthToken(authToken);
 	}
@@ -129,9 +165,9 @@ public class FogBugz {
 			} };
 
 			// Install the trust manager
-			SSLContext sc = SSLContext.getInstance("SSL");
-			sc.init(null, tm, new SecureRandom());
-			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+			SSLContext sslContext = SSLContext.getInstance("SSL");
+			sslContext.init(null, tm, new SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 		} catch (NoSuchAlgorithmException | KeyManagementException e) {
 			throw new FB2GHException(e);
 		}
@@ -175,28 +211,11 @@ public class FogBugz {
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element element = (Element) node;
-
-				// ID
-				Integer id = null;
-				String idString = element.getElementsByTagName("ixFixFor").item(0).getTextContent();
-				if (!idString.isEmpty()) {
-					id = Integer.parseInt(idString);
-				}
-
-				// Name
-				String name = element.getElementsByTagName("sFixFor").item(0).getTextContent();
-
-				// Project ID
-				Integer projectId = null;
-				String projectIdString = element.getElementsByTagName("ixProject").item(0).getTextContent();
-				if (!projectIdString.isEmpty()) {
-					projectId = Integer.parseInt(projectIdString);
-				}
-
-				// Project Name
-				String projectName = element.getElementsByTagName("sProject").item(0).getTextContent();
-
+				Element fixFor = (Element) node;
+				Integer id = getIntValue(fixFor, "ixFixFor");
+				String name = getTextValue(fixFor, "sFixFor");
+				Integer projectId = getIntValue(fixFor, "ixProject");
+				String projectName = getTextValue(fixFor, "sProject");
 				list.add(new FBMilestone(id, name, projectId, projectName));
 			}
 		}
@@ -228,8 +247,8 @@ public class FogBugz {
 			}
 
 			// Optional
-			for (String arg : parameters) {
-				url += "&" + arg;
+			for (String param : parameters) {
+				url += "&" + param;
 			}
 
 			// Parse XML response
@@ -240,6 +259,45 @@ public class FogBugz {
 			return doc;
 		} catch (IOException | SAXException e) {
 			throw new FB2GHException(e);
+		}
+	}
+
+	/**
+	 * Scan the element for the tag and get its text content.
+	 * 
+	 * @param element
+	 *            The element
+	 * @param tagName
+	 *            The name of the tag
+	 * @return The text content, or <code>null</code> if not found
+	 */
+	private String getTextValue(Element element, String tagName) {
+		NodeList nodeList = element.getElementsByTagName(tagName);
+		if (nodeList != null && nodeList.getLength() > 0) {
+			return nodeList.item(0).getTextContent();
+		}
+		return null;
+	}
+
+	/**
+	 * Scan the element for the tag and get its text content, then parse it as
+	 * an integer.
+	 * 
+	 * @param element
+	 *            The element
+	 * @param tagName
+	 *            The name of the tag
+	 * @return The parsed integer, or <code>null</code> if parsing failed
+	 */
+	private Integer getIntValue(Element element, String tagName) {
+		String textValue = getTextValue(element, tagName);
+		if (textValue == null) {
+			return null;
+		}
+		try {
+			return Integer.parseInt(textValue);
+		} catch (NumberFormatException e) {
+			return null;
 		}
 	}
 
