@@ -1,18 +1,13 @@
 package fb2gh.github;
 
-import java.io.IOException;
-
-import com.jcabi.github.Coordinates;
 import com.jcabi.github.RtGithub;
-
-import fb2gh.FB2GHException;
 
 /**
  * Class used to interact with <a href="https://github.com">GitHub</a>.
  */
 public class GitHub {
 
-    private RtGithub rtGithub;
+    private final RtGithub rtGithub;
 
     /**
      * Constructor which authenticates via OAuth.
@@ -39,23 +34,27 @@ public class GitHub {
     }
 
     /**
-     * Create a milestone.
+     * Access a repository.
      * 
-     * @param user
-     *            Repo owner
-     * @param repo
-     *            Repo name
-     * @param milestone
-     *            Milestone name
+     * @param repoOwner
+     *            The owner of the repository. For example, if accessing the
+     *            <code>nodejs/node</code> repository, the owner would be
+     *            <code>nodejs</code>.
      * 
-     * @throws FB2GHException
+     * @param repoName
+     *            The name of the repository. For example, if accessing the
+     *            <code>nodejs/node</code> repository, the name would be
+     *            <code>node</code>.
      */
-    public void putMilestoneInRepo(String user, String repo, String milestone) throws FB2GHException {
-        try {
-            rtGithub.repos().get(new Coordinates.Simple(user, repo)).milestones().create(milestone);
-        } catch (IOException e) {
-            throw new FB2GHException(e);
-        }
+    public GHRepo getRepo(String repoOwner, String repoName) {
+        return new GHRepo(this, repoOwner, repoName);
+    }
+
+    /**
+     * @return the rtGithub
+     */
+    RtGithub getRtGithub() {
+        return rtGithub;
     }
 
 }

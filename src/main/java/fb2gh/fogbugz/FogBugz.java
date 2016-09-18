@@ -76,7 +76,7 @@ public class FogBugz {
 
     private final String baseURL;
     private String authToken;
-    private DocumentBuilder documentBuilder;
+    private final DocumentBuilder documentBuilder;
 
     /**
      * Constructor which initializes <code>documentBuilder</code> and
@@ -222,6 +222,37 @@ public class FogBugz {
     }
 
     /**
+     * Get a list of all cases from this FogBugz instance.
+     * 
+     * @return The list
+     * 
+     * @throws FB2GHException
+     */
+    public List<FBCase> listCases() throws FB2GHException {
+        List<FBCase> list = new ArrayList<>();
+
+        // TODO Replace with search (listCases uses a filter)
+        Document doc = parseApiRequest("listCases", "cols=fOpen,sTitle,sPersonAssignedTo,sStatus,ixFixFor,events");
+
+        // Loop through XML elements
+        NodeList nodes = doc.getElementsByTagName("case");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element bug = (Element) node;
+                Integer id = Integer.parseInt(bug.getAttribute("ixBug"));
+                Boolean open = getBooleanValue(bug, "fOpen");
+                String title = getTextValue(bug, "sTitle");
+                String assignee = getTextValue(bug, "sPersonAssignedTo");
+                String status = getTextValue(bug, "sStatus");
+                Integer milestoneId = getIntValue(bug, "ixFixFor");
+                list.add(new FBCase(id, open, title, assignee, status, milestoneId));
+            }
+        }
+        return list;
+    }
+
+    /**
      * Perform the given API call, then parse the response as a
      * {@link Document}.
      * 
@@ -296,6 +327,30 @@ public class FogBugz {
         try {
             return Integer.parseInt(textValue);
         } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Scan the element for the tag and get its text content. If the content
+     * equals <code>"true"</code>, return <code>true</code>. If the content
+     * equals <code>"false"</code>, return <code>false</code>. Otherwise, return
+     * <code>null</code>.
+     * 
+     * @param element
+     *            The element
+     * @param tagName
+     *            The name of the tag
+     * @return The boolean value represented by this content, or
+     *         <code>null</code>
+     */
+    private Boolean getBooleanValue(Element element, String tagName) {
+        String textValue = getTextValue(element, tagName);
+        if (textValue.equals("true")) {
+            return true;
+        } else if (textValue.equals("false")) {
+            return false;
+        } else {
             return null;
         }
     }
