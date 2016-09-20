@@ -35,7 +35,7 @@ public class FBCase extends DataClass {
      * @param events
      *            events
      */
-    public FBCase(Integer id, Boolean open, String title, String assignee, String status, Integer milestoneId,
+    FBCase(Integer id, Boolean open, String title, String assignee, String status, Integer milestoneId,
             List<FBCaseEvent> events) {
         this.id = id;
         this.open = open;

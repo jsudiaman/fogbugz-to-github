@@ -18,7 +18,7 @@ public class FBAttachment extends DataClass {
      * @param url
      *            sURL
      */
-    public FBAttachment(String filename, String url) {
+    FBAttachment(String filename, String url) {
         this.filename = filename;
         this.url = url;
     }

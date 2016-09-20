@@ -24,7 +24,7 @@ public class FBMilestone extends DataClass {
      * @param projectName
      *            sProject
      */
-    public FBMilestone(Integer id, String name, Integer projectId, String projectName) {
+    FBMilestone(Integer id, String name, Integer projectId, String projectName) {
         this.id = id;
         this.name = name;
         this.projectId = projectId;

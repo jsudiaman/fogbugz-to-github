@@ -32,7 +32,7 @@ public class FBCaseEvent extends DataClass {
      * @param description
      *            evtDescription
      */
-    public FBCaseEvent(Integer id, Integer caseId, String body, String changes, List<FBAttachment> attachments,
+    FBCaseEvent(Integer id, Integer caseId, String body, String changes, List<FBAttachment> attachments,
             String description) {
         this.id = id;
         this.caseId = caseId;
