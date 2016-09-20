@@ -1,13 +1,15 @@
 package fb2gh.github;
 
+import com.jcabi.github.Coordinates;
 import com.jcabi.github.RtGithub;
+import com.jcabi.http.wire.RetryWire;
 
 /**
  * Class used to interact with <a href="https://github.com">GitHub</a>.
  */
 public class GitHub {
 
-    private final RtGithub rtGithub;
+    private final RtGithub connector;
 
     /**
      * Constructor which authenticates via OAuth.
@@ -18,7 +20,7 @@ public class GitHub {
      * @see <a href="https://developer.github.com/v3/oauth/">OAuth</a>
      */
     public GitHub(String token) {
-        rtGithub = new RtGithub(token);
+        connector = new RtGithub(new RtGithub(token).entry().through(RetryWire.class));
     }
 
     /**
@@ -30,7 +32,7 @@ public class GitHub {
      *            GitHub password
      */
     public GitHub(String username, String password) {
-        rtGithub = new RtGithub(username, password);
+        connector = new RtGithub(new RtGithub(username, password).entry().through(RetryWire.class));
     }
 
     /**
@@ -47,14 +49,7 @@ public class GitHub {
      *            <code>node</code>.
      */
     public GHRepo getRepo(String repoOwner, String repoName) {
-        return new GHRepo(this, repoOwner, repoName);
-    }
-
-    /**
-     * @return the rtGithub
-     */
-    RtGithub getRtGithub() {
-        return rtGithub;
+        return new GHRepo(connector.repos().get(new Coordinates.Simple(repoOwner, repoName)));
     }
 
 }

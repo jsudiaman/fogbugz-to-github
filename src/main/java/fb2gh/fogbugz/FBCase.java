@@ -1,11 +1,12 @@
 package fb2gh.fogbugz;
 
+import java.util.List;
+
 import fb2gh.DataClass;
 
 /**
  * FogBugz case.
  */
-// TODO events
 public class FBCase extends DataClass {
 
     private final Integer id;
@@ -14,6 +15,7 @@ public class FBCase extends DataClass {
     private final String assignee;
     private final String status;
     private final Integer milestoneId;
+    private final List<FBCaseEvent> events;
 
     /**
      * Constructor.
@@ -30,14 +32,18 @@ public class FBCase extends DataClass {
      *            sStatus
      * @param milestoneId
      *            ixFixFor
+     * @param events
+     *            events
      */
-    public FBCase(Integer id, Boolean open, String title, String assignee, String status, Integer milestoneId) {
+    public FBCase(Integer id, Boolean open, String title, String assignee, String status, Integer milestoneId,
+            List<FBCaseEvent> events) {
         this.id = id;
         this.open = open;
         this.title = title;
         this.assignee = assignee;
         this.status = status;
         this.milestoneId = milestoneId;
+        this.events = events;
     }
 
     /**
@@ -80,6 +86,13 @@ public class FBCase extends DataClass {
      */
     public Integer getMilestoneId() {
         return milestoneId;
+    }
+
+    /**
+     * @return the events
+     */
+    public List<FBCaseEvent> getEvents() {
+        return events;
     }
 
 }

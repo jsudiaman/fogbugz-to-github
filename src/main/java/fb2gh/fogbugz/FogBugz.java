@@ -75,31 +75,8 @@ public class FogBugz {
     private static final Logger logger = LoggerFactory.getLogger(FogBugz.class);
 
     private final String baseURL;
-    private String authToken;
+    private final String authToken;
     private final DocumentBuilder documentBuilder;
-
-    /**
-     * Constructor which initializes <code>documentBuilder</code> and
-     * <code>baseURL</code>.
-     * 
-     * @throws FB2GHException
-     */
-    private FogBugz(String baseURL) throws FB2GHException {
-        try {
-            // Remove trailing default.asp
-            while (baseURL.endsWith("/")) {
-                baseURL = StringUtils.chop(baseURL);
-            }
-            if (baseURL.endsWith("default.asp")) {
-                baseURL = StringUtils.removeEnd(baseURL, "default.asp");
-            }
-
-            this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            this.baseURL = baseURL;
-        } catch (ParserConfigurationException e) {
-            throw new FB2GHException(e);
-        }
-    }
 
     /**
      * Constructor.
@@ -116,8 +93,13 @@ public class FogBugz {
      *      To Get a FogBugz XML API Token</a>
      */
     public FogBugz(String baseURL, String authToken) throws FB2GHException {
-        this(baseURL);
-        setAuthToken(authToken);
+        try {
+            this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            this.baseURL = normalize(baseURL);
+            this.authToken = authToken;
+        } catch (ParserConfigurationException e) {
+            throw new FB2GHException(e);
+        }
     }
 
     /**
@@ -134,11 +116,37 @@ public class FogBugz {
      * @throws FB2GHException
      */
     public FogBugz(String baseURL, String email, String password) throws FB2GHException {
-        this(baseURL);
-        Document doc = parseApiRequest("logon", "email=" + email, "password=" + password);
-        String authToken = getTextValue(doc.getDocumentElement(), "token");
-        logger.info("Generated API token: {}", authToken);
-        setAuthToken(authToken);
+        try {
+            this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            this.baseURL = normalize(baseURL);
+            Document doc = parseApiRequest("logon", "email=" + email, "password=" + password);
+            String authToken = getTextValue(doc.getDocumentElement(), "token");
+            logger.info("Generated API token: {}", authToken);
+            this.authToken = authToken;
+        } catch (ParserConfigurationException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
+     * Remove trailing "default.asp" (if present) from the given URL. This
+     * method might a bit of a misnomer, as it does not perform a fully
+     * extensive URL normalization. It does, however, suffice for the purpose of
+     * this class.
+     * 
+     * @param baseURL
+     *            The URL
+     * 
+     * @return The normalized URL
+     */
+    private String normalize(String baseURL) {
+        while (baseURL.endsWith("/")) {
+            baseURL = StringUtils.chop(baseURL);
+        }
+        if (baseURL.endsWith("default.asp")) {
+            baseURL = StringUtils.removeEnd(baseURL, "default.asp");
+        }
+        return baseURL;
     }
 
     /**
@@ -187,14 +195,6 @@ public class FogBugz {
     }
 
     /**
-     * @param authToken
-     *            the authToken to set
-     */
-    private void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
-
-    /**
      * Get a list of all milestones from this FogBugz instance.
      * 
      * @return The list
@@ -222,17 +222,23 @@ public class FogBugz {
     }
 
     /**
-     * Get a list of all cases from this FogBugz instance.
+     * Search for cases.
      * 
-     * @return The list
+     * @param query
+     *            The query term you are searching for. Can be a string, a case
+     *            number, a comma separated list of case numbers without spaces,
+     *            e.g. 12,25,556. This search acts exactly the same way the
+     *            search box in FogBugz operates. To search for the number 123
+     *            and not the case 123, enclose your search in quotes.
+     * 
+     * @return A list containing the search results
      * 
      * @throws FB2GHException
      */
-    public List<FBCase> listCases() throws FB2GHException {
+    public List<FBCase> searchCases(String query) throws FB2GHException {
         List<FBCase> list = new ArrayList<>();
-
-        // TODO Replace with search (listCases uses a filter)
-        Document doc = parseApiRequest("listCases", "cols=fOpen,sTitle,sPersonAssignedTo,sStatus,ixFixFor,events");
+        Document doc = parseApiRequest("search", "q=" + query,
+                "cols=fOpen,sTitle,sPersonAssignedTo,sStatus,ixFixFor,events");
 
         // Loop through XML elements
         NodeList nodes = doc.getElementsByTagName("case");
@@ -246,7 +252,58 @@ public class FogBugz {
                 String assignee = getTextValue(bug, "sPersonAssignedTo");
                 String status = getTextValue(bug, "sStatus");
                 Integer milestoneId = getIntValue(bug, "ixFixFor");
-                list.add(new FBCase(id, open, title, assignee, status, milestoneId));
+                List<FBCaseEvent> events = getCaseEvents(bug);
+                list.add(new FBCase(id, open, title, assignee, status, milestoneId, events));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get the events contained within this case.
+     * 
+     * @param bug
+     *            The case
+     * 
+     * @return A list of case events
+     */
+    private List<FBCaseEvent> getCaseEvents(Element bug) {
+        List<FBCaseEvent> list = new ArrayList<>();
+        NodeList nodes = bug.getElementsByTagName("event");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element event = (Element) node;
+                Integer id = Integer.parseInt(event.getAttribute("ixBugEvent"));
+                Integer caseId = Integer.parseInt(event.getAttribute("ixBug"));
+                String body = getTextValue(event, "s");
+                String changes = getTextValue(event, "sChanges");
+                List<FBAttachment> attachments = getAttachments(event);
+                String description = getTextValue(event, "evtDescription");
+                list.add(new FBCaseEvent(id, caseId, body, changes, attachments, description));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get the attachments contained within this event.
+     * 
+     * @param event
+     *            The event
+     * 
+     * @return A list of attachments
+     */
+    private List<FBAttachment> getAttachments(Element event) {
+        List<FBAttachment> list = new ArrayList<>();
+        NodeList nodes = event.getElementsByTagName("attachment");
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element attachment = (Element) node;
+                String filename = getTextValue(attachment, "sFileName");
+                String url = getTextValue(attachment, "sURL");
+                list.add(new FBAttachment(filename, url));
             }
         }
         return list;

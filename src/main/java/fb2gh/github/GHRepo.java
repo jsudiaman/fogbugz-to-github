@@ -2,7 +2,6 @@ package fb2gh.github;
 
 import java.io.IOException;
 
-import com.jcabi.github.Coordinates;
 import com.jcabi.github.Repo;
 
 import fb2gh.FB2GHException;
@@ -17,16 +16,12 @@ public class GHRepo {
     /**
      * Constructor.
      * 
-     * @param gitHub
-     *            The {@link GitHub} instance used to access the repository.
-     * @param repoOwner
-     *            The repository owner.
-     * @param repoName
-     *            The name of the repository.
+     * @param repo
+     *            The {@link Repo} instance used to access the repository.
      * 
      */
-    GHRepo(GitHub gitHub, String repoOwner, String repoName) {
-        this.repo = gitHub.getRtGithub().repos().get(new Coordinates.Simple(repoOwner, repoName));
+    GHRepo(Repo repo) {
+        this.repo = repo;
     }
 
     /**
