@@ -2,7 +2,9 @@ package fb2gh.fogbugz;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -120,33 +122,12 @@ public class FogBugz {
             this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             this.baseURL = normalize(baseURL);
             Document doc = parseApiRequest("logon", "email=" + email, "password=" + password);
-            String authToken = getTextValue(doc.getDocumentElement(), "token");
+            String authToken = FBXmlObject.getTextValue(doc.getDocumentElement(), "token");
             logger.info("Generated API token: {}", authToken);
             this.authToken = authToken;
         } catch (ParserConfigurationException e) {
             throw new FB2GHException(e);
         }
-    }
-
-    /**
-     * Remove trailing "default.asp" (if present) from the given URL. This
-     * method might a bit of a misnomer, as it does not perform a fully
-     * extensive URL normalization. It does, however, suffice for the purpose of
-     * this class.
-     * 
-     * @param baseURL
-     *            The URL
-     * 
-     * @return The normalized URL
-     */
-    private String normalize(String baseURL) {
-        while (baseURL.endsWith("/")) {
-            baseURL = StringUtils.chop(baseURL);
-        }
-        if (baseURL.endsWith("default.asp")) {
-            baseURL = StringUtils.removeEnd(baseURL, "default.asp");
-        }
-        return baseURL;
     }
 
     /**
@@ -210,12 +191,7 @@ public class FogBugz {
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element fixFor = (Element) node;
-                Integer id = getIntValue(fixFor, "ixFixFor");
-                String name = getTextValue(fixFor, "sFixFor");
-                Integer projectId = getIntValue(fixFor, "ixProject");
-                String projectName = getTextValue(fixFor, "sProject");
-                list.add(new FBMilestone(id, name, projectId, projectName));
+                list.add(new FBMilestone((Element) node));
             }
         }
         return list;
@@ -236,77 +212,23 @@ public class FogBugz {
      * @throws FB2GHException
      */
     public List<FBCase> searchCases(String query) throws FB2GHException {
-        List<FBCase> list = new ArrayList<>();
-        Document doc = parseApiRequest("search", "q=" + query,
-                "cols=fOpen,sTitle,sPersonAssignedTo,sStatus,ixFixFor,events");
+        try {
+            List<FBCase> list = new ArrayList<>();
+            Document doc = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
+                    "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,events,sCase");
 
-        // Loop through XML elements
-        NodeList nodes = doc.getElementsByTagName("case");
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element bug = (Element) node;
-                Integer id = Integer.parseInt(bug.getAttribute("ixBug"));
-                Boolean open = getBooleanValue(bug, "fOpen");
-                String title = getTextValue(bug, "sTitle");
-                String assignee = getTextValue(bug, "sPersonAssignedTo");
-                String status = getTextValue(bug, "sStatus");
-                Integer milestoneId = getIntValue(bug, "ixFixFor");
-                List<FBCaseEvent> events = getCaseEvents(bug);
-                list.add(new FBCase(id, open, title, assignee, status, milestoneId, events));
+            // Loop through XML elements
+            NodeList nodes = doc.getElementsByTagName("case");
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node node = nodes.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    list.add(new FBCase((Element) node));
+                }
             }
+            return list;
+        } catch (UnsupportedEncodingException e) {
+            throw new FB2GHException(e);
         }
-        return list;
-    }
-
-    /**
-     * Get the events contained within this case.
-     * 
-     * @param bug
-     *            The case
-     * 
-     * @return A list of case events
-     */
-    private List<FBCaseEvent> getCaseEvents(Element bug) {
-        List<FBCaseEvent> list = new ArrayList<>();
-        NodeList nodes = bug.getElementsByTagName("event");
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element event = (Element) node;
-                Integer id = Integer.parseInt(event.getAttribute("ixBugEvent"));
-                Integer caseId = Integer.parseInt(event.getAttribute("ixBug"));
-                String body = getTextValue(event, "s");
-                String changes = getTextValue(event, "sChanges");
-                List<FBAttachment> attachments = getAttachments(event);
-                String description = getTextValue(event, "evtDescription");
-                list.add(new FBCaseEvent(id, caseId, body, changes, attachments, description));
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Get the attachments contained within this event.
-     * 
-     * @param event
-     *            The event
-     * 
-     * @return A list of attachments
-     */
-    private List<FBAttachment> getAttachments(Element event) {
-        List<FBAttachment> list = new ArrayList<>();
-        NodeList nodes = event.getElementsByTagName("attachment");
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element attachment = (Element) node;
-                String filename = getTextValue(attachment, "sFileName");
-                String url = getTextValue(attachment, "sURL");
-                list.add(new FBAttachment(filename, url));
-            }
-        }
-        return list;
     }
 
     /**
@@ -350,66 +272,24 @@ public class FogBugz {
     }
 
     /**
-     * Scan the element for the tag and get its text content.
+     * Remove trailing "default.asp" (if present) from the given URL. This
+     * method might a bit of a misnomer, as it does not perform a fully
+     * extensive URL normalization. It does, however, suffice for the purpose of
+     * this class.
      * 
-     * @param element
-     *            The element
-     * @param tagName
-     *            The name of the tag
-     * @return The text content, or <code>null</code> if not found
-     */
-    private String getTextValue(Element element, String tagName) {
-        NodeList nodeList = element.getElementsByTagName(tagName);
-        if (nodeList != null && nodeList.getLength() > 0) {
-            return nodeList.item(0).getTextContent();
-        }
-        return null;
-    }
-
-    /**
-     * Scan the element for the tag and get its text content, then parse it as
-     * an integer.
+     * @param baseURL
+     *            The URL
      * 
-     * @param element
-     *            The element
-     * @param tagName
-     *            The name of the tag
-     * @return The parsed integer, or <code>null</code> if parsing failed
+     * @return The normalized URL
      */
-    private Integer getIntValue(Element element, String tagName) {
-        String textValue = getTextValue(element, tagName);
-        if (textValue == null) {
-            return null;
+    private static String normalize(String baseURL) {
+        while (baseURL.endsWith("/")) {
+            baseURL = StringUtils.chop(baseURL);
         }
-        try {
-            return Integer.parseInt(textValue);
-        } catch (NumberFormatException e) {
-            return null;
+        if (baseURL.endsWith("default.asp")) {
+            baseURL = StringUtils.removeEnd(baseURL, "default.asp");
         }
-    }
-
-    /**
-     * Scan the element for the tag and get its text content. If the content
-     * equals <code>"true"</code>, return <code>true</code>. If the content
-     * equals <code>"false"</code>, return <code>false</code>. Otherwise, return
-     * <code>null</code>.
-     * 
-     * @param element
-     *            The element
-     * @param tagName
-     *            The name of the tag
-     * @return The boolean value represented by this content, or
-     *         <code>null</code>
-     */
-    private Boolean getBooleanValue(Element element, String tagName) {
-        String textValue = getTextValue(element, tagName);
-        if (textValue.equals("true")) {
-            return true;
-        } else if (textValue.equals("false")) {
-            return false;
-        } else {
-            return null;
-        }
+        return baseURL;
     }
 
 }

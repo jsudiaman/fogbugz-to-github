@@ -1,11 +1,11 @@
 package fb2gh.fogbugz;
 
-import fb2gh.DataClass;
+import org.w3c.dom.Element;
 
 /**
  * FogBugz milestone.
  */
-public class FBMilestone extends DataClass {
+public final class FBMilestone extends FBXmlObject {
 
     private final Integer id;
     private final String name;
@@ -15,20 +15,15 @@ public class FBMilestone extends DataClass {
     /**
      * Constructor.
      * 
-     * @param id
-     *            ixFixFor
-     * @param name
-     *            sFixFor
-     * @param projectId
-     *            ixProject
-     * @param projectName
-     *            sProject
+     * @param fixFor
+     *            The <code>fixfor</code> XML element that this object
+     *            represents
      */
-    FBMilestone(Integer id, String name, Integer projectId, String projectName) {
-        this.id = id;
-        this.name = name;
-        this.projectId = projectId;
-        this.projectName = projectName;
+    FBMilestone(Element fixFor) {
+        this.id = getIntValue(fixFor, "ixFixFor");
+        this.name = getTextValue(fixFor, "sFixFor");
+        this.projectId = getIntValue(fixFor, "ixProject");
+        this.projectName = getTextValue(fixFor, "sProject");
     }
 
     /**

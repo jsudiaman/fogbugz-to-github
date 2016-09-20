@@ -1,49 +1,45 @@
 package fb2gh.fogbugz;
 
+import java.util.Collections;
 import java.util.List;
 
-import fb2gh.DataClass;
+import org.w3c.dom.Element;
 
 /**
  * FogBugz case.
  */
-public class FBCase extends DataClass {
+public final class FBCase extends FBXmlObject {
 
     private final Integer id;
+    private final Integer parentCaseId;
     private final Boolean open;
     private final String title;
     private final String assignee;
     private final String status;
+    private final Integer duplicateOfId;
+    private final String priority;
     private final Integer milestoneId;
     private final List<FBCaseEvent> events;
+    private final Integer salesforceCaseId;
 
     /**
      * Constructor.
      * 
-     * @param id
-     *            ixBug
-     * @param open
-     *            fOpen
-     * @param title
-     *            sTitle
-     * @param assignee
-     *            sPersonAssignedTo
-     * @param status
-     *            sStatus
-     * @param milestoneId
-     *            ixFixFor
-     * @param events
-     *            events
+     * @param caze
+     *            The <code>case</code> XML element that this object represents
      */
-    FBCase(Integer id, Boolean open, String title, String assignee, String status, Integer milestoneId,
-            List<FBCaseEvent> events) {
-        this.id = id;
-        this.open = open;
-        this.title = title;
-        this.assignee = assignee;
-        this.status = status;
-        this.milestoneId = milestoneId;
-        this.events = events;
+    FBCase(Element caze) {
+        this.id = Integer.parseInt(caze.getAttribute("ixBug"));
+        this.parentCaseId = getIntValue(caze, "ixBugParent");
+        this.open = getBooleanValue(caze, "fOpen");
+        this.title = getTextValue(caze, "sTitle");
+        this.assignee = getTextValue(caze, "sPersonAssignedTo");
+        this.status = getTextValue(caze, "sStatus");
+        this.duplicateOfId = getIntValue(caze, "ixBugOriginal");
+        this.priority = getTextValue(caze, "sPriority");
+        this.milestoneId = getIntValue(caze, "ixFixFor");
+        this.events = Collections.unmodifiableList(FBCaseEvent.listCaseEvents(caze));
+        this.salesforceCaseId = getIntValue(caze, "sCase");
     }
 
     /**
@@ -51,6 +47,13 @@ public class FBCase extends DataClass {
      */
     public Integer getId() {
         return id;
+    }
+
+    /**
+     * @return the parentCaseId
+     */
+    public Integer getParentCaseId() {
+        return parentCaseId;
     }
 
     /**
@@ -82,6 +85,20 @@ public class FBCase extends DataClass {
     }
 
     /**
+     * @return the duplicateOfId
+     */
+    public Integer getDuplicateOfId() {
+        return duplicateOfId;
+    }
+
+    /**
+     * @return the priority
+     */
+    public String getPriority() {
+        return priority;
+    }
+
+    /**
      * @return the milestoneId
      */
     public Integer getMilestoneId() {
@@ -93,6 +110,13 @@ public class FBCase extends DataClass {
      */
     public List<FBCaseEvent> getEvents() {
         return events;
+    }
+
+    /**
+     * @return the salesforceCaseId
+     */
+    public Integer getSalesforceCaseId() {
+        return salesforceCaseId;
     }
 
 }
