@@ -1,5 +1,5 @@
 # FogBugz to GitHub (FB2GH)
-**FB2GH** is designed to help you programatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/). In addition to that, it can alternatively serve as a lightweight Java API for FogBugz or GH Issues.
+**FB2GH** is designed to help you programatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/). It also can alternatively serve as a lightweight Java API for FogBugz or GH Issues.
 
 ## Usage
 
