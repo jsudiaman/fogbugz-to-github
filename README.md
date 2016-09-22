@@ -25,4 +25,4 @@ or using your username and password:
 
 `GitHub gh = new GitHub(String username, String password)`
 
-Using the token is generally safer, as tokens can be limited to specific types of data and can be revoked at any time.
+(Using a token is generally safer.)
