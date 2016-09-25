@@ -19,6 +19,7 @@ public final class FBCase extends FBXmlObject {
     private final Integer duplicateOfId;
     private final String priority;
     private final Integer milestoneId;
+    private final String category;
     private final List<FBCaseEvent> events;
     private final Integer salesforceCaseId;
 
@@ -38,6 +39,7 @@ public final class FBCase extends FBXmlObject {
         this.duplicateOfId = getIntValue(caze, "ixBugOriginal");
         this.priority = getTextValue(caze, "sPriority");
         this.milestoneId = getIntValue(caze, "ixFixFor");
+        this.category = getTextValue(caze, "sCategory");
         this.events = Collections.unmodifiableList(FBCaseEvent.listCaseEvents(caze));
         this.salesforceCaseId = getIntValue(caze, "sCase");
     }
@@ -103,6 +105,13 @@ public final class FBCase extends FBXmlObject {
      */
     public Integer getMilestoneId() {
         return milestoneId;
+    }
+
+    /**
+     * @return the category
+     */
+    public String getCategory() {
+        return category;
     }
 
     /**

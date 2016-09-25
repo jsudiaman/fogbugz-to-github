@@ -215,7 +215,7 @@ public class FogBugz {
         try {
             List<FBCase> list = new ArrayList<>();
             Document doc = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
-                    "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,events,sCase");
+                    "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,sCategory,events,sCase");
 
             // Loop through XML elements
             NodeList nodes = doc.getElementsByTagName("case");
