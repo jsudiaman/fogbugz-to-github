@@ -23,6 +23,6 @@ Now let's access the GitHub API. Similar to FogBugz, you can construct a GitHub 
 
 or using your username and password:
 
-`GitHub gh = new GitHub(String username, String password)`
+`GitHub gh = new GitHub(String username, String password);`
 
 (Using a token is generally safer.)
