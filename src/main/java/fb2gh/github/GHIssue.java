@@ -80,7 +80,7 @@ public class GHIssue {
      * 
      * @throws FB2GHException
      */
-    public void assignTo(String ghUsername) {
+    public void assignTo(String ghUsername) throws FB2GHException {
         try {
             issue.assign(ghUsername);
         } catch (IOException e) {
@@ -96,8 +96,10 @@ public class GHIssue {
      * @param milestoneNumber
      *            The <code>number</code> of the milestone to associate this
      *            issue with or <code>null</code> to remove current.
+     * 
+     * @throws FB2GHException
      */
-    public void setMilestone(Integer milestoneNumber) {
+    public void setMilestone(Integer milestoneNumber) throws FB2GHException {
         try {
             if (milestoneNumber != null) {
                 issue.patch(Json.createObjectBuilder().add("milestone", milestoneNumber).build());
