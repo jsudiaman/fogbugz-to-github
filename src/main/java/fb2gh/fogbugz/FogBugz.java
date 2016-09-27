@@ -26,8 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import fb2gh.FB2GHException;
@@ -187,12 +185,8 @@ public class FogBugz {
         Document doc = parseApiRequest("listFixFors");
 
         // Loop through XML elements
-        NodeList nodes = doc.getElementsByTagName("fixfor");
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                list.add(new FBMilestone((Element) node));
-            }
+        for (Element fixFor : new FBXmlElements(doc.getElementsByTagName("fixfor"))) {
+            list.add(new FBMilestone(fixFor));
         }
         return list;
     }
@@ -218,12 +212,8 @@ public class FogBugz {
                     "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,sCategory,events,sCase");
 
             // Loop through XML elements
-            NodeList nodes = doc.getElementsByTagName("case");
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Node node = nodes.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    list.add(new FBCase((Element) node));
-                }
+            for (Element caze : new FBXmlElements(doc.getElementsByTagName("case"))) {
+                list.add(new FBCase(caze));
             }
             return list;
         } catch (UnsupportedEncodingException e) {

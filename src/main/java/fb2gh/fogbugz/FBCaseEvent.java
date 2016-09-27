@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * FogBugz case event.
@@ -46,12 +44,8 @@ public final class FBCaseEvent extends FBXmlObject {
      */
     static List<FBCaseEvent> listCaseEvents(Element caze) {
         List<FBCaseEvent> list = new ArrayList<>();
-        NodeList nodes = caze.getElementsByTagName("event");
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                list.add(new FBCaseEvent((Element) node));
-            }
+        for (Element event : new FBXmlElements(caze.getElementsByTagName("event"))) {
+            list.add(new FBCaseEvent(event));
         }
         return list;
     }
