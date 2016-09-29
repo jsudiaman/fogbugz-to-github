@@ -100,8 +100,8 @@ public class CaseMigrator {
                 String filename = attachment.getFilename();
                 String url = fbAttachmentConverter.convert(attachment);
 
+                // If it's an image, prepend '!' to the Markdown string
                 if (FilenameUtils.getExtension(url).toLowerCase().matches("png|gif|jpg|jpeg")) {
-                    // If it's an image, prepend '!' to the Markdown string
                     sb.append("!");
                 }
                 sb.append("[").append(filename).append("](").append(url).append(")<br>");
