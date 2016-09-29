@@ -24,13 +24,16 @@ public final class FBCaseEvent extends FBXmlObject {
      * 
      * @param event
      *            The <code>event</code> XML element that this object represents
+     * @param baseURL
+     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
+     *            that owns this case event
      */
-    private FBCaseEvent(Element event) {
+    private FBCaseEvent(Element event, String baseURL) {
         this.id = Integer.parseInt(event.getAttribute("ixBugEvent"));
         this.caseId = Integer.parseInt(event.getAttribute("ixBug"));
         this.body = getTextValue(event, "sHtml");
         this.changes = StringUtils.chomp(getTextValue(event, "sChanges"));
-        this.attachments = Collections.unmodifiableList(FBAttachment.listAttachments(event));
+        this.attachments = Collections.unmodifiableList(FBAttachment.listAttachments(event, baseURL));
         this.description = getTextValue(event, "evtDescription");
     }
 
@@ -39,13 +42,16 @@ public final class FBCaseEvent extends FBXmlObject {
      * 
      * @param caze
      *            The case
+     * @param baseURL
+     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
+     *            that owns these case events
      * 
      * @return A list of case events
      */
-    static List<FBCaseEvent> listCaseEvents(Element caze) {
+    static List<FBCaseEvent> listCaseEvents(Element caze, String baseURL) {
         List<FBCaseEvent> list = new ArrayList<>();
         for (Element event : new FBXmlElements(caze.getElementsByTagName("event"))) {
-            list.add(new FBCaseEvent(event));
+            list.add(new FBCaseEvent(event, baseURL));
         }
         return list;
     }

@@ -11,7 +11,7 @@ import com.jcabi.github.Issue;
 import fb2gh.FB2GHException;
 
 /**
- * GitHub issue.
+ * Fluent GitHub issue.
  */
 public class GHIssue {
 
@@ -33,11 +33,14 @@ public class GHIssue {
      * @param labels
      *            The label(s) to add
      * 
+     * @return this issue
+     * 
      * @throws FB2GHException
      */
-    public void addLabels(String... labels) throws FB2GHException {
+    public GHIssue addLabels(String... labels) throws FB2GHException {
         try {
             issue.labels().add(Arrays.asList(labels));
+            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -49,11 +52,14 @@ public class GHIssue {
      * @param comment
      *            The contents of the comment. Supports Markdown.
      * 
+     * @return this issue
+     * 
      * @throws FB2GHException
      */
-    public void addComment(String comment) throws FB2GHException {
+    public GHIssue addComment(String comment) throws FB2GHException {
         try {
             issue.comments().post(comment);
+            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -62,11 +68,14 @@ public class GHIssue {
     /**
      * Close this issue.
      * 
+     * @return this issue
+     * 
      * @throws FB2GHException
      */
-    public void close() throws FB2GHException {
+    public GHIssue close() throws FB2GHException {
         try {
             issue.close();
+            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -78,11 +87,14 @@ public class GHIssue {
      * @param ghUsername
      *            GitHub username
      * 
+     * @return this issue
+     * 
      * @throws FB2GHException
      */
-    public void assignTo(String ghUsername) throws FB2GHException {
+    public GHIssue assignTo(String ghUsername) throws FB2GHException {
         try {
             issue.assign(ghUsername);
+            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -97,15 +109,18 @@ public class GHIssue {
      *            The <code>number</code> of the milestone to associate this
      *            issue with or <code>null</code> to remove current.
      * 
+     * @return this issue
+     * 
      * @throws FB2GHException
      */
-    public void setMilestone(Integer milestoneNumber) throws FB2GHException {
+    public GHIssue setMilestone(Integer milestoneNumber) throws FB2GHException {
         try {
             if (milestoneNumber != null) {
                 issue.patch(Json.createObjectBuilder().add("milestone", milestoneNumber).build());
             } else {
                 issue.patch(Json.createObjectBuilder().add("milestone", JsonObject.NULL).build());
             }
+            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }

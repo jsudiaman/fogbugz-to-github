@@ -28,8 +28,11 @@ public final class FBCase extends FBXmlObject {
      * 
      * @param caze
      *            The <code>case</code> XML element that this object represents
+     * @param baseURL
+     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
+     *            that owns this case
      */
-    FBCase(Element caze) {
+    FBCase(Element caze, String baseURL) {
         this.id = Integer.parseInt(caze.getAttribute("ixBug"));
         this.parentCaseId = getIntValue(caze, "ixBugParent");
         this.open = getBooleanValue(caze, "fOpen");
@@ -40,7 +43,7 @@ public final class FBCase extends FBXmlObject {
         this.priority = getTextValue(caze, "sPriority");
         this.milestoneId = getIntValue(caze, "ixFixFor");
         this.category = getTextValue(caze, "sCategory");
-        this.events = Collections.unmodifiableList(FBCaseEvent.listCaseEvents(caze));
+        this.events = Collections.unmodifiableList(FBCaseEvent.listCaseEvents(caze, baseURL));
         this.salesforceCaseId = getIntValue(caze, "sCase");
     }
 

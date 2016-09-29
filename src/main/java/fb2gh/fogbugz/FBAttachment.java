@@ -20,10 +20,13 @@ public final class FBAttachment extends FBXmlObject {
      * @param attachment
      *            The <code>attachment</code> XML element that this object
      *            represents
+     * @param baseURL
+     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
+     *            that owns this attachment
      */
-    private FBAttachment(Element attachment) {
+    private FBAttachment(Element attachment, String baseURL) {
         this.filename = getTextValue(attachment, "sFileName");
-        this.url = StringEscapeUtils.unescapeHtml4(getTextValue(attachment, "sURL"));
+        this.url = baseURL + "/" + StringEscapeUtils.unescapeHtml4(getTextValue(attachment, "sURL"));
     }
 
     /**
@@ -31,13 +34,16 @@ public final class FBAttachment extends FBXmlObject {
      * 
      * @param event
      *            The event
+     * @param baseURL
+     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
+     *            that owns these attachments
      * 
      * @return A list of attachments
      */
-    static List<FBAttachment> listAttachments(Element event) {
+    static List<FBAttachment> listAttachments(Element event, String baseURL) {
         List<FBAttachment> list = new ArrayList<>();
         for (Element attachment : new FBXmlElements(event.getElementsByTagName("attachment"))) {
-            list.add(new FBAttachment(attachment));
+            list.add(new FBAttachment(attachment, baseURL));
         }
         return list;
     }

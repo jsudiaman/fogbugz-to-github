@@ -213,8 +213,9 @@ public class FogBugz {
 
             // Loop through XML elements
             for (Element caze : new FBXmlElements(doc.getElementsByTagName("case"))) {
-                list.add(new FBCase(caze));
+                list.add(new FBCase(caze, getBaseURL()));
             }
+            logger.info("Search for '{}' returned {} case(s)", query, list.size());
             return list;
         } catch (UnsupportedEncodingException e) {
             throw new FB2GHException(e);
@@ -251,7 +252,7 @@ public class FogBugz {
             }
 
             // Parse XML response
-            logger.debug("Opening URL: {}", url);
+            logger.info("Opening URL: {}", url);
             InputStream inStream = new URL(url).openStream();
             Document doc = documentBuilder.parse(inStream);
             inStream.close();
