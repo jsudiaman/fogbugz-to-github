@@ -13,6 +13,7 @@ public final class FBAttachment extends FBXmlObject {
 
     private final String filename;
     private final String url;
+    private final FBCaseEvent fbCaseEvent;
 
     /**
      * Constructor.
@@ -20,13 +21,15 @@ public final class FBAttachment extends FBXmlObject {
      * @param attachment
      *            The <code>attachment</code> XML element that this object
      *            represents
-     * @param baseURL
-     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
-     *            that owns this attachment
+     * @param fbCaseEvent
+     *            The <code>FBCaseEvent</code> instance that owns this
+     *            attachment
      */
-    private FBAttachment(Element attachment, String baseURL) {
+    private FBAttachment(Element attachment, FBCaseEvent fbCaseEvent) {
         this.filename = getTextValue(attachment, "sFileName");
-        this.url = baseURL + "/" + StringEscapeUtils.unescapeHtml4(getTextValue(attachment, "sURL"));
+        this.url = fbCaseEvent.getFbCase().getFogBugz().getBaseURL() + "/"
+                + StringEscapeUtils.unescapeHtml4(getTextValue(attachment, "sURL"));
+        this.fbCaseEvent = fbCaseEvent;
     }
 
     /**
@@ -34,16 +37,16 @@ public final class FBAttachment extends FBXmlObject {
      * 
      * @param event
      *            The event
-     * @param baseURL
-     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
-     *            that owns these attachments
+     * @param fbCaseEvent
+     *            The <code>FBCaseEvent</code> instance that owns these
+     *            attachments
      * 
      * @return A list of attachments
      */
-    static List<FBAttachment> listAttachments(Element event, String baseURL) {
+    static List<FBAttachment> listAttachments(Element event, FBCaseEvent fbCaseEvent) {
         List<FBAttachment> list = new ArrayList<>();
         for (Element attachment : new FBXmlElements(event.getElementsByTagName("attachment"))) {
-            list.add(new FBAttachment(attachment, baseURL));
+            list.add(new FBAttachment(attachment, fbCaseEvent));
         }
         return list;
     }
@@ -60,6 +63,13 @@ public final class FBAttachment extends FBXmlObject {
      */
     public String getUrl() {
         return url;
+    }
+
+    /**
+     * @return the fbCaseEvent
+     */
+    public FBCaseEvent getFbCaseEvent() {
+        return fbCaseEvent;
     }
 
 }

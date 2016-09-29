@@ -22,17 +22,17 @@ public final class FBCase extends FBXmlObject {
     private final String category;
     private final List<FBCaseEvent> events;
     private final Integer salesforceCaseId;
+    private final FogBugz fogBugz;
 
     /**
      * Constructor.
      * 
      * @param caze
      *            The <code>case</code> XML element that this object represents
-     * @param baseURL
-     *            The <code>baseURL</code> of the <code>FogBugz</code> instance
-     *            that owns this case
+     * @param fogBugz
+     *            The <code>FogBugz</code> instance that owns this case
      */
-    FBCase(Element caze, String baseURL) {
+    FBCase(Element caze, FogBugz fogBugz) {
         this.id = Integer.parseInt(caze.getAttribute("ixBug"));
         this.parentCaseId = getIntValue(caze, "ixBugParent");
         this.open = getBooleanValue(caze, "fOpen");
@@ -43,8 +43,9 @@ public final class FBCase extends FBXmlObject {
         this.priority = getTextValue(caze, "sPriority");
         this.milestoneId = getIntValue(caze, "ixFixFor");
         this.category = getTextValue(caze, "sCategory");
-        this.events = Collections.unmodifiableList(FBCaseEvent.listCaseEvents(caze, baseURL));
         this.salesforceCaseId = getIntValue(caze, "sCase");
+        this.fogBugz = fogBugz;
+        this.events = Collections.unmodifiableList(FBCaseEvent.listCaseEvents(caze, this));
     }
 
     /**
@@ -129,6 +130,13 @@ public final class FBCase extends FBXmlObject {
      */
     public Integer getSalesforceCaseId() {
         return salesforceCaseId;
+    }
+
+    /**
+     * @return the fogBugz
+     */
+    public FogBugz getFogBugz() {
+        return fogBugz;
     }
 
 }

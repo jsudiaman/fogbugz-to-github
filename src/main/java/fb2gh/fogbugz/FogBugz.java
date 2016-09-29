@@ -213,7 +213,7 @@ public class FogBugz {
 
             // Loop through XML elements
             for (Element caze : new FBXmlElements(doc.getElementsByTagName("case"))) {
-                list.add(new FBCase(caze, getBaseURL()));
+                list.add(new FBCase(caze, this));
             }
             logger.info("Search for '{}' returned {} case(s)", query, list.size());
             return list;
