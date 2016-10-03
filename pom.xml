@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>fb2gh</groupId>
+    <groupId>com.sudicode</groupId>
     <artifactId>fb2gh</artifactId>
     <version>0.0.1</version>
     <name>fogbugz-to-github</name>
@@ -35,6 +35,11 @@
             <groupId>com.jcabi</groupId>
             <artifactId>jcabi-github</artifactId>
             <version>0.28</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>3.0.0-beta4</version>
         </dependency>
     </dependencies>
 </project>
