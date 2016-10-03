@@ -93,8 +93,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             // Download FogBugz attachment
             String filename = fbAttachment.getFilename();
             String extension = FilenameUtils.getExtension(filename);
-            String fbURL = fbAttachment.getUrl() + "&token="
-                    + fbAttachment.getFbCaseEvent().getFbCase().getFogBugz().getAuthToken();
+            String fbURL = fbAttachment.getUrl();
             File temp = File.createTempFile(filename, "." + extension);
             FileUtils.copyURLToFile(new URL(fbURL), temp, TIMEOUT_IN_SECONDS * 1000, TIMEOUT_IN_SECONDS * 1000);
             temp.deleteOnExit();

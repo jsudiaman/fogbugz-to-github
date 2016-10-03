@@ -28,7 +28,8 @@ public final class FBAttachment extends FBXmlObject {
     private FBAttachment(Element attachment, FBCaseEvent fbCaseEvent) {
         this.filename = getTextValue(attachment, "sFileName");
         this.url = fbCaseEvent.getFbCase().getFogBugz().getBaseURL() + "/"
-                + StringEscapeUtils.unescapeHtml4(getTextValue(attachment, "sURL"));
+                + StringEscapeUtils.unescapeHtml4(getTextValue(attachment, "sURL")) + "&token="
+                + fbCaseEvent.getFbCase().getFogBugz().getAuthToken();
         this.fbCaseEvent = fbCaseEvent;
     }
 
