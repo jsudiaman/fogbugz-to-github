@@ -1,4 +1,4 @@
-package com.sudicode.fb2gh.migrate;
+package com.sudicode.fb2gh.migrate.beta;
 
 import java.io.Closeable;
 import java.io.File;
@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.common.annotations.Beta;
 import com.sudicode.fb2gh.FB2GHException;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
+import com.sudicode.fb2gh.migrate.FBAttachmentConverter;
 
 /**
  * <p>
@@ -82,8 +83,9 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
     /**
      * Download the FogBugz attachment, then reupload it to GitHub Issues. If
-     * the file type is incompatible with GitHub Issues, zip it beforehand. (ZIP
-     * files are supported.)
+     * the file type is incompatible with GitHub Issues, zip it beforehand.
+     * Since ZIP files are supported by GitHub Issues, this guarantees that any
+     * attachment (within size constraints) will be accepted.
      * 
      * @return URL of the uploaded file
      */
