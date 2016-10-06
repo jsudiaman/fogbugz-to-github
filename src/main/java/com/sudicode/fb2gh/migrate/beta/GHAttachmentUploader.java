@@ -113,7 +113,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             browser.findElement(By.id("issue_body")).clear();
             browser.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser"))
                     .sendKeys(temp.getAbsolutePath());
-            String ghURL = wait.ignoring(StringIndexOutOfBoundsException.class).until(new ExpectedCondition<String>() {
+            return wait.ignoring(StringIndexOutOfBoundsException.class).until(new ExpectedCondition<String>() {
                 @Override
                 public String apply(WebDriver webDriver) {
                     String body = webDriver.findElement(By.id("issue_body")).getAttribute("value");
@@ -121,7 +121,6 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
                     return body.length() > 0 ? body : null;
                 }
             });
-            return ghURL;
         } catch (IOException e) {
             // Checked exceptions are incompatible with the supertype
             throw new UncheckedIOException(e);
