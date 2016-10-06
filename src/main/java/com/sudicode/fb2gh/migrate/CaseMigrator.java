@@ -19,7 +19,7 @@ import com.sudicode.fb2gh.github.GHRepo;
  */
 public class CaseMigrator {
 
-    private final static Logger logger = LoggerFactory.getLogger(CaseMigrator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CaseMigrator.class);
 
     private final FBAttachmentConverter fbAttachmentConverter;
     private final FBCase fbCase;
@@ -29,7 +29,8 @@ public class CaseMigrator {
      * Constructor.
      * 
      * @param fogBugz
-     *            The FogBugz instance
+     *            The FogBugz instance (required to get the URL from
+     *            <code>FBAttachment</code>)
      * @param fbCase
      *            The FogBugz case to migrate
      * @param ghRepo

@@ -138,9 +138,11 @@ public class FogBugz {
                 }
 
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                    // no check
                 }
 
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                    // no check
                 }
             } };
 
@@ -222,17 +224,18 @@ public class FogBugz {
     private FBResponse parseApiRequest(String cmd, String... parameters) throws FB2GHException {
         try {
             // Required
-            String url = getBaseURL() + "/api.asp?cmd=" + cmd;
+            StringBuilder urlBuilder = new StringBuilder(getBaseURL()).append("/api.asp?cmd=").append(cmd);
             if (!cmd.equals("logon")) {
-                url += "&token=" + getAuthToken();
+                urlBuilder.append("&token=").append(getAuthToken());
             }
 
             // Optional
             for (String param : parameters) {
-                url += "&" + param;
+                urlBuilder.append('&').append(param);
             }
 
             // Parse XML response
+            String url = urlBuilder.toString();
             logger.info("Opening URL: {}", url);
             InputStream inStream = new URL(url).openStream();
             FBResponse response = (FBResponse) jaxb.unmarshal(inStream);
@@ -254,6 +257,7 @@ public class FogBugz {
      * 
      * @return The normalized URL
      */
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private static String normalize(String baseURL) {
         while (baseURL.endsWith("/")) {
             baseURL = StringUtils.chop(baseURL);
