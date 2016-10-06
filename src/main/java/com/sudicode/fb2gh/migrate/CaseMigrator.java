@@ -6,9 +6,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sudicode.fb2gh.FB2GHException;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FBCase;
 import com.sudicode.fb2gh.fogbugz.FBCaseEvent;
+import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHIssue;
 import com.sudicode.fb2gh.github.GHRepo;
 
@@ -26,13 +28,15 @@ public class CaseMigrator {
     /**
      * Constructor.
      * 
+     * @param fogBugz
+     *            The FogBugz instance
      * @param fbCase
      *            The FogBugz case to migrate
      * @param ghRepo
      *            The GitHub repo to post the issue in
      */
-    public CaseMigrator(FBCase fbCase, GHRepo ghRepo) {
-        this(fbCase, ghRepo, fbAttachment -> fbAttachment.getUrl());
+    public CaseMigrator(FogBugz fogBugz, FBCase fbCase, GHRepo ghRepo) {
+        this(fbCase, ghRepo, fbAttachment -> fbAttachment.getUrl(fogBugz));
     }
 
     /**
@@ -56,8 +60,10 @@ public class CaseMigrator {
      * 
      * @return The generated {@link GHIssue}, which can be further interacted
      *         with.
+     * 
+     * @throws FB2GHException
      */
-    public GHIssue migrate() {
+    public GHIssue migrate() throws FB2GHException {
         // Get title and description
         List<FBCaseEvent> events = fbCase.getEvents();
         String title = fbCase.getTitle();

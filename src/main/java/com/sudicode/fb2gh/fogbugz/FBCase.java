@@ -1,142 +1,83 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.w3c.dom.Element;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FogBugz case.
  */
+@XmlRootElement(name = "case")
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class FBCase extends FBXmlObject {
 
-    private final Integer id;
-    private final Integer parentCaseId;
-    private final Boolean open;
-    private final String title;
-    private final String assignee;
-    private final String status;
-    private final Integer duplicateOfId;
-    private final String priority;
-    private final Integer milestoneId;
-    private final String category;
-    private final List<FBCaseEvent> events;
-    private final Integer salesforceCaseId;
-    private final FogBugz fogBugz;
+    @XmlAttribute
+    private Integer ixBug;
+    private Integer ixBugParent;
+    private Boolean fOpen;
+    private String sTitle;
+    private String sPersonAssignedTo;
+    private String sStatus;
+    private Integer ixBugOriginal;
+    private String sPriority;
+    private Integer ixFixFor;
+    private String sCategory;
+    @XmlElementWrapper
+    @XmlElement(name = "event")
+    private List<FBCaseEvent> events;
+    private Integer sCase;
 
-    /**
-     * Constructor.
-     * 
-     * @param caze
-     *            The <code>case</code> XML element that this object represents
-     * @param fogBugz
-     *            The <code>FogBugz</code> instance that owns this case
-     */
-    FBCase(Element caze, FogBugz fogBugz) {
-        this.id = Integer.parseInt(caze.getAttribute("ixBug"));
-        this.parentCaseId = getIntValue(caze, "ixBugParent");
-        this.open = getBooleanValue(caze, "fOpen");
-        this.title = getTextValue(caze, "sTitle");
-        this.assignee = getTextValue(caze, "sPersonAssignedTo");
-        this.status = getTextValue(caze, "sStatus");
-        this.duplicateOfId = getIntValue(caze, "ixBugOriginal");
-        this.priority = getTextValue(caze, "sPriority");
-        this.milestoneId = getIntValue(caze, "ixFixFor");
-        this.category = getTextValue(caze, "sCategory");
-        this.salesforceCaseId = getIntValue(caze, "sCase");
-        this.fogBugz = fogBugz;
-        this.events = Collections.unmodifiableList(FBCaseEvent.listCaseEvents(caze, this));
-    }
-
-    /**
-     * @return the id
-     */
     public Integer getId() {
-        return id;
+        return ixBug;
     }
 
-    /**
-     * @return the parentCaseId
-     */
     public Integer getParentCaseId() {
-        return parentCaseId;
+        return ixBugParent;
     }
 
-    /**
-     * @return the open
-     */
-    public boolean isOpen() {
-        return open;
+    public Boolean isOpen() {
+        return fOpen;
     }
 
-    /**
-     * @return the title
-     */
     public String getTitle() {
-        return title;
+        return sTitle;
     }
 
-    /**
-     * @return the assignee
-     */
     public String getAssignee() {
-        return assignee;
+        return sPersonAssignedTo;
     }
 
-    /**
-     * @return the status
-     */
     public String getStatus() {
-        return status;
+        return sStatus;
     }
 
-    /**
-     * @return the duplicateOfId
-     */
     public Integer getDuplicateOfId() {
-        return duplicateOfId;
+        return ixBugOriginal;
     }
 
-    /**
-     * @return the priority
-     */
     public String getPriority() {
-        return priority;
+        return sPriority;
     }
 
-    /**
-     * @return the milestoneId
-     */
     public Integer getMilestoneId() {
-        return milestoneId;
+        return ixFixFor;
     }
 
-    /**
-     * @return the category
-     */
     public String getCategory() {
-        return category;
+        return sCategory;
     }
 
-    /**
-     * @return the events
-     */
     public List<FBCaseEvent> getEvents() {
         return events;
     }
 
-    /**
-     * @return the salesforceCaseId
-     */
     public Integer getSalesforceCaseId() {
-        return salesforceCaseId;
-    }
-
-    /**
-     * @return the fogBugz
-     */
-    public FogBugz getFogBugz() {
-        return fogBugz;
+        return sCase;
     }
 
 }

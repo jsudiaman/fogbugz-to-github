@@ -9,7 +9,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -17,16 +16,13 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import com.sudicode.fb2gh.FB2GHException;
 
@@ -76,7 +72,7 @@ public class FogBugz {
 
     private final String baseURL;
     private final String authToken;
-    private final DocumentBuilder documentBuilder;
+    private final Unmarshaller jaxb;
 
     /**
      * Constructor.
@@ -94,10 +90,10 @@ public class FogBugz {
      */
     public FogBugz(String baseURL, String authToken) throws FB2GHException {
         try {
-            this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
             this.baseURL = normalize(baseURL);
             this.authToken = authToken;
-        } catch (ParserConfigurationException e) {
+        } catch (JAXBException e) {
             throw new FB2GHException(e);
         }
     }
@@ -117,13 +113,11 @@ public class FogBugz {
      */
     public FogBugz(String baseURL, String email, String password) throws FB2GHException {
         try {
-            this.documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
             this.baseURL = normalize(baseURL);
-            Document doc = parseApiRequest("logon", "email=" + email, "password=" + password);
-            String authToken = FBXmlObject.getTextValue(doc.getDocumentElement(), "token");
-            logger.info("Generated API token: {}", authToken);
-            this.authToken = authToken;
-        } catch (ParserConfigurationException e) {
+            this.authToken = parseApiRequest("logon", "email=" + email, "password=" + password).getToken();
+            logger.info("Generated API token: {}", this.authToken);
+        } catch (JAXBException e) {
             throw new FB2GHException(e);
         }
     }
@@ -180,15 +174,8 @@ public class FogBugz {
      * 
      * @throws FB2GHException
      */
-    public List<FBMilestone> listMilestones() throws FB2GHException {
-        List<FBMilestone> list = new ArrayList<>();
-        Document doc = parseApiRequest("listFixFors");
-
-        // Loop through XML elements
-        for (Element fixFor : new FBXmlElements(doc.getElementsByTagName("fixfor"))) {
-            list.add(new FBMilestone(fixFor));
-        }
-        return list;
+    public List<FBMilestone> getMilestones() throws FB2GHException {
+        return parseApiRequest("listFixFors").getMilestones();
     }
 
     /**
@@ -205,16 +192,11 @@ public class FogBugz {
      * 
      * @throws FB2GHException
      */
-    public List<FBCase> searchCases(String query) throws FB2GHException {
+    public List<FBCase> getCases(String query) throws FB2GHException {
         try {
-            List<FBCase> list = new ArrayList<>();
-            Document doc = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
-                    "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,sCategory,events,sCase");
-
-            // Loop through XML elements
-            for (Element caze : new FBXmlElements(doc.getElementsByTagName("case"))) {
-                list.add(new FBCase(caze, this));
-            }
+            List<FBCase> list = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
+                    "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,sCategory,events,sCase")
+                            .getCases();
             logger.info("Search for '{}' returned {} case(s)", query, list.size());
             return list;
         } catch (UnsupportedEncodingException e) {
@@ -223,22 +205,21 @@ public class FogBugz {
     }
 
     /**
-     * Perform the given API call, then parse the response as a
-     * {@link Document}.
+     * Perform the given API call, then parse the response.
      * 
      * @param cmd
      *            The <code>cmd</code> argument
      * @param parameters
      *            Additional parameters to include in the query string
      * 
-     * @return The response, which is an XML document.
+     * @return The response.
      * 
      * @throws FB2GHException
      * 
      * @see <a href="http://help.fogcreek.com/the-fogbugz-api">The FogBugz
      *      API</a>
      */
-    private Document parseApiRequest(String cmd, String... parameters) throws FB2GHException {
+    private FBResponse parseApiRequest(String cmd, String... parameters) throws FB2GHException {
         try {
             // Required
             String url = getBaseURL() + "/api.asp?cmd=" + cmd;
@@ -254,10 +235,10 @@ public class FogBugz {
             // Parse XML response
             logger.info("Opening URL: {}", url);
             InputStream inStream = new URL(url).openStream();
-            Document doc = documentBuilder.parse(inStream);
+            FBResponse response = (FBResponse) jaxb.unmarshal(inStream);
             inStream.close();
-            return doc;
-        } catch (IOException | SAXException e) {
+            return response;
+        } catch (IOException | JAXBException e) {
             throw new FB2GHException(e);
         }
     }

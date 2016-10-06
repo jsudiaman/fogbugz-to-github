@@ -20,7 +20,7 @@ import com.sudicode.fb2gh.fogbugz.FBAttachment;
  *     &#64;Override
  *     public String convert(FBAttachment fbAttachment) {
  *         // Handle this the way you want to. This is default behavior.
- *         return fbAttachment.getUrl();
+ *         return fbAttachment.getUrl(fogBugz);
  *     }
  * });
  * </pre>
