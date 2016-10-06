@@ -22,6 +22,7 @@ public class CaseMigrator {
     private static final Logger logger = LoggerFactory.getLogger(CaseMigrator.class);
 
     private final FBAttachmentConverter fbAttachmentConverter;
+    private final FogBugz fogBugz;
     private final FBCase fbCase;
     private final GHRepo ghRepo;
 
@@ -29,20 +30,26 @@ public class CaseMigrator {
      * Constructor.
      * 
      * @param fogBugz
-     *            The FogBugz instance (required to get the URL from
-     *            <code>FBAttachment</code>)
+     *            The FogBugz instance
      * @param fbCase
      *            The FogBugz case to migrate
      * @param ghRepo
      *            The GitHub repo to post the issue in
      */
     public CaseMigrator(FogBugz fogBugz, FBCase fbCase, GHRepo ghRepo) {
-        this(fbCase, ghRepo, fbAttachment -> fbAttachment.getUrl(fogBugz));
+        this(fogBugz, fbCase, ghRepo, new FBAttachmentConverter() {
+            @Override
+            public String convert(FogBugz fogBugz, FBAttachment fbAttachment) {
+                return fbAttachment.getUrl(fogBugz);
+            }
+        });
     }
 
     /**
      * Constructor.
      * 
+     * @param fogBugz
+     *            The FogBugz instance
      * @param fbCase
      *            The FogBugz case to migrate
      * @param ghRepo
@@ -50,7 +57,8 @@ public class CaseMigrator {
      * @param fbAttachmentConverter
      *            The {@link FBAttachmentConverter} to use
      */
-    public CaseMigrator(FBCase fbCase, GHRepo ghRepo, FBAttachmentConverter fbAttachmentConverter) {
+    public CaseMigrator(FogBugz fogBugz, FBCase fbCase, GHRepo ghRepo, FBAttachmentConverter fbAttachmentConverter) {
+        this.fogBugz = fogBugz;
         this.fbCase = fbCase;
         this.ghRepo = ghRepo;
         this.fbAttachmentConverter = fbAttachmentConverter;
@@ -105,7 +113,7 @@ public class CaseMigrator {
             sb.append("<hr>");
             for (FBAttachment attachment : event.getAttachments()) {
                 String filename = attachment.getFilename();
-                String url = fbAttachmentConverter.convert(attachment);
+                String url = fbAttachmentConverter.convert(fogBugz, attachment);
 
                 // If it's an image, prepend '!' to the Markdown string
                 if (FilenameUtils.getExtension(url).toLowerCase().matches("png|gif|jpg|jpeg")) {

@@ -1,6 +1,7 @@
 package com.sudicode.fb2gh.migrate;
 
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
+import com.sudicode.fb2gh.fogbugz.FogBugz;
 
 /**
  * <p>
@@ -18,7 +19,7 @@ import com.sudicode.fb2gh.fogbugz.FBAttachment;
  * <pre>
  * CaseMigrator cm = new CaseMigrator(fbCase, ghRepo, new FBAttachmentConverter() {
  *     &#64;Override
- *     public String convert(FBAttachment fbAttachment) {
+ *     public String convert(FogBugz fogBugz, FBAttachment fbAttachment) {
  *         // Handle this the way you want to. This is default behavior.
  *         return fbAttachment.getUrl(fogBugz);
  *     }
@@ -31,10 +32,14 @@ public interface FBAttachmentConverter {
      * Obtain the URL that should be used when posting a {@link FBAttachment} to
      * GitHub.
      * 
+     * @param fogBugz
+     *            The {@link FogBugz} instance that owns the
+     *            {@link FBAttachment}
      * @param fbAttachment
      *            The {@link FBAttachment}
+     * 
      * @return The URL
      */
-    public String convert(FBAttachment fbAttachment);
+    public String convert(FogBugz fogBugz, FBAttachment fbAttachment);
 
 }

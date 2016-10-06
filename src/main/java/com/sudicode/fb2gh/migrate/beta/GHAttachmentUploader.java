@@ -40,7 +40,6 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     /** TODO Customizable timeout */
     private static final int TIMEOUT_IN_SECONDS = 100;
 
-    private final FogBugz fogBugz;
     private final WebDriver browser;
     private final FluentWait<WebDriver> wait;
 
@@ -49,25 +48,19 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * {@link WebDriver}. Since GitHub issues cannot be submitted anonymously,
      * valid credentials are required.
      * 
-     * @param fogBugz
-     *            The FogBugz instance (required to get the URL from
-     *            <code>FBAttachment</code>)
      * @param ghUsername
      *            GitHub username
      * @param ghPassword
      *            GitHub password
      */
-    public GHAttachmentUploader(FogBugz fogBugz, String ghUsername, String ghPassword) {
-        this(fogBugz, ghUsername, ghPassword, newWebDriver());
+    public GHAttachmentUploader(String ghUsername, String ghPassword) {
+        this(ghUsername, ghPassword, newWebDriver());
     }
 
     /**
      * Construct a new {@link GHAttachmentUploader} using a specific
      * {@link WebDriver}.
      * 
-     * @param fogBugz
-     *            The FogBugz instance (required to get the URL from
-     *            <code>FBAttachment</code>)
      * @param ghUsername
      *            GitHub username
      * @param ghPassword
@@ -75,9 +68,8 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * @param webDriver
      *            The {@link WebDriver} to use
      */
-    public GHAttachmentUploader(FogBugz fogBugz, String ghUsername, String ghPassword, WebDriver webDriver) {
+    public GHAttachmentUploader(String ghUsername, String ghPassword, WebDriver webDriver) {
         // Initialize
-        this.fogBugz = fogBugz;
         this.browser = webDriver;
         this.wait = new WebDriverWait(browser, TIMEOUT_IN_SECONDS);
 
@@ -96,10 +88,16 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * Since ZIP files are supported by GitHub Issues, this guarantees that any
      * attachment (within size constraints) will be accepted.
      * 
+     * @param fogBugz
+     *            The {@link FogBugz} instance that owns the
+     *            {@link FBAttachment}
+     * @param fbAttachment
+     *            The {@link FBAttachment}
+     * 
      * @return URL of the uploaded file
      */
     @Override
-    public String convert(FBAttachment fbAttachment) {
+    public String convert(FogBugz fogBugz, FBAttachment fbAttachment) {
         try {
             // Download FogBugz attachment
             String filename = fbAttachment.getFilename();
