@@ -1,11 +1,5 @@
 package com.sudicode.fb2gh.migrate;
 
-import java.util.List;
-
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sudicode.fb2gh.FB2GHException;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FBCase;
@@ -13,6 +7,12 @@ import com.sudicode.fb2gh.fogbugz.FBCaseEvent;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHIssue;
 import com.sudicode.fb2gh.github.GHRepo;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Migrates FogBugz case to GitHub issue.
@@ -28,34 +28,27 @@ public class CaseMigrator {
 
     /**
      * Constructor.
-     * 
-     * @param fogBugz
-     *            The FogBugz instance
-     * @param fbCase
-     *            The FogBugz case to migrate
-     * @param ghRepo
-     *            The GitHub repo to post the issue in
+     *
+     * @param fogBugz The FogBugz instance
+     * @param fbCase  The FogBugz case to migrate
+     * @param ghRepo  The GitHub repo to post the issue in
      */
     public CaseMigrator(FogBugz fogBugz, FBCase fbCase, GHRepo ghRepo) {
         this(fogBugz, fbCase, ghRepo, new FBAttachmentConverter() {
             @Override
             public String convert(FogBugz fogBugz, FBAttachment fbAttachment) {
-                return fbAttachment.getUrl(fogBugz);
+                return fbAttachment.getAbsoluteUrl(fogBugz);
             }
         });
     }
 
     /**
      * Constructor.
-     * 
-     * @param fogBugz
-     *            The FogBugz instance
-     * @param fbCase
-     *            The FogBugz case to migrate
-     * @param ghRepo
-     *            The GitHub repo to post the issue in
-     * @param fbAttachmentConverter
-     *            The {@link FBAttachmentConverter} to use
+     *
+     * @param fogBugz               The FogBugz instance
+     * @param fbCase                The FogBugz case to migrate
+     * @param ghRepo                The GitHub repo to post the issue in
+     * @param fbAttachmentConverter The {@link FBAttachmentConverter} to use
      */
     public CaseMigrator(FogBugz fogBugz, FBCase fbCase, GHRepo ghRepo, FBAttachmentConverter fbAttachmentConverter) {
         this.fogBugz = fogBugz;
@@ -66,10 +59,9 @@ public class CaseMigrator {
 
     /**
      * Migrate the case.
-     * 
+     *
      * @return The generated {@link GHIssue}, which can be further interacted
-     *         with.
-     * 
+     * with.
      * @throws FB2GHException
      */
     public GHIssue migrate() throws FB2GHException {
@@ -90,10 +82,8 @@ public class CaseMigrator {
 
     /**
      * Represent the given {@link FBCaseEvent} as a GitHub issue comment.
-     * 
-     * @param event
-     *            The {@link FBCaseEvent}
-     * 
+     *
+     * @param event The {@link FBCaseEvent}
      * @return The comment
      */
     private String eventToComment(FBCaseEvent event) {
@@ -101,8 +91,8 @@ public class CaseMigrator {
 
         sb.append("<strong>").append(event.getDescription()).append("</strong> ").append(event.getDateTime());
 
-        if (event.getChanges().length() > 0) {
-            sb.append("<br>").append(event.getChanges());
+        if (StringUtils.chomp(event.getChanges()).length() > 0) {
+            sb.append("<br>").append(StringUtils.chomp(event.getChanges()));
         }
 
         if (event.getBody().length() > 0) {

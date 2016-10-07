@@ -1,13 +1,10 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
 
 /**
  * FogBugz case event.
@@ -15,65 +12,100 @@ import org.apache.commons.lang3.StringUtils;
 @XmlRootElement(name = "event")
 public final class FBCaseEvent extends FBXmlObject {
 
-    @XmlAttribute
-    private Integer ixBugEvent;
-    @XmlAttribute
-    private Integer ixBug;
-    private String sHtml;
-    private String sChanges;
-    @XmlElementWrapper
-    @XmlElement(name = "attachment")
-    private List<FBAttachment> rgAttachments;
-    private String evtDescription;
-    private String dt;
+    private Integer id;
+    private Integer caseId;
+    private String body;
+    private String changes;
+    private List<FBAttachment> attachments;
+    private String description;
+    private String dateTime;
+
+    FBCaseEvent() {
+    }
 
     /**
      * @return Identity field in the database for this event
      */
     public Integer getId() {
-        return ixBugEvent;
+        return id;
+    }
+
+    @XmlAttribute(name = "ixBugEvent")
+    void setId(Integer id) {
+        this.id = id;
     }
 
     /**
      * @return Case number
      */
     public Integer getCaseId() {
-        return ixBug;
+        return caseId;
+    }
+
+    @XmlAttribute(name = "ixBug")
+    void setCaseId(Integer caseId) {
+        this.caseId = caseId;
     }
 
     /**
      * @return The raw HTML version of the event
      */
     public String getBody() {
-        return sHtml;
+        return body;
+    }
+
+    @XmlElement(name = "sHtml")
+    void setBody(String body) {
+        this.body = body;
     }
 
     /**
      * @return Description of changes to the case during this event
      */
     public String getChanges() {
-        return StringUtils.chomp(sChanges);
+        return changes;
+    }
+
+    @XmlElement(name = "sChanges")
+    void setChanges(String changes) {
+        this.changes = changes;
     }
 
     /**
      * @return The attachments of the event
      */
     public List<FBAttachment> getAttachments() {
-        return rgAttachments;
+        return attachments;
+    }
+
+    @XmlElementWrapper(name = "rgAttachments")
+    @XmlElement(name = "attachment")
+    void setAttachments(List<FBAttachment> attachments) {
+        this.attachments = attachments;
     }
 
     /**
      * @return Description of event <strong><em>in YOUR language</em></strong>
      */
     public String getDescription() {
-        return evtDescription;
+        return description;
+    }
+
+    @XmlElement(name = "evtDescription")
+    void setDescription(String description) {
+        this.description = description;
     }
 
     /**
      * @return Date and time that the event happened, in RFC822 UTC format
      */
     public String getDateTime() {
-        return dt;
+        return dateTime;
+    }
+
+    @XmlElement(name = "dt")
+    void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
     }
 
 }

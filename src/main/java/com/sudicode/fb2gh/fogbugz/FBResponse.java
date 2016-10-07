@@ -1,10 +1,9 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * FogBugz response. Represents the root element <code>&lt;response&gt;</code>
@@ -14,18 +13,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 final class FBResponse extends FBXmlObject {
 
     private String token;
-    @XmlElementWrapper
-    @XmlElement(name = "case")
     private List<FBCase> cases;
-    @XmlElementWrapper
-    @XmlElement(name = "fixfor")
-    private List<FBMilestone> fixfors;
+    private List<FBMilestone> milestones;
+
+    FBResponse() {
+    }
 
     /**
      * @return The descendant <code>&lt;token&gt;</code> element
      */
     public String getToken() {
         return token;
+    }
+
+    @XmlElement
+    void setToken(String token) {
+        this.token = token;
     }
 
     /**
@@ -35,11 +38,23 @@ final class FBResponse extends FBXmlObject {
         return cases;
     }
 
+    @XmlElementWrapper
+    @XmlElement(name = "case")
+    void setCases(List<FBCase> cases) {
+        this.cases = cases;
+    }
+
     /**
      * @return Contents of the descendant <code>&lt;fixfors&gt;</code> element
      */
     public List<FBMilestone> getMilestones() {
-        return fixfors;
+        return milestones;
+    }
+
+    @XmlElementWrapper(name = "fixfors")
+    @XmlElement(name = "fixfor")
+    void setMilestones(List<FBMilestone> milestones) {
+        this.milestones = milestones;
     }
 
 }

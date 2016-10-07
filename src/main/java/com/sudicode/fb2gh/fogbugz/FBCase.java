@@ -1,11 +1,10 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * FogBugz case.
@@ -13,92 +12,142 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "case")
 public final class FBCase extends FBXmlObject {
 
-    @XmlAttribute
-    private Integer ixBug;
-    private Integer ixBugParent;
-    private Boolean fOpen;
-    private String sTitle;
-    private String sPersonAssignedTo;
-    private String sStatus;
-    private Integer ixBugOriginal;
-    private String sPriority;
-    private Integer ixFixFor;
-    private String sCategory;
-    @XmlElementWrapper
-    @XmlElement(name = "event")
+    private Integer id;
+    private Integer parentCaseId;
+    private Boolean open;
+    private String title;
+    private String assignee;
+    private String status;
+    private Integer duplicateOfId;
+    private String priority;
+    private Integer milestoneId;
+    private String category;
     private List<FBCaseEvent> events;
-    private Integer sCase;
+    private Integer salesforceCaseId;
+
+    FBCase() {
+    }
 
     /**
      * @return Case number
      */
     public Integer getId() {
-        return ixBug;
+        return id;
+    }
+
+    @XmlAttribute(name = "ixBug")
+    void setId(Integer id) {
+        this.id = id;
     }
 
     /**
      * @return Parent case number
      */
     public Integer getParentCaseId() {
-        return ixBugParent;
+        return parentCaseId;
+    }
+
+    @XmlElement(name = "ixBugParent")
+    void setParentCaseId(Integer parentCaseId) {
+        this.parentCaseId = parentCaseId;
     }
 
     /**
      * @return <code>true</code> if the case is open. <code>false</code> if it
-     *         is closed
+     * is closed
      */
     public Boolean isOpen() {
-        return fOpen;
+        return open;
+    }
+
+    @XmlElement(name = "fOpen")
+    void setOpen(Boolean open) {
+        this.open = open;
     }
 
     /**
      * @return The title of the case
      */
     public String getTitle() {
-        return sTitle;
+        return title;
+    }
+
+    @XmlElement(name = "sTitle")
+    void setTitle(String title) {
+        this.title = title;
     }
 
     /**
      * @return Name of the person assigned to the case
      */
     public String getAssignee() {
-        return sPersonAssignedTo;
+        return assignee;
+    }
+
+    @XmlElement(name = "sPersonAssignedTo")
+    void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
 
     /**
      * @return The status of the case
      */
     public String getStatus() {
-        return sStatus;
+        return status;
+    }
+
+    @XmlElement(name = "sStatus")
+    void setStatus(String status) {
+        this.status = status;
     }
 
     /**
      * @return If marked as duplicate, the case that this case was a duplicate
-     *         of
+     * of
      */
     public Integer getDuplicateOfId() {
-        return ixBugOriginal;
+        return duplicateOfId;
+    }
+
+    @XmlElement(name = "ixBugOriginal")
+    void setDuplicateOfId(Integer duplicateOfId) {
+        this.duplicateOfId = duplicateOfId;
     }
 
     /**
      * @return The priority of the case
      */
     public String getPriority() {
-        return sPriority;
+        return priority;
+    }
+
+    @XmlElement(name = "sPriority")
+    void setPriority(String priority) {
+        this.priority = priority;
     }
 
     /**
      * @return ID of the milestone this case is assigned to
      */
     public Integer getMilestoneId() {
-        return ixFixFor;
+        return milestoneId;
+    }
+
+    @XmlElement(name = "ixFixFor")
+    void setMilestoneId(Integer milestoneId) {
+        this.milestoneId = milestoneId;
     }
 
     /**
      * @return The category of the case
      */
     public String getCategory() {
-        return sCategory;
+        return category;
+    }
+
+    @XmlElement(name = "sCategory")
+    void setCategory(String category) {
+        this.category = category;
     }
 
     /**
@@ -108,11 +157,22 @@ public final class FBCase extends FBXmlObject {
         return events;
     }
 
+    @XmlElementWrapper
+    @XmlElement(name = "event")
+    void setEvents(List<FBCaseEvent> events) {
+        this.events = events;
+    }
+
     /**
      * @return The Salesforce case ID of the case (Requires Salesforce plugin)
      */
     public Integer getSalesforceCaseId() {
-        return sCase;
+        return salesforceCaseId;
+    }
+
+    @XmlElement(name = "sCase")
+    void setSalesforceCaseId(Integer salesforceCaseId) {
+        this.salesforceCaseId = salesforceCaseId;
     }
 
 }

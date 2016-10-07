@@ -1,11 +1,9 @@
 package com.sudicode.fb2gh.migrate.beta;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URL;
-
+import com.google.common.annotations.Beta;
+import com.sudicode.fb2gh.fogbugz.FBAttachment;
+import com.sudicode.fb2gh.fogbugz.FogBugz;
+import com.sudicode.fb2gh.migrate.FBAttachmentConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -17,10 +15,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.annotations.Beta;
-import com.sudicode.fb2gh.fogbugz.FBAttachment;
-import com.sudicode.fb2gh.fogbugz.FogBugz;
-import com.sudicode.fb2gh.migrate.FBAttachmentConverter;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URL;
 
 /**
  * <p>
@@ -29,15 +28,15 @@ import com.sudicode.fb2gh.migrate.FBAttachmentConverter;
  * implementation is therefore unstable and should be handled as such. But if it
  * works for you, the more power to you.
  * </p>
- * 
+ *
  * @see <a href=
- *      "https://help.github.com/articles/file-attachments-on-issues-and-pull-requests/">File
- *      attachments on issues and pull requests</a>
+ * "https://help.github.com/articles/file-attachments-on-issues-and-pull-requests/">File
+ * attachments on issues and pull requests</a>
  */
 @Beta
 public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
-    /** TODO Customizable timeout */
+    // TODO Customizable timeout
     private static final int TIMEOUT_IN_SECONDS = 100;
 
     private final WebDriver browser;
@@ -47,11 +46,9 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * Construct a new {@link GHAttachmentUploader} using the default
      * {@link WebDriver}. Since GitHub issues cannot be submitted anonymously,
      * valid credentials are required.
-     * 
-     * @param ghUsername
-     *            GitHub username
-     * @param ghPassword
-     *            GitHub password
+     *
+     * @param ghUsername GitHub username
+     * @param ghPassword GitHub password
      */
     public GHAttachmentUploader(String ghUsername, String ghPassword) {
         this(ghUsername, ghPassword, newWebDriver());
@@ -60,13 +57,10 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     /**
      * Construct a new {@link GHAttachmentUploader} using a specific
      * {@link WebDriver}.
-     * 
-     * @param ghUsername
-     *            GitHub username
-     * @param ghPassword
-     *            GitHub password
-     * @param webDriver
-     *            The {@link WebDriver} to use
+     *
+     * @param ghUsername GitHub username
+     * @param ghPassword GitHub password
+     * @param webDriver  The {@link WebDriver} to use
      */
     public GHAttachmentUploader(String ghUsername, String ghPassword, WebDriver webDriver) {
         // Initialize
@@ -87,13 +81,10 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * the file type is incompatible with GitHub Issues, zip it beforehand.
      * Since ZIP files are supported by GitHub Issues, this guarantees that any
      * attachment (within size constraints) will be accepted.
-     * 
-     * @param fogBugz
-     *            The {@link FogBugz} instance that owns the
-     *            {@link FBAttachment}
-     * @param fbAttachment
-     *            The {@link FBAttachment}
-     * 
+     *
+     * @param fogBugz      The {@link FogBugz} instance that owns the
+     *                     {@link FBAttachment}
+     * @param fbAttachment The {@link FBAttachment}
      * @return URL of the uploaded file
      */
     @Override
@@ -102,7 +93,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             // Download FogBugz attachment
             String filename = fbAttachment.getFilename();
             String extension = FilenameUtils.getExtension(filename);
-            String fbURL = fbAttachment.getUrl(fogBugz);
+            String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
             File temp = File.createTempFile(filename, "." + extension);
             FileUtils.copyURLToFile(new URL(fbURL), temp, TIMEOUT_IN_SECONDS * 1000, TIMEOUT_IN_SECONDS * 1000);
             temp.deleteOnExit();

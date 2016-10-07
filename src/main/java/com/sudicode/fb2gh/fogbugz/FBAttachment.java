@@ -1,8 +1,9 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.apache.commons.lang3.StringEscapeUtils;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * FogBugz case event attachment.
@@ -10,24 +11,42 @@ import org.apache.commons.lang3.StringEscapeUtils;
 @XmlRootElement(name = "attachment")
 public final class FBAttachment extends FBXmlObject {
 
-    private String sFileName;
-    private String sURL;
+    private String filename;
+    private String url;
+
+    FBAttachment() {
+    }
 
     /**
      * @return The filename of this attachment
      */
     public String getFilename() {
-        return sFileName;
+        return filename;
+    }
+
+    @XmlElement(name = "sFileName")
+    void setFilename(String filename) {
+        this.filename = filename;
     }
 
     /**
-     * @param fogBugz
-     *            The <code>FogBugz</code> that owns this attachment
-     * 
-     * @return The URL of this attachment
+     * @return The relative URL of this attachment
      */
-    public String getUrl(FogBugz fogBugz) {
-        return fogBugz.getBaseURL() + "/" + StringEscapeUtils.unescapeHtml4(sURL) + "&token=" + fogBugz.getAuthToken();
+    public String getUrl() {
+        return url;
+    }
+
+    @XmlElement(name = "sURL")
+    void setUrl(String url) {
+        this.url = url;
+    }
+
+    /**
+     * @param fogBugz The <code>FogBugz</code> that owns this attachment
+     * @return The absolute URL of this attachment, including FogBugz base URL and token string.
+     */
+    public String getAbsoluteUrl(FogBugz fogBugz) {
+        return fogBugz.getBaseURL() + "/" + StringEscapeUtils.unescapeHtml4(url) + "&token=" + fogBugz.getAuthToken();
     }
 
 }

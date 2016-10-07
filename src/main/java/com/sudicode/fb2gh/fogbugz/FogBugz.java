@@ -1,5 +1,18 @@
 package com.sudicode.fb2gh.fogbugz;
 
+import com.sudicode.fb2gh.FB2GHException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -11,21 +24,6 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.sudicode.fb2gh.FB2GHException;
-
 /**
  * <p>
  * This class uses the
@@ -33,33 +31,26 @@ import com.sudicode.fb2gh.FB2GHException;
  * interact with the given FogBugz instance. You will need to supply the URL of
  * your FogBugz instance, which will be referenced here as <code>baseURL</code>.
  * </p>
- * 
  * <p>
  * If you have an <a href=
  * "http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">API
  * token</a>, you can instantiate this class like so:
- * 
  * <pre>
  * FogBugz fb = new FogBugz(baseURL, authToken);
  * </pre>
  * </p>
- * 
  * <p>
  * Otherwise, you can alternatively use:
- * 
  * <pre>
  * FogBugz fb = new FogBugz(baseURL, email, password);
  * </pre>
- * 
  * After instantiating this class, you may then use
  * <code>fb.getAuthToken();</code> to obtain a valid API token for later.
  * </p>
- * 
  * <p>
  * If the constructors of this class are throwing {@link SSLHandshakeException},
  * then your FogBugz instance is most likely using an invalid SSL certificate.
  * This can be bypassed (at your own risk) like so:
- * 
  * <pre>
  * FogBugz.trustInvalidCertificates();
  * FogBugz fb = ...
@@ -76,17 +67,13 @@ public class FogBugz {
 
     /**
      * Constructor.
-     * 
-     * @param baseURL
-     *            The FogBugz URL
-     * @param authToken
-     *            FogBugz API token
-     * 
+     *
+     * @param baseURL   The FogBugz URL
+     * @param authToken FogBugz API token
      * @throws FB2GHException
-     * 
      * @see <a href=
-     *      "http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">How
-     *      To Get a FogBugz XML API Token</a>
+     * "http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">How
+     * To Get a FogBugz XML API Token</a>
      */
     public FogBugz(String baseURL, String authToken) throws FB2GHException {
         try {
@@ -101,14 +88,10 @@ public class FogBugz {
     /**
      * Constructor that obtains an <code>authToken</code> from the given email
      * and password.
-     * 
-     * @param baseURL
-     *            The FogBugz URL
-     * @param email
-     *            FogBugz email
-     * @param password
-     *            FogBugz password
-     * 
+     *
+     * @param baseURL  The FogBugz URL
+     * @param email    FogBugz email
+     * @param password FogBugz password
      * @throws FB2GHException
      */
     public FogBugz(String baseURL, String email, String password) throws FB2GHException {
@@ -126,13 +109,13 @@ public class FogBugz {
      * Call this method if your FogBugz instance has an untrusted security
      * certificate. (This is indicated by "Privacy error" in Chrome, or if
      * methods of this class are throwing {@link SSLHandshakeException}.)
-     * 
+     *
      * @throws FB2GHException
      */
     public static void trustInvalidCertificates() throws FB2GHException {
         try {
             // Create a trust manager that does not validate certificate chains
-            TrustManager[] tm = new TrustManager[] { new X509TrustManager() {
+            TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[0];
                 }
@@ -144,7 +127,7 @@ public class FogBugz {
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
                     // no check
                 }
-            } };
+            }};
 
             // Install the trust manager
             SSLContext sslContext = SSLContext.getInstance("SSL");
@@ -171,9 +154,8 @@ public class FogBugz {
 
     /**
      * Get a list of all milestones from this FogBugz instance.
-     * 
+     *
      * @return The list
-     * 
      * @throws FB2GHException
      */
     public List<FBMilestone> getMilestones() throws FB2GHException {
@@ -182,23 +164,20 @@ public class FogBugz {
 
     /**
      * Search for cases.
-     * 
-     * @param query
-     *            The query term you are searching for. Can be a string, a case
-     *            number, a comma separated list of case numbers without spaces,
-     *            e.g. 12,25,556. This search acts exactly the same way the
-     *            search box in FogBugz operates. To search for the number 123
-     *            and not the case 123, enclose your search in quotes.
-     * 
+     *
+     * @param query The query term you are searching for. Can be a string, a case
+     *              number, a comma separated list of case numbers without spaces,
+     *              e.g. 12,25,556. This search acts exactly the same way the
+     *              search box in FogBugz operates. To search for the number 123
+     *              and not the case 123, enclose your search in quotes.
      * @return A list containing the search results
-     * 
      * @throws FB2GHException
      */
     public List<FBCase> getCases(String query) throws FB2GHException {
         try {
             List<FBCase> list = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
                     "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,sCategory,events,sCase")
-                            .getCases();
+                    .getCases();
             logger.info("Search for '{}' returned {} case(s)", query, list.size());
             return list;
         } catch (UnsupportedEncodingException e) {
@@ -208,18 +187,13 @@ public class FogBugz {
 
     /**
      * Perform the given API call, then parse the response.
-     * 
-     * @param cmd
-     *            The <code>cmd</code> argument
-     * @param parameters
-     *            Additional parameters to include in the query string
-     * 
+     *
+     * @param cmd        The <code>cmd</code> argument
+     * @param parameters Additional parameters to include in the query string
      * @return The response.
-     * 
      * @throws FB2GHException
-     * 
      * @see <a href="http://help.fogcreek.com/the-fogbugz-api">The FogBugz
-     *      API</a>
+     * API</a>
      */
     private FBResponse parseApiRequest(String cmd, String... parameters) throws FB2GHException {
         try {
@@ -251,13 +225,10 @@ public class FogBugz {
      * method might a bit of a misnomer, as it does not perform a fully
      * extensive URL normalization. It does, however, suffice for the purpose of
      * this class.
-     * 
-     * @param baseURL
-     *            The URL
-     * 
+     *
+     * @param baseURL The URL
      * @return The normalized URL
      */
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
     private static String normalize(String baseURL) {
         while (baseURL.endsWith("/")) {
             baseURL = StringUtils.chop(baseURL);

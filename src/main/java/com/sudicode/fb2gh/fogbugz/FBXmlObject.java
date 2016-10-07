@@ -1,8 +1,5 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -12,7 +9,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * FogBugz XML object. Used as the base class for common FogBugz elements such
  * as milestones and cases.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 abstract class FBXmlObject {
 
     @Override
