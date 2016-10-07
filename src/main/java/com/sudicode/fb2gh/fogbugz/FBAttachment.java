@@ -13,10 +13,6 @@ public final class FBAttachment extends FBXmlObject {
     private String sFileName;
     private String sURL;
 
-    private FBAttachment() {
-        // Constructed through JAXB
-    }
-
     /**
      * @return The filename of this attachment
      */

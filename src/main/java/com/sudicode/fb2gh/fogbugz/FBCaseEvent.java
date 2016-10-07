@@ -27,10 +27,6 @@ public final class FBCaseEvent extends FBXmlObject {
     private String evtDescription;
     private String dt;
 
-    private FBCaseEvent() {
-        // Constructed through JAXB
-    }
-
     /**
      * @return Identity field in the database for this event
      */

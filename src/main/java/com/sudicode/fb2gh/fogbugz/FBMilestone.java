@@ -13,10 +13,6 @@ public final class FBMilestone extends FBXmlObject {
     private Integer ixProject;
     private String sProject;
 
-    private FBMilestone() {
-        // Constructed through JAXB
-    }
-
     /**
      * @return ID of the milestone
      */

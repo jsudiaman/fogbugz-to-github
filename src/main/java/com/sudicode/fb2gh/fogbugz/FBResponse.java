@@ -21,10 +21,6 @@ final class FBResponse extends FBXmlObject {
     @XmlElement(name = "fixfor")
     private List<FBMilestone> fixfors;
 
-    private FBResponse() {
-        // Constructed through JAXB
-    }
-
     /**
      * @return The descendant <code>&lt;token&gt;</code> element
      */

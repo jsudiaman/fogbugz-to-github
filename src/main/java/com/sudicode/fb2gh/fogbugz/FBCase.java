@@ -29,10 +29,6 @@ public final class FBCase extends FBXmlObject {
     private List<FBCaseEvent> events;
     private Integer sCase;
 
-    private FBCase() {
-        // Constructed through JAXB
-    }
-
     /**
      * @return Case number
      */

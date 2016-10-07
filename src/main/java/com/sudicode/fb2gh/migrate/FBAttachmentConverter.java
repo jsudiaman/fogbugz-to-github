@@ -40,6 +40,6 @@ public interface FBAttachmentConverter {
      * 
      * @return The URL
      */
-    public String convert(FogBugz fogBugz, FBAttachment fbAttachment);
+    String convert(FogBugz fogBugz, FBAttachment fbAttachment);
 
 }
