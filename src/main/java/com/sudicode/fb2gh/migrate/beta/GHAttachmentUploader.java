@@ -174,7 +174,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * Compress a single file in ZIP format.
      *
      * @param file The file to compress
-     * @return The ZIP file
+     * @return The ZIP file, which will be deleted on exit
      * @throws IOException If an I/O error occurs
      */
     private static File zipFile(File file) throws IOException {
