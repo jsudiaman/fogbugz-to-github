@@ -13,6 +13,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
@@ -40,6 +42,8 @@ import java.util.zip.ZipOutputStream;
  * attachments on issues and pull requests</a>
  */
 public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
+
+    private static final Logger logger = LoggerFactory.getLogger(GHAttachmentUploader.class);
 
     /**
      * The timeout used for blocking operations (downloading, uploading, etc.)
@@ -113,12 +117,10 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
             File temp = createTempFile(filename);
             FileUtils.copyURLToFile(new URL(fbURL), temp, TIMEOUT_IN_SECONDS * 1000, TIMEOUT_IN_SECONDS * 1000);
-            temp.deleteOnExit();
 
             // If file is incompatible, zip it
             if (!extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
                 temp = zipFile(temp);
-                temp.deleteOnExit();
             }
 
             // Upload to GH Issues
@@ -209,9 +211,12 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * @throws IOException If an I/O error occurs
      */
     private static File createTempFile(String filename) throws IOException {
-        Path tmp = Paths.get(System.getProperty("java.io.tmpdir"), filename);
-        Files.deleteIfExists(tmp);
-        return tmp.toFile();
+        Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"), filename);
+        Files.deleteIfExists(tempPath);
+        File tempFile = tempPath.toFile();
+        tempFile.deleteOnExit();
+        logger.info("Created temporary file: '{}'. Will delete on exit.", tempFile.getAbsolutePath());
+        return tempFile;
     }
 
 }
