@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableMap;
 import com.jcabi.github.Label;
+import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
 import com.sudicode.fb2gh.FB2GHException;
 
@@ -31,19 +33,32 @@ public class GHRepo {
     /**
      * Create a milestone.
      * 
-     * @param milestoneName
-     *            The name of the milestone
+     * @param title
+     *            The title of the milestone
      * 
      * @return Milestone number
      * 
      * @throws FB2GHException
      */
-    public int addMilestone(String milestoneName) throws FB2GHException {
+    public int addMilestone(String title) throws FB2GHException {
         try {
-            return repo.milestones().create(milestoneName).number();
+            return repo.milestones().create(title).number();
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
+    }
+
+    /**
+     * Get all milestones within this repository.
+     * 
+     * @return A list of the milestones.
+     */
+    public List<GHMilestone> getMilestones() {
+        List<GHMilestone> milestones = new ArrayList<>();
+        for (Milestone milestone : repo.milestones().iterate(ImmutableMap.of("state", "all"))) {
+            milestones.add(new GHMilestone(milestone));
+        }
+        return milestones;
     }
 
     /**

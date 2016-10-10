@@ -21,6 +21,7 @@ public final class FBCase extends FBXmlObject {
     private Integer duplicateOfId;
     private String priority;
     private Integer milestoneId;
+    private String milestoneName;
     private String category;
     private List<FBCaseEvent> events;
     private Integer salesforceCaseId;
@@ -136,6 +137,18 @@ public final class FBCase extends FBXmlObject {
     @XmlElement(name = "ixFixFor")
     void setMilestoneId(Integer milestoneId) {
         this.milestoneId = milestoneId;
+    }
+
+    /**
+     * @return Name of the milestone this case is assigned to
+     */
+    public String getMilestoneName() {
+        return milestoneName;
+    }
+
+    @XmlElement(name = "sFixFor")
+    void setMilestoneName(String milestoneName) {
+        this.milestoneName = milestoneName;
     }
 
     /**

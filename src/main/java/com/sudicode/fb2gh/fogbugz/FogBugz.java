@@ -158,7 +158,7 @@ public class FogBugz {
      * @return The list
      * @throws FB2GHException
      */
-    public List<FBMilestone> getMilestones() throws FB2GHException {
+    public List<FBMilestone> listMilestones() throws FB2GHException {
         return parseApiRequest("listFixFors").getMilestones();
     }
 
@@ -173,11 +173,12 @@ public class FogBugz {
      * @return A list containing the search results
      * @throws FB2GHException
      */
-    public List<FBCase> getCases(String query) throws FB2GHException {
+    public List<FBCase> searchCases(String query) throws FB2GHException {
         try {
+            String[] cols = { "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus", "ixBugOriginal",
+                    "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase" };
             List<FBCase> list = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
-                    "cols=ixBugParent,fOpen,sTitle,sPersonAssignedTo,sStatus,ixBugOriginal,sPriority,ixFixFor,sCategory,events,sCase")
-                    .getCases();
+                    "cols=" + String.join(",", cols)).getCases();
             logger.info("Search for '{}' returned {} case(s)", query, list.size());
             return list;
         } catch (UnsupportedEncodingException e) {

@@ -2,7 +2,7 @@ package com.sudicode.fb2gh.github;
 
 import com.jcabi.github.Coordinates;
 import com.jcabi.github.RtGithub;
-import com.jcabi.http.wire.RetryWire;
+import com.jcabi.github.wire.CarefulWire;
 
 /**
  * Class used to interact with <a href="https://github.com">GitHub</a>.
@@ -20,7 +20,7 @@ public class GitHub {
      * @see <a href="https://developer.github.com/v3/oauth/">OAuth</a>
      */
     public GitHub(String token) {
-        connector = new RtGithub(new RtGithub(token).entry().through(RetryWire.class));
+        connector = new RtGithub(new RtGithub(token).entry().through(CarefulWire.class, 50));
     }
 
     /**
@@ -32,7 +32,7 @@ public class GitHub {
      *            GitHub password
      */
     public GitHub(String username, String password) {
-        connector = new RtGithub(new RtGithub(username, password).entry().through(RetryWire.class));
+        connector = new RtGithub(new RtGithub(username, password).entry().through(CarefulWire.class, 50));
     }
 
     /**
