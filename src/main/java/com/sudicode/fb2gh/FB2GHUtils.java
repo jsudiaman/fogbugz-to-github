@@ -17,7 +17,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Static utility methods.
  */
-public class FB2GHUtils {
+public final class FB2GHUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(FB2GHUtils.class);
 
@@ -73,12 +73,12 @@ public class FB2GHUtils {
         ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(zipFile));
         ZipEntry zipEntry = new ZipEntry(file.getName());
         zipStream.putNextEntry(zipEntry);
-        FileInputStream fileStream = new FileInputStream(file);
-        int bytesRead;
-        while ((bytesRead = fileStream.read(buff)) > 0) {
-            zipStream.write(buff, 0, bytesRead);
+        try (FileInputStream fileStream = new FileInputStream(file)) {
+            int bytesRead;
+            while ((bytesRead = fileStream.read(buff)) > 0) {
+                zipStream.write(buff, 0, bytesRead);
+            }
         }
-        fileStream.close();
         zipStream.closeEntry();
         zipStream.close();
 

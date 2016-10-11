@@ -175,8 +175,8 @@ public class FogBugz {
      */
     public List<FBCase> searchCases(String query) throws FB2GHException {
         try {
-            String[] cols = { "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus", "ixBugOriginal",
-                    "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase" };
+            String[] cols = {"ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus", "ixBugOriginal",
+                    "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase"};
             List<FBCase> list = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
                     "cols=" + String.join(",", cols)).getCases();
             logger.info("Search for '{}' returned {} case(s)", query, list.size());
