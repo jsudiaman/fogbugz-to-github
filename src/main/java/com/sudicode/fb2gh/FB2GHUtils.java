@@ -46,8 +46,7 @@ public final class FB2GHUtils {
      *
      * @param strings      A collection of strings
      * @param searchString The string to search for
-     * @return True if <code>searchString</code> is found in
-     * <code>strings</code>, regardless of case
+     * @return <code>true</code> if <code>searchString</code> is found in <code>strings</code>, regardless of case
      */
     public static boolean containsIgnoreCase(final Collection<String> strings, final String searchString) {
         return strings.stream().filter(s -> s.equalsIgnoreCase(searchString)).findFirst().isPresent();
@@ -103,9 +102,14 @@ public final class FB2GHUtils {
     }
 
     /**
+     * <p>
      * Trust invalid security certificates when browsing using HTTPS. <strong>Not</strong> recommended for production
-     * code. If you're using this to resolve <code>SSLHandshakeException</code>, this might be a better idea:
+     * code.
+     * </p>
+     * <p>
+     * If you're using this to resolve <code>SSLHandshakeException</code>, this might be a better idea:
      * <a href="http://stackoverflow.com/a/6742204/6268626">How to solve javax.net.ssl.SSLHandshakeException Error?</a>
+     * </p>
      *
      * @throws FB2GHException if the trust manager could not be disabled
      */

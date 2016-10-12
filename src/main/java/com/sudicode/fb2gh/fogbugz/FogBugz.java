@@ -5,8 +5,7 @@ import com.sudicode.fb2gh.FB2GHException;
 import java.util.List;
 
 /**
- * Entry point for the FogBugz API. The standard implementing class is {@link FogBugzImpl}, which uses the
- * <code>JAXB</code> framework to communicate with FogBugz.
+ * Entry point for the FogBugz API. The provided implementing class is {@link FogBugzImpl}.
  */
 public interface FogBugz {
 

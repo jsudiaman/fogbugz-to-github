@@ -29,15 +29,17 @@ import java.util.Optional;
  * If you have an <a href=
  * "http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">API
  * token</a>, you can instantiate this class like so:
+ * </p>
  * <pre>
  * FogBugz fb = new FogBugzImpl(baseURL, authToken);
  * </pre>
- * </p>
  * <p>
  * Otherwise, you can alternatively use:
+ * </p>
  * <pre>
  * FogBugz fb = new FogBugzImpl(baseURL, email, password);
  * </pre>
+ * <p>
  * After instantiating this class, you may then use
  * <code>fb.getAuthToken();</code> to obtain a valid API token for later.
  * </p>
@@ -45,11 +47,11 @@ import java.util.Optional;
  * If the constructors of this class are throwing {@link SSLHandshakeException},
  * then your FogBugz instance is most likely using an invalid SSL certificate.
  * This can be bypassed (at your own risk) like so:
+ * </p>
  * <pre>
  * FB2GHUtils.trustInvalidCertificates();
  * FogBugz fb = ...
  * </pre>
- * </p>
  */
 public final class FogBugzImpl implements FogBugz {
 
