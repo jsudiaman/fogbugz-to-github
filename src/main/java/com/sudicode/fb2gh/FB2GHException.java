@@ -6,9 +6,20 @@ package com.sudicode.fb2gh;
 public class FB2GHException extends RuntimeException {
 
     /**
-     * @see Exception#Exception(Throwable)
+     * Construct a new <code>FB2GHException</code> with the specified message.
+     *
+     * @param message The message
      */
-    public FB2GHException(Throwable cause) {
+    public FB2GHException(final String message) {
+        super(message);
+    }
+
+    /**
+     * Construct a new <code>FB2GHException</code> with the specified cause.
+     *
+     * @param cause The cause
+     */
+    public FB2GHException(final Throwable cause) {
         super(cause);
     }
 

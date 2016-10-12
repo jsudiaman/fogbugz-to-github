@@ -3,6 +3,10 @@ package com.sudicode.fb2gh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,6 +14,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -92,6 +100,41 @@ public final class FB2GHUtils {
 
         // Return zip file
         return zipFile;
+    }
+
+    /**
+     * Trust invalid security certificates when browsing using HTTPS. <strong>Not</strong> recommended for production
+     * code. If you're using this to resolve <code>SSLHandshakeException</code>, this might be a better idea:
+     * <a href="http://stackoverflow.com/a/6742204/6268626">How to solve javax.net.ssl.SSLHandshakeException Error?</a>
+     *
+     * @throws FB2GHException if the trust manager could not be disabled
+     */
+    public static void trustInvalidCertificates() throws FB2GHException {
+        try {
+            // Create a trust manager that does not validate certificate chains
+            TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                }
+            }
+            };
+
+            // Install the trust manager
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, tm, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            throw new FB2GHException(e);
+        }
     }
 
 }
