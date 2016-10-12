@@ -1,45 +1,38 @@
 package com.sudicode.fb2gh.github;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-
 import com.jcabi.github.Issue;
 import com.sudicode.fb2gh.FB2GHException;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import java.io.IOException;
+import java.util.Arrays;
+
 /**
- * Fluent GitHub issue.
+ * GitHub issue.
  */
-public class GHIssue {
+public final class GHIssue {
 
     private final Issue.Smart issue;
 
     /**
      * Constructor.
-     * 
-     * @param issue
-     *            The {@link Issue} instance to access.
+     *
+     * @param issue The {@link Issue} instance to access.
      */
-    GHIssue(Issue issue) {
+    GHIssue(final Issue issue) {
         this.issue = new Issue.Smart(issue);
     }
 
     /**
      * Add label(s) to this issue.
-     * 
-     * @param labels
-     *            The label(s) to add
-     * 
-     * @return this issue
-     * 
-     * @throws FB2GHException
+     *
+     * @param labels The label(s) to add
+     * @throws FB2GHException if an I/O error occurs
      */
-    public GHIssue addLabels(String... labels) throws FB2GHException {
+    public void addLabels(final String... labels) throws FB2GHException {
         try {
             issue.labels().add(Arrays.asList(labels));
-            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -47,18 +40,13 @@ public class GHIssue {
 
     /**
      * Add a comment.
-     * 
-     * @param comment
-     *            The contents of the comment. Supports Markdown.
-     * 
-     * @return this issue
-     * 
-     * @throws FB2GHException
+     *
+     * @param comment The contents of the comment. Supports Markdown.
+     * @throws FB2GHException if an I/O error occurs
      */
-    public GHIssue addComment(String comment) throws FB2GHException {
+    public void addComment(final String comment) throws FB2GHException {
         try {
             issue.comments().post(comment);
-            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -66,15 +54,12 @@ public class GHIssue {
 
     /**
      * Close this issue.
-     * 
-     * @return this issue
-     * 
-     * @throws FB2GHException
+     *
+     * @throws FB2GHException if an I/O error occurs
      */
-    public GHIssue close() throws FB2GHException {
+    public void close() throws FB2GHException {
         try {
             issue.close();
-            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -82,18 +67,13 @@ public class GHIssue {
 
     /**
      * Assign this issue to another user.
-     * 
-     * @param ghUsername
-     *            GitHub username
-     * 
-     * @return this issue
-     * 
-     * @throws FB2GHException
+     *
+     * @param ghUsername GitHub username
+     * @throws FB2GHException if an I/O error occurs
      */
-    public GHIssue assignTo(String ghUsername) throws FB2GHException {
+    public void assignTo(final String ghUsername) throws FB2GHException {
         try {
             issue.assign(ghUsername);
-            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -103,23 +83,17 @@ public class GHIssue {
      * Add this issue to a milestone. <em>NOTE: Only users with push access can
      * set the milestone for issues. The milestone is silently dropped
      * otherwise.</em>
-     * 
-     * @param milestoneNumber
-     *            The <code>number</code> of the milestone to associate this
-     *            issue with or <code>null</code> to remove current.
-     * 
-     * @return this issue
-     * 
-     * @throws FB2GHException
+     *
+     * @param milestone The {@link GHMilestone} to associate this issue with or <code>null</code> to remove current.
+     * @throws FB2GHException if an I/O error occurs
      */
-    public GHIssue setMilestone(Integer milestoneNumber) throws FB2GHException {
+    public void setMilestone(final GHMilestone milestone) throws FB2GHException {
         try {
-            if (milestoneNumber != null) {
-                issue.patch(Json.createObjectBuilder().add("milestone", milestoneNumber).build());
+            if (milestone != null) {
+                issue.patch(Json.createObjectBuilder().add("milestone", milestone.getNumber()).build());
             } else {
                 issue.patch(Json.createObjectBuilder().add("milestone", JsonObject.NULL).build());
             }
-            return this;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }

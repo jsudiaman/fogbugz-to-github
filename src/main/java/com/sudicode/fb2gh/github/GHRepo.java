@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * GitHub repository.
  */
-public class GHRepo {
+public final class GHRepo {
 
     /**
      * Hex code of the default label color.
@@ -36,12 +36,12 @@ public class GHRepo {
      * Create a milestone.
      *
      * @param title The title of the milestone
-     * @return Milestone number
-     * @throws FB2GHException
+     * @return The milestone
+     * @throws FB2GHException if an I/O error occurs
      */
-    public int addMilestone(final String title) throws FB2GHException {
+    public GHMilestone addMilestone(final String title) throws FB2GHException {
         try {
-            return repo.milestones().create(title).number();
+            return new GHMilestone(repo.milestones().create(title));
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -66,7 +66,7 @@ public class GHRepo {
      * @param title       Title of the issue
      * @param description Description of the issue
      * @return The created issue
-     * @throws FB2GHException
+     * @throws FB2GHException if an I/O error occurs
      */
     public GHIssue addIssue(final String title, final String description) throws FB2GHException {
         try {
@@ -90,7 +90,7 @@ public class GHRepo {
      * Create a label with the default label color.
      *
      * @param name The name of the label.
-     * @throws FB2GHException
+     * @throws FB2GHException if an I/O error occurs
      */
     public void addLabel(final String name) throws FB2GHException {
         addLabel(name, DEFAULT_LABEL_COLOR);
@@ -101,7 +101,7 @@ public class GHRepo {
      *
      * @param name  The name of the label.
      * @param color The {@link Color} to use.
-     * @throws FB2GHException
+     * @throws FB2GHException if an I/O error occurs
      */
     public void addLabel(final String name, final Color color) throws FB2GHException {
         addLabel(name, String.format("%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue()));
@@ -111,9 +111,8 @@ public class GHRepo {
      * Create a label with a specific label color.
      *
      * @param name     The name of the label.
-     * @param hexColor A 6 character hex code, without the leading #, identifying the
-     *                 color.
-     * @throws FB2GHException
+     * @param hexColor A 6 character hex code, without the leading #, identifying the color.
+     * @throws FB2GHException if an I/O error occurs
      */
     public void addLabel(final String name, final String hexColor) throws FB2GHException {
         try {

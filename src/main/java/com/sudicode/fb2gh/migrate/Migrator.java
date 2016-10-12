@@ -1,7 +1,5 @@
 package com.sudicode.fb2gh.migrate;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.sudicode.fb2gh.FB2GHException;
 import com.sudicode.fb2gh.FB2GHUtils;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
@@ -16,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ import java.util.Set;
 /**
  * Migrates FogBugz cases to GitHub issues.
  */
-public class Migrator {
+public final class Migrator {
 
     private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
 
@@ -40,11 +39,20 @@ public class Migrator {
      * @param caseList A list of cases to migrate
      * @param ghRepo   The GitHub repository to migrate to
      */
-    public Migrator(FogBugz fogBugz, List<FBCase> caseList, GHRepo ghRepo) {
+    public Migrator(final FogBugz fogBugz, final List<FBCase> caseList, final GHRepo ghRepo) {
         this(fogBugz, caseList, ghRepo, (fb, attachment) -> attachment.getAbsoluteUrl(fb));
     }
 
-    public Migrator(FogBugz fogBugz, List<FBCase> caseList, GHRepo ghRepo, FBAttachmentConverter fbAttachmentConverter) {
+    /**
+     * Constructor.
+     *
+     * @param fogBugz               The FogBugz instance
+     * @param caseList              A list of cases to migrate
+     * @param ghRepo                The GitHub repository to migrate to
+     * @param fbAttachmentConverter The {@link FBAttachmentConverter} to use
+     */
+    public Migrator(final FogBugz fogBugz, final List<FBCase> caseList, final GHRepo ghRepo,
+                    final FBAttachmentConverter fbAttachmentConverter) {
         this.fogBugz = fogBugz;
         this.caseList = caseList;
         this.ghRepo = ghRepo;
@@ -54,12 +62,15 @@ public class Migrator {
     /**
      * Migrate the cases.
      *
-     * @throws FB2GHException
+     * @throws FB2GHException if there is an API issue.
      */
     public void migrate() throws FB2GHException {
         // Internal caches
-        Set<String> repoLabels = new HashSet<>(ghRepo.getLabels());
-        BiMap<Integer, String> repoMilestones = repoMilestoneMap();
+        Set<String> labels = new HashSet<>(ghRepo.getLabels());
+        Map<String, GHMilestone> milestones = new HashMap<>();
+        for (GHMilestone milestone : ghRepo.getMilestones()) {
+            milestones.put(milestone.getTitle(), milestone);
+        }
 
         for (FBCase fbCase : caseList) {
             // Labels to attach to issue
@@ -67,20 +78,20 @@ public class Migrator {
 
             // If labels don't exist, create them
             for (String label : issueLabels) {
-                if (!FB2GHUtils.containsIgnoreCase(repoLabels, label)) {
+                if (!FB2GHUtils.containsIgnoreCase(labels, label)) {
                     ghRepo.addLabel(label);
-                    repoLabels.add(label);
+                    labels.add(label);
                 }
             }
 
             // If milestone doesn't exist, create it
             String milestoneTitle = fbCase.getMilestoneName();
-            int milestoneNumber;
-            if (!repoMilestones.containsValue(milestoneTitle)) {
-                milestoneNumber = ghRepo.addMilestone(milestoneTitle);
-                repoMilestones.put(milestoneNumber, milestoneTitle);
+            GHMilestone ghMilestone;
+            if (milestones.containsKey(milestoneTitle)) {
+                ghMilestone = milestones.get(milestoneTitle);
             } else {
-                milestoneNumber = repoMilestones.inverse().get(milestoneTitle);
+                ghMilestone = ghRepo.addMilestone(milestoneTitle);
+                milestones.put(milestoneTitle, ghMilestone);
             }
 
             // Get title and description
@@ -89,7 +100,9 @@ public class Migrator {
             String description = convertToComment(events.get(0));
 
             // Post the issue, along with remaining events (if any)
-            GHIssue issue = ghRepo.addIssue(title, description).addLabels(issueLabels).setMilestone(milestoneNumber);
+            GHIssue issue = ghRepo.addIssue(title, description);
+            issue.addLabels(issueLabels);
+            issue.setMilestone(ghMilestone);
             for (int i = 1; i < events.size(); i++) {
                 issue.addComment(convertToComment(events.get(i)));
             }
@@ -99,30 +112,12 @@ public class Migrator {
     }
 
     /**
-     * Generates a {@link BiMap} of GitHub milestones, mapping milestone numbers
-     * to their respective titles. The reason for using {@link BiMap} rather
-     * than {@link Map} is to allow for a two-way lookup - number to title, and
-     * vice versa.
-     *
-     * @return A {@link BiMap} of GitHub milestones, where <code>key</code> is
-     * the milestone number and <code>value</code> is its title.
-     * @throws FB2GHException
-     */
-    private BiMap<Integer, String> repoMilestoneMap() throws FB2GHException {
-        BiMap<Integer, String> biMap = HashBiMap.create();
-        for (GHMilestone milestone : ghRepo.getMilestones()) {
-            biMap.put(milestone.getNumber(), milestone.getTitle());
-        }
-        return biMap;
-    }
-
-    /**
      * Represent the given {@link FBCaseEvent} as a GitHub issue comment.
      *
      * @param event The {@link FBCaseEvent}
      * @return The comment
      */
-    private String convertToComment(FBCaseEvent event) {
+    private String convertToComment(final FBCaseEvent event) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<strong>").append(event.getDescription()).append("</strong> ").append(event.getDateTime());
@@ -142,7 +137,7 @@ public class Migrator {
                 String url = fbAttachmentConverter.convert(fogBugz, attachment);
 
                 // If it's an image, prepend '!' to the Markdown string
-                if (FilenameUtils.getExtension(url).toLowerCase().matches("png|gif|jpg|jpeg")) {
+                if (FilenameUtils.getExtension(url).toLowerCase().matches("png|gif|jpg")) {
                     sb.append("!");
                 }
                 sb.append("[").append(filename).append("](").append(url).append(")<br>");

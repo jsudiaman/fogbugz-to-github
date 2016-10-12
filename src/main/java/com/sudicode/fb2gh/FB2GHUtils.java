@@ -59,7 +59,7 @@ public final class FB2GHUtils {
      * @param filename Name of the temporary file. If the file already exists, it will be overwritten.
      *                 If it exists and is a non-empty directory, an {@link IOException} will occur.
      * @return The temporary file
-     * @throws IOException If an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static File createTempFile(final String filename) throws IOException {
         Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"), filename);
@@ -75,7 +75,7 @@ public final class FB2GHUtils {
      *
      * @param file The file to compress
      * @return The ZIP file, which will be deleted on exit
-     * @throws IOException If an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static File createTempZipFile(final File file) throws IOException {
         // Define buffer
@@ -107,7 +107,7 @@ public final class FB2GHUtils {
      * code.
      * </p>
      * <p>
-     * If you're using this to resolve <code>SSLHandshakeException</code>, this might be a better idea:
+     * If you're using this to resolve {@link javax.net.ssl.SSLHandshakeException}, this might be a better idea:
      * <a href="http://stackoverflow.com/a/6742204/6268626">How to solve javax.net.ssl.SSLHandshakeException Error?</a>
      * </p>
      *
