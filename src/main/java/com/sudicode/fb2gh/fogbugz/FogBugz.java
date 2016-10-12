@@ -5,7 +5,8 @@ import com.sudicode.fb2gh.FB2GHException;
 import java.util.List;
 
 /**
- * FogBugz API. Use {@link FogBugzImpl} to instantiate.
+ * Entry point for the FogBugz API. The standard implementing class is {@link FogBugzImpl}, which uses the
+ * <code>JAXB</code> framework to communicate with FogBugz.
  */
 public interface FogBugz {
 
@@ -31,15 +32,33 @@ public interface FogBugz {
     List<FBCase> searchCases(String query) throws FB2GHException;
 
     /**
+     * <p>
+     * Get the FogBugz URL.
+     * </p>
+     * <p>
+     * This method will return an empty <code>String</code> if left unimplemented.
+     * </p>
+     *
      * @return The URL of this FogBugz instance.
      * @throws FB2GHException if there is an API issue.
      */
-    String getBaseURL() throws FB2GHException;
+    default String getBaseURL() throws FB2GHException {
+        return "";
+    }
 
     /**
+     * <p>
+     * Get the API token.
+     * </p>
+     * <p>
+     * This method will return an empty <code>String</code> if left unimplemented.
+     * </p>
+     *
      * @return The <code>token</code> parameter used to access the API.
      * @throws FB2GHException if there is an API issue.
      */
-    String getAuthToken() throws FB2GHException;
+    default String getAuthToken() throws FB2GHException {
+        return "";
+    }
 
 }

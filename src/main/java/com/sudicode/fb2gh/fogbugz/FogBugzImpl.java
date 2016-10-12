@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,7 +72,7 @@ public final class FogBugzImpl implements FogBugz {
         try {
             this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
             this.baseURL = normalize(baseURL);
-            this.authToken = authToken;
+            this.authToken = authToken; // TODO Validate the token
         } catch (JAXBException e) {
             throw new FB2GHException(e);
         }
@@ -107,10 +108,12 @@ public final class FogBugzImpl implements FogBugz {
     @Override
     public List<FBCase> searchCases(final String query) throws FB2GHException {
         try {
-            String[] cols = {"ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus", "ixBugOriginal",
-                    "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase"};
-            List<FBCase> list = parseApiRequest("search", "q=" + URLEncoder.encode(query, "UTF-8"),
-                    "cols=" + String.join(",", cols)).getCases();
+            String encodedQuery = URLEncoder.encode(query, "UTF-8");
+            String cols = String.join(",", "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus",
+                    "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase");
+            List<FBCase> list = Optional
+                    .ofNullable(parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases())
+                    .orElseGet(Collections::emptyList);
             logger.info("Search for '{}' returned {} case(s)", query, list.size());
             return list;
         } catch (UnsupportedEncodingException e) {
