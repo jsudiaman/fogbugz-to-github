@@ -3,6 +3,7 @@ package com.sudicode.fb2gh.migrate.beta;
 import com.sudicode.fb2gh.FB2GHUtils;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
+import com.sudicode.fb2gh.github.GHRepo;
 import com.sudicode.fb2gh.migrate.FBAttachmentConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -14,12 +15,15 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -35,15 +39,12 @@ import java.net.URL;
  */
 public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
+    private static final Logger logger = LoggerFactory.getLogger(GHAttachmentUploader.class);
+
     /**
      * The timeout used for blocking operations (downloading, uploading, etc.)
      */
     private static final int TIMEOUT_IN_SECONDS = 100;
-
-    /**
-     * A "New Issue" page, which is used for uploading purposes. Issues won't actually be posted here.
-     */
-    private static final String ISSUES_LINK = "https://github.com/sudiamanj/empty-repo/issues/new";
 
     /**
      * File types supported by GitHub.
@@ -60,9 +61,10 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      *
      * @param ghUsername GitHub username
      * @param ghPassword GitHub password
+     * @param ghRepo     GitHub repository to upload to
      */
-    public GHAttachmentUploader(String ghUsername, String ghPassword) {
-        this(ghUsername, ghPassword, newWebDriver());
+    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo) {
+        this(ghUsername, ghPassword, ghRepo, newWebDriver());
     }
 
     /**
@@ -71,9 +73,11 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      *
      * @param ghUsername GitHub username
      * @param ghPassword GitHub password
+     * @param ghRepo     GitHub repository to upload to
      * @param webDriver  The {@link WebDriver} to use
      */
-    public GHAttachmentUploader(String ghUsername, String ghPassword, WebDriver webDriver) {
+    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
+                                final WebDriver webDriver) {
         // Initialize
         this.browser = webDriver;
         this.wait = new WebDriverWait(browser, TIMEOUT_IN_SECONDS);
@@ -84,7 +88,8 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
         browser.findElement(By.id("password")).sendKeys(ghPassword);
         browser.findElement(By.name("commit")).click();
         wait.until(ExpectedConditions.urlToBe("https://github.com/"));
-        browser.get(ISSUES_LINK);
+        browser.get(String.format("https://github.com/%s/%s/issues/new", ghRepo.getOwner(), ghRepo.getName()));
+        logger.info("Constructed successfully");
     }
 
     /**
@@ -99,14 +104,15 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * @return URL of the uploaded file
      */
     @Override
-    public String convert(FogBugz fogBugz, FBAttachment fbAttachment) {
+    public String convert(final FogBugz fogBugz, final FBAttachment fbAttachment) {
         try {
             // Download FogBugz attachment
             String filename = fbAttachment.getFilename();
             String extension = FilenameUtils.getExtension(filename);
             String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
             File temp = FB2GHUtils.createTempFile(filename);
-            FileUtils.copyURLToFile(new URL(fbURL), temp, TIMEOUT_IN_SECONDS * 1000, TIMEOUT_IN_SECONDS * 1000);
+            int timeoutInMillis = Math.toIntExact(TimeUnit.SECONDS.toMillis(TIMEOUT_IN_SECONDS));
+            FileUtils.copyURLToFile(new URL(fbURL), temp, timeoutInMillis, timeoutInMillis);
 
             // If file is incompatible, zip it
             if (!extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
@@ -117,14 +123,16 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             browser.findElement(By.id("issue_body")).clear();
             browser.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser"))
                     .sendKeys(temp.getAbsolutePath());
-            return wait.ignoring(StringIndexOutOfBoundsException.class).until(new ExpectedCondition<String>() {
+            String url = wait.ignoring(StringIndexOutOfBoundsException.class).until(new ExpectedCondition<String>() {
                 @Override
-                public String apply(WebDriver webDriver) {
+                public String apply(final WebDriver webDriver) {
                     String body = webDriver.findElement(By.id("issue_body")).getAttribute("value");
                     body = body.substring(body.lastIndexOf('(') + 1, body.lastIndexOf(')'));
                     return body.length() > 0 ? body : null;
                 }
             });
+            logger.info("Uploaded file '{}' to URL '{}'", temp.getAbsolutePath(), url);
+            return url;
         } catch (IOException e) {
             // Checked exceptions are incompatible with the supertype
             throw new UncheckedIOException(e);

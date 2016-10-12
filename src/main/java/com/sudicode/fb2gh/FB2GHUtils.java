@@ -21,6 +21,14 @@ public final class FB2GHUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(FB2GHUtils.class);
 
+    /**
+     * Size (in bytes) to use for file buffers.
+     */
+    private static final int BUFFER_SIZE = 1024;
+
+    /**
+     * This is a utility class which is not designed for instantiation.
+     */
     private FB2GHUtils() {
         throw new AssertionError("Cannot instantiate.");
     }
@@ -33,7 +41,7 @@ public final class FB2GHUtils {
      * @return True if <code>searchString</code> is found in
      * <code>strings</code>, regardless of case
      */
-    public static boolean containsIgnoreCase(Collection<String> strings, String searchString) {
+    public static boolean containsIgnoreCase(final Collection<String> strings, final String searchString) {
         return strings.stream().filter(s -> s.equalsIgnoreCase(searchString)).findFirst().isPresent();
     }
 
@@ -46,7 +54,7 @@ public final class FB2GHUtils {
      * @return The temporary file
      * @throws IOException If an I/O error occurs
      */
-    public static File createTempFile(String filename) throws IOException {
+    public static File createTempFile(final String filename) throws IOException {
         Path tempPath = Paths.get(System.getProperty("java.io.tmpdir"), filename);
         Files.deleteIfExists(tempPath);
         File tempFile = tempPath.toFile();
@@ -62,9 +70,9 @@ public final class FB2GHUtils {
      * @return The ZIP file, which will be deleted on exit
      * @throws IOException If an I/O error occurs
      */
-    public static File createTempZipFile(File file) throws IOException {
+    public static File createTempZipFile(final File file) throws IOException {
         // Define buffer
-        byte[] buff = new byte[1024];
+        byte[] buff = new byte[BUFFER_SIZE];
 
         // Create zip file
         File zipFile = createTempFile(file.getName() + ".zip");
