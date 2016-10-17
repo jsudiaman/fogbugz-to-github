@@ -23,7 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * <p>
@@ -32,6 +34,15 @@ import java.util.concurrent.TimeUnit;
  * implementation is therefore unstable and should be handled as such. But if it
  * works for you, the more power to you.
  * </p>
+ * <p>
+ * This class cannot be instantiated using a traditional constructor. To instantiate, use the
+ * <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a>, like so:
+ * </p>
+ * <pre>
+ * GHAttachmentUploader ghau = new GHAttachmentUploader.Builder(ghUsername, ghPassword, ghRepo) // Required
+ *     .webDriver(webDriver) // Optional
+ *     .get(); // Returns GHAttachmentUploader
+ * </pre>
  *
  * @see <a href=
  * "https://help.github.com/articles/file-attachments-on-issues-and-pull-requests/">File
@@ -55,42 +66,63 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     private final FluentWait<WebDriver> wait;
 
     /**
-     * Construct a new {@link GHAttachmentUploader} using the default
-     * {@link WebDriver}. Since GitHub issues cannot be submitted anonymously,
-     * valid credentials are required.
+     * Constructor.
      *
-     * @param ghUsername GitHub username
-     * @param ghPassword GitHub password
-     * @param ghRepo     GitHub repository to upload to
+     * @param builder The {@link Builder} to initialize with
      */
-    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo) {
-        this(ghUsername, ghPassword, ghRepo, newWebDriver());
-    }
-
-    /**
-     * Construct a new {@link GHAttachmentUploader} using a specific
-     * {@link WebDriver}.
-     *
-     * @param ghUsername GitHub username
-     * @param ghPassword GitHub password
-     * @param ghRepo     GitHub repository to upload to
-     * @param webDriver  The {@link WebDriver} to use
-     */
-    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
-                                final WebDriver webDriver) {
+    private GHAttachmentUploader(final Builder builder) {
         // Initialize
-        this.browser = webDriver;
-        this.wait = new WebDriverWait(browser, TIMEOUT_IN_SECONDS);
+        this.browser = Optional.ofNullable(builder.webDriver).orElseGet(GHAttachmentUploader::newWebDriver);
+        this.wait = new WebDriverWait(this.browser, TIMEOUT_IN_SECONDS);
 
         // Log in to GitHub (required to access the issues page)
         browser.get("http://github.com/login/");
-        browser.findElement(By.id("login_field")).sendKeys(ghUsername);
-        browser.findElement(By.id("password")).sendKeys(ghPassword);
+        browser.findElement(By.id("login_field")).sendKeys(builder.ghUsername);
+        browser.findElement(By.id("password")).sendKeys(builder.ghPassword);
         browser.findElement(By.name("commit")).click();
         wait.until(ExpectedConditions.urlToBe("https://github.com/"));
-        browser.get(String.format("https://github.com/%s/%s/issues/new", ghRepo.getOwner(), ghRepo.getName()));
+        browser.get(String.format("https://github.com/%s/%s/issues/new", builder.ghRepo.getOwner(),
+                builder.ghRepo.getName()));
         logger.info("Constructed successfully");
     }
+
+    /**
+     * Builder used to instantiate {@link GHAttachmentUploader}.
+     */
+    public static final class Builder implements Supplier<GHAttachmentUploader> {
+        private final String ghUsername;
+        private final String ghPassword;
+        private final GHRepo ghRepo;
+        private WebDriver webDriver;
+
+        /**
+         * Constructor. Since GitHub issues cannot be submitted anonymously, valid credentials are required.
+         *
+         * @param ghUsername GitHub username
+         * @param ghPassword GitHub password
+         * @param ghRepo     GitHub repository to upload to
+         */
+        public Builder(final String ghUsername, final String ghPassword, final GHRepo ghRepo) {
+            this.ghUsername = ghUsername;
+            this.ghPassword = ghPassword;
+            this.ghRepo = ghRepo;
+        }
+
+        /**
+         * @param webDriver The {@link WebDriver} to use
+         * @return This object
+         */
+        public Builder webDriver(final WebDriver webDriver) {
+            this.webDriver = webDriver;
+            return this;
+        }
+
+        @Override
+        public GHAttachmentUploader get() {
+            return new GHAttachmentUploader(this);
+        }
+    }
+
 
     /**
      * Download the FogBugz attachment, then reupload it to GitHub Issues. If

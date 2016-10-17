@@ -18,10 +18,23 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
+ * <p>
  * Migrates FogBugz cases to GitHub issues.
+ * </p>
+ * <p>
+ * This class cannot be instantiated using a traditional constructor. To instantiate, use the
+ * <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a>, like so:
+ * </p>
+ * <pre>
+ * Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo) // Required
+ *     .fbAttachmentConverter(fbAttachmentConverter) // Optional
+ *     .get(); // Returns Migrator
+ * </pre>
  */
 public final class Migrator {
 
@@ -35,28 +48,51 @@ public final class Migrator {
     /**
      * Constructor.
      *
-     * @param fogBugz  The FogBugz instance
-     * @param caseList A list of cases to migrate
-     * @param ghRepo   The GitHub repository to migrate to
+     * @param builder The {@link Builder} to initialize with
      */
-    public Migrator(final FogBugz fogBugz, final List<FBCase> caseList, final GHRepo ghRepo) {
-        this(fogBugz, caseList, ghRepo, (fb, attachment) -> attachment.getAbsoluteUrl(fb));
+    private Migrator(final Builder builder) {
+        fogBugz = builder.fogBugz;
+        caseList = builder.caseList;
+        ghRepo = builder.ghRepo;
+        fbAttachmentConverter = Optional.ofNullable(builder.fbAttachmentConverter)
+                .orElse((fb, attachment) -> attachment.getAbsoluteUrl(fb));
     }
 
     /**
-     * Constructor.
-     *
-     * @param fogBugz               The FogBugz instance
-     * @param caseList              A list of cases to migrate
-     * @param ghRepo                The GitHub repository to migrate to
-     * @param fbAttachmentConverter The {@link FBAttachmentConverter} to use
+     * Builder used to instantiate {@link Migrator}.
      */
-    public Migrator(final FogBugz fogBugz, final List<FBCase> caseList, final GHRepo ghRepo,
-                    final FBAttachmentConverter fbAttachmentConverter) {
-        this.fogBugz = fogBugz;
-        this.caseList = caseList;
-        this.ghRepo = ghRepo;
-        this.fbAttachmentConverter = fbAttachmentConverter;
+    public static final class Builder implements Supplier<Migrator> {
+        private final FogBugz fogBugz;
+        private final List<FBCase> caseList;
+        private final GHRepo ghRepo;
+        private FBAttachmentConverter fbAttachmentConverter;
+
+        /**
+         * Constructor.
+         *
+         * @param fogBugz  The FogBugz instance
+         * @param caseList A list of cases to migrate
+         * @param ghRepo   The GitHub repository to migrate to
+         */
+        public Builder(final FogBugz fogBugz, final List<FBCase> caseList, final GHRepo ghRepo) {
+            this.fogBugz = fogBugz;
+            this.caseList = caseList;
+            this.ghRepo = ghRepo;
+        }
+
+        /**
+         * @param fbAttachmentConverter The {@link FBAttachmentConverter} to use
+         * @return This object
+         */
+        public Builder fbAttachmentConverter(final FBAttachmentConverter fbAttachmentConverter) {
+            this.fbAttachmentConverter = fbAttachmentConverter;
+            return this;
+        }
+
+        @Override
+        public Migrator get() {
+            return new Migrator(this);
+        }
     }
 
     /**
@@ -74,7 +110,7 @@ public final class Migrator {
 
         for (FBCase fbCase : caseList) {
             // Labels to attach to issue
-            String[] issueLabels = {fbCase.getCategory(), fbCase.getPriority()};
+            String[] issueLabels = {fbCase.getCategory(), fbCase.getPriority(), fbCase.getStatus()};
 
             // If labels don't exist, create them
             for (String label : issueLabels) {
@@ -105,6 +141,9 @@ public final class Migrator {
             issue.setMilestone(ghMilestone);
             for (int i = 1; i < events.size(); i++) {
                 issue.addComment(convertToComment(events.get(i)));
+            }
+            if (!fbCase.isOpen()) {
+                issue.close();
             }
 
             logger.info("Migrated case '{}'", title);
