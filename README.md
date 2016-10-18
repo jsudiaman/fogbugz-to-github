@@ -2,7 +2,7 @@
 **FB2GH** is designed to help you programatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/). It also can alternatively serve as a lightweight Java API for FogBugz or GH Issues.
 
 ## Usage
-```
+```java
 // Login to FogBugz
 // How to get an API token: http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token
 FogBugz fogBugz = new FogBugzImpl(fogBugzURL, fogBugzAPIToken);
