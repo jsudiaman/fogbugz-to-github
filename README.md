@@ -17,9 +17,9 @@ List<FBCase> caseList = fogBugz.searchCases("123");
 // Login to GitHub
 GitHub github = new GitHubImpl(githubOAuthToken); // Using OAuth (https://github.com/settings/tokens/new)
 GitHub otherGh = new GitHubImpl(githubUsername, githubPassword); // Using basic authentication
-GHRepo ghRepo = github.getRepo(repoOwner, repoName);
+GHRepo ghRepo = github.getRepo(repoOwner, repoName); // GitHub repository to migrate to
 
-// Migrate caseList
+// Migrate caseList to ghRepo
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).get();
 migrator.migrate();
 ```
