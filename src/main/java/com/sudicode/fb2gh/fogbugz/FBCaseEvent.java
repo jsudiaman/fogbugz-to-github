@@ -12,8 +12,8 @@ import java.util.List;
 @XmlRootElement(name = "event")
 public final class FBCaseEvent {
 
-    private Integer id;
-    private Integer caseId;
+    private int id;
+    private int caseId;
     private String body;
     private String changes;
     private List<FBAttachment> attachments;
@@ -26,24 +26,24 @@ public final class FBCaseEvent {
     /**
      * @return Identity field in the database for this event
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
     @XmlAttribute(name = "ixBugEvent")
-    void setId(Integer id) {
+    void setId(int id) {
         this.id = id;
     }
 
     /**
      * @return Case number
      */
-    public Integer getCaseId() {
+    public int getCaseId() {
         return caseId;
     }
 
     @XmlAttribute(name = "ixBug")
-    void setCaseId(Integer caseId) {
+    void setCaseId(int caseId) {
         this.caseId = caseId;
     }
 

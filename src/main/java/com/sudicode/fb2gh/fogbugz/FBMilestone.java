@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "fixfor")
 public final class FBMilestone {
 
-    private Integer id;
+    private int id;
     private String name;
-    private Integer projectId;
+    private int projectId;
     private String projectName;
 
     FBMilestone() {
@@ -20,12 +20,12 @@ public final class FBMilestone {
     /**
      * @return ID of the milestone
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
     @XmlElement(name = "ixFixFor")
-    void setId(Integer id) {
+    void setId(int id) {
         this.id = id;
     }
 
@@ -44,12 +44,12 @@ public final class FBMilestone {
     /**
      * @return Project ID
      */
-    public Integer getProjectId() {
+    public int getProjectId() {
         return projectId;
     }
 
     @XmlElement(name = "ixProject")
-    void setProjectId(Integer projectId) {
+    void setProjectId(int projectId) {
         this.projectId = projectId;
     }
 

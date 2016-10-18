@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -72,7 +71,8 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      */
     private GHAttachmentUploader(final Builder builder) {
         // Initialize
-        this.browser = Optional.ofNullable(builder.webDriver).orElseGet(GHAttachmentUploader::newWebDriver);
+        this.browser = builder.webDriver != null ? builder.webDriver
+                : newWebDriver();
         this.wait = new WebDriverWait(this.browser, TIMEOUT_IN_SECONDS);
 
         // Log in to GitHub (required to access the issues page)

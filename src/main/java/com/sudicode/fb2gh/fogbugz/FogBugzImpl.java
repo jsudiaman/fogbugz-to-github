@@ -16,7 +16,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <p>
@@ -93,9 +92,10 @@ public final class FogBugzImpl implements FogBugz {
         try {
             this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
             this.baseURL = normalize(baseURL);
-            this.authToken = Optional
-                    .ofNullable(parseApiRequest("logon", "email=" + email, "password=" + password).getToken())
-                    .orElseThrow(() -> new FB2GHException("Authentication failed."));
+            this.authToken = parseApiRequest("logon", "email=" + email, "password=" + password).getToken();
+            if (this.authToken == null) {
+                throw new FB2GHException("Authentication failed.");
+            }
             logger.info("Generated API token: {}", this.authToken);
         } catch (JAXBException e) {
             throw new FB2GHException(e);
@@ -113,9 +113,10 @@ public final class FogBugzImpl implements FogBugz {
             String encodedQuery = URLEncoder.encode(query, "UTF-8");
             String cols = String.join(",", "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus",
                     "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase");
-            List<FBCase> list = Optional
-                    .ofNullable(parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases())
-                    .orElseGet(Collections::emptyList);
+            List<FBCase> list = parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases();
+            if (list == null) {
+                list = Collections.emptyList();
+            }
             logger.info("Search for '{}' returned {} case(s)", query, list.size());
             return list;
         } catch (UnsupportedEncodingException e) {

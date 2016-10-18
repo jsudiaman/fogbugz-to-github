@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -51,11 +50,14 @@ public final class Migrator {
      * @param builder The {@link Builder} to initialize with
      */
     private Migrator(final Builder builder) {
+        // Required
         fogBugz = builder.fogBugz;
         caseList = builder.caseList;
         ghRepo = builder.ghRepo;
-        fbAttachmentConverter = Optional.ofNullable(builder.fbAttachmentConverter)
-                .orElse((fb, attachment) -> attachment.getAbsoluteUrl(fb));
+
+        // Optional
+        fbAttachmentConverter = builder.fbAttachmentConverter != null ? builder.fbAttachmentConverter
+                : (fb, attachment) -> attachment.getAbsoluteUrl(fb);
     }
 
     /**

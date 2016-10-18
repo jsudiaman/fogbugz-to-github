@@ -12,19 +12,19 @@ import java.util.List;
 @XmlRootElement(name = "case")
 public final class FBCase {
 
-    private Integer id;
-    private Integer parentCaseId;
-    private Boolean open;
+    private int id;
+    private int parentCaseId;
+    private boolean open;
     private String title;
     private String assignee;
     private String status;
-    private Integer duplicateOfId;
+    private int duplicateOfId;
     private String priority;
-    private Integer milestoneId;
+    private int milestoneId;
     private String milestoneName;
     private String category;
     private List<FBCaseEvent> events;
-    private Integer salesforceCaseId;
+    private int salesforceCaseId;
 
     FBCase() {
     }
@@ -32,24 +32,24 @@ public final class FBCase {
     /**
      * @return Case number
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
     @XmlAttribute(name = "ixBug")
-    void setId(Integer id) {
+    void setId(int id) {
         this.id = id;
     }
 
     /**
      * @return Parent case number
      */
-    public Integer getParentCaseId() {
+    public int getParentCaseId() {
         return parentCaseId;
     }
 
     @XmlElement(name = "ixBugParent")
-    void setParentCaseId(Integer parentCaseId) {
+    void setParentCaseId(int parentCaseId) {
         this.parentCaseId = parentCaseId;
     }
 
@@ -57,12 +57,12 @@ public final class FBCase {
      * @return <code>true</code> if the case is open. <code>false</code> if it
      * is closed
      */
-    public Boolean isOpen() {
+    public boolean isOpen() {
         return open;
     }
 
     @XmlElement(name = "fOpen")
-    void setOpen(Boolean open) {
+    void setOpen(boolean open) {
         this.open = open;
     }
 
@@ -106,12 +106,12 @@ public final class FBCase {
      * @return If marked as duplicate, the case that this case was a duplicate
      * of
      */
-    public Integer getDuplicateOfId() {
+    public int getDuplicateOfId() {
         return duplicateOfId;
     }
 
     @XmlElement(name = "ixBugOriginal")
-    void setDuplicateOfId(Integer duplicateOfId) {
+    void setDuplicateOfId(int duplicateOfId) {
         this.duplicateOfId = duplicateOfId;
     }
 
@@ -130,12 +130,12 @@ public final class FBCase {
     /**
      * @return ID of the milestone this case is assigned to
      */
-    public Integer getMilestoneId() {
+    public int getMilestoneId() {
         return milestoneId;
     }
 
     @XmlElement(name = "ixFixFor")
-    void setMilestoneId(Integer milestoneId) {
+    void setMilestoneId(int milestoneId) {
         this.milestoneId = milestoneId;
     }
 
@@ -179,12 +179,12 @@ public final class FBCase {
     /**
      * @return The Salesforce case ID of the case (Requires Salesforce plugin)
      */
-    public Integer getSalesforceCaseId() {
+    public int getSalesforceCaseId() {
         return salesforceCaseId;
     }
 
     @XmlElement(name = "sCase")
-    void setSalesforceCaseId(Integer salesforceCaseId) {
+    void setSalesforceCaseId(int salesforceCaseId) {
         this.salesforceCaseId = salesforceCaseId;
     }
 
