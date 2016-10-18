@@ -2,8 +2,27 @@
 **FB2GH** is designed to help you programatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/). It also can alternatively serve as a lightweight Java API for FogBugz or GH Issues.
 
 ## Usage
+```
+// Login to FogBugz
+// How to get an API token: http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token
+FogBugz fogBugz = new FogBugzImpl(fogBugzURL, fogBugzAPIToken);
 
-TBD
+// You can also get a token through FB2GH
+FogBugz otherFb = new FogBugzImpl(fogBugzURL, fogBugzEmail, fogBugzPassword);
+System.out.println(otherFb.getAuthToken());
+
+// FogBugz::searchCases(String) functions exactly like the search box in FogBugz
+List<FBCase> caseList = fogBugz.searchCases("123");
+
+// Login to GitHub
+GitHub github = new GitHubImpl(githubOAuthToken); // Using OAuth (https://github.com/settings/tokens/new)
+GitHub otherGh = new GitHubImpl(githubUsername, githubPassword); // Using basic authentication
+GHRepo ghRepo = github.getRepo(repoOwner, repoName);
+
+// Migrate caseList
+Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).get();
+migrator.migrate();
+```
 
 ## Troubleshooting
 
