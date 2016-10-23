@@ -1,6 +1,7 @@
 package com.sudicode.fb2gh.fogbugz;
 
 import com.sudicode.fb2gh.FB2GHException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,11 +73,11 @@ public final class FogBugzImpl implements FogBugz {
     public FogBugzImpl(final String baseURL, final String authToken) throws FB2GHException {
         try {
             this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
-            this.baseURL = normalize(baseURL);
-            this.authToken = authToken; // TODO Validate the token
         } catch (JAXBException e) {
-            throw new FB2GHException(e);
+            throw new FB2GHException("Failed to initialize XML parser", e);
         }
+        this.baseURL = normalize(baseURL);
+        this.authToken = authToken; // TODO Validate the token
     }
 
     /**
@@ -91,15 +92,15 @@ public final class FogBugzImpl implements FogBugz {
     public FogBugzImpl(final String baseURL, final String email, final String password) throws FB2GHException {
         try {
             this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
-            this.baseURL = normalize(baseURL);
-            this.authToken = parseApiRequest("logon", "email=" + email, "password=" + password).getToken();
-            if (this.authToken == null) {
-                throw new FB2GHException("Authentication failed.");
-            }
-            logger.info("Generated API token: {}", this.authToken);
         } catch (JAXBException e) {
-            throw new FB2GHException(e);
+            throw new FB2GHException("Failed to initialize XML parser", e);
         }
+        this.baseURL = normalize(baseURL);
+        this.authToken = parseApiRequest("logon", "email=" + email, "password=" + password).getToken();
+        if (this.authToken == null) {
+            throw new FB2GHException("Authentication failed.");
+        }
+        logger.info("Generated API token: {}", this.authToken);
     }
 
     @Override
@@ -109,19 +110,21 @@ public final class FogBugzImpl implements FogBugz {
 
     @Override
     public List<FBCase> searchCases(final String query) throws FB2GHException {
+        String encodedQuery;
         try {
-            String encodedQuery = URLEncoder.encode(query, "UTF-8");
-            String cols = String.join(",", "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus",
-                    "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase");
-            List<FBCase> list = parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases();
-            if (list == null) {
-                list = Collections.emptyList();
-            }
-            logger.info("Search for '{}' returned {} case(s)", query, list.size());
-            return list;
+            encodedQuery = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new FB2GHException(e);
+            throw new FB2GHException("Caught UnsupportedEncodingException which should NOT happen. "
+                    + "Please raise an issue at: https://github.com/sudiamanj/fogbugz-to-github/issues", e);
         }
+        String cols = String.join(",", "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus",
+                "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase");
+        List<FBCase> list = parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases();
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        logger.info("Search for '{}' returned {} case(s)", query, list.size());
+        return list;
     }
 
     @Override
@@ -145,27 +148,30 @@ public final class FogBugzImpl implements FogBugz {
      * API</a>
      */
     private FBResponse parseApiRequest(final String cmd, final String... parameters) throws FB2GHException {
+        // Required
+        StringBuilder urlBuilder = new StringBuilder(getBaseURL()).append("/api.asp?cmd=").append(cmd);
+        if (!cmd.equals("logon")) {
+            urlBuilder.append("&token=").append(getAuthToken());
+        }
+
+        // Optional
+        for (String param : parameters) {
+            urlBuilder.append('&').append(param);
+        }
+
+        // Parse XML response
+        String url = urlBuilder.toString();
+        logger.info("Opening URL: {}", url);
+        InputStream inStream = null;
         try {
-            // Required
-            StringBuilder urlBuilder = new StringBuilder(getBaseURL()).append("/api.asp?cmd=").append(cmd);
-            if (!cmd.equals("logon")) {
-                urlBuilder.append("&token=").append(getAuthToken());
-            }
-
-            // Optional
-            for (String param : parameters) {
-                urlBuilder.append('&').append(param);
-            }
-
-            // Parse XML response
-            String url = urlBuilder.toString();
-            logger.info("Opening URL: {}", url);
-            InputStream inStream = new URL(url).openStream();
-            FBResponse response = (FBResponse) jaxb.unmarshal(inStream);
-            inStream.close();
-            return response;
-        } catch (IOException | JAXBException e) {
-            throw new FB2GHException(e);
+            inStream = new URL(url).openStream();
+            return (FBResponse) jaxb.unmarshal(inStream);
+        } catch (IOException e) {
+            throw new FB2GHException("Could not open " + url, e);
+        } catch (JAXBException e) {
+            throw new FB2GHException("Could not parse " + url, e);
+        } finally {
+            IOUtils.closeQuietly(inStream);
         }
     }
 

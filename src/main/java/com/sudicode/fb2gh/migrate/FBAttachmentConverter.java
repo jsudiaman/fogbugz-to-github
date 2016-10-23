@@ -9,6 +9,7 @@ import com.sudicode.fb2gh.fogbugz.FogBugz;
  * those who are planning to do away with FogBugz entirely. In such cases, this
  * interface can be used to override the default behavior.
  */
+@FunctionalInterface
 public interface FBAttachmentConverter {
 
     /**

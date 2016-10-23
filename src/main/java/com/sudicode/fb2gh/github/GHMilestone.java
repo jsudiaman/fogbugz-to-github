@@ -1,9 +1,9 @@
 package com.sudicode.fb2gh.github;
 
-import java.io.IOException;
-
 import com.jcabi.github.Milestone;
 import com.sudicode.fb2gh.FB2GHException;
+
+import java.io.IOException;
 
 /**
  * GitHub milestone.
@@ -14,9 +14,8 @@ public class GHMilestone {
 
     /**
      * Constructor.
-     * 
-     * @param milestone
-     *            The {@link Milestone} instance to access.
+     *
+     * @param milestone The {@link Milestone} instance to access.
      */
     GHMilestone(Milestone milestone) {
         this.milestone = new Milestone.Smart(milestone);
@@ -31,8 +30,7 @@ public class GHMilestone {
 
     /**
      * @return The title of the milestone.
-     * 
-     * @throws FB2GHException
+     * @throws FB2GHException if an I/O error occurs
      */
     public String getTitle() throws FB2GHException {
         try {

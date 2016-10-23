@@ -114,30 +114,30 @@ public final class FB2GHUtils {
      * @throws FB2GHException if the trust manager could not be disabled
      */
     public static void trustInvalidCertificates() throws FB2GHException {
-        try {
-            // Create a trust manager that does not validate certificate chains
-            TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
             }
-            };
 
-            // Install the trust manager
+            @Override
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
+        };
+
+        // Install the trust manager
+        try {
             SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, tm, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new FB2GHException(e);
+        } catch (KeyManagementException | NoSuchAlgorithmException e) {
+            throw new FB2GHException("Failed to disable the trust manager", e);
         }
     }
 

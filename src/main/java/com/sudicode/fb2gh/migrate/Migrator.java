@@ -14,11 +14,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -43,6 +45,8 @@ public final class Migrator {
     private final List<FBCase> caseList;
     private final GHRepo ghRepo;
     private final FBAttachmentConverter fbAttachmentConverter;
+    private final FBCaseLabeler fbCaseLabeler;
+    private final Predicate<FBCase> closeIf;
 
     /**
      * Constructor.
@@ -58,6 +62,10 @@ public final class Migrator {
         // Optional
         fbAttachmentConverter = builder.fbAttachmentConverter != null ? builder.fbAttachmentConverter
                 : (fb, attachment) -> attachment.getAbsoluteUrl(fb);
+        fbCaseLabeler = builder.fbCaseLabeler != null ? builder.fbCaseLabeler
+                : fbCase -> Collections.singletonList(fbCase.getCategory());
+        closeIf = builder.closeIf != null ? builder.closeIf
+                : fbCase -> !fbCase.isOpen();
     }
 
     /**
@@ -68,6 +76,8 @@ public final class Migrator {
         private final List<FBCase> caseList;
         private final GHRepo ghRepo;
         private FBAttachmentConverter fbAttachmentConverter;
+        private FBCaseLabeler fbCaseLabeler;
+        private Predicate<FBCase> closeIf;
 
         /**
          * Constructor.
@@ -88,6 +98,27 @@ public final class Migrator {
          */
         public Builder fbAttachmentConverter(final FBAttachmentConverter fbAttachmentConverter) {
             this.fbAttachmentConverter = fbAttachmentConverter;
+            return this;
+        }
+
+        /**
+         * @param fbCaseLabeler The {@link FBCaseLabeler} to use
+         * @return This object
+         */
+        public Builder fbCaseLabeler(final FBCaseLabeler fbCaseLabeler) {
+            this.fbCaseLabeler = fbCaseLabeler;
+            return this;
+        }
+
+        /**
+         * After migrating a FogBugz case, close the corresponding GitHub issue if the {@link FBCase} passes the given
+         * {@link Predicate}. By default, the GitHub issue will be closed if the FogBugz case is closed.
+         *
+         * @param closeIf The {@link Predicate} to use
+         * @return This object
+         */
+        public Builder closeIf(final Predicate<FBCase> closeIf) {
+            this.closeIf = closeIf;
             return this;
         }
 
@@ -112,7 +143,7 @@ public final class Migrator {
 
         for (FBCase fbCase : caseList) {
             // Labels to attach to issue
-            String[] issueLabels = {fbCase.getCategory(), fbCase.getPriority(), fbCase.getStatus()};
+            List<String> issueLabels = fbCaseLabeler.getLabels(fbCase);
 
             // If labels don't exist, create them
             for (String label : issueLabels) {
@@ -144,7 +175,7 @@ public final class Migrator {
             for (int i = 1; i < events.size(); i++) {
                 issue.addComment(convertToComment(events.get(i)));
             }
-            if (!fbCase.isOpen()) {
+            if (closeIf.test(fbCase)) {
                 issue.close();
             }
 

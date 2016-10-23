@@ -31,8 +31,18 @@ public final class GHIssue {
      * @throws FB2GHException if an I/O error occurs
      */
     public void addLabels(final String... labels) throws FB2GHException {
+        addLabels(Arrays.asList(labels));
+    }
+
+    /**
+     * Add label(s) to this issue.
+     *
+     * @param labels An <code>Iterable</code> (usually some sort of <code>Collection</code>) of the label(s) to add
+     * @throws FB2GHException if an I/O error occurs
+     */
+    public void addLabels(final Iterable<String> labels) throws FB2GHException {
         try {
-            issue.labels().add(Arrays.asList(labels));
+            issue.labels().add(labels);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
