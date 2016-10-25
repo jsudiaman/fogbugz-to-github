@@ -1,5 +1,6 @@
-package com.sudicode.fb2gh;
+package com.sudicode.fb2gh.common;
 
+import com.sudicode.fb2gh.FB2GHException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

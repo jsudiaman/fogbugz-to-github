@@ -5,9 +5,9 @@ import com.jcabi.github.RtGithub;
 import com.jcabi.github.wire.CarefulWire;
 
 /**
- * Class used to interact with <a href="https://github.com">GitHub</a>.
+ * {@link GitHub} implementation.
  */
-public final class GitHubImpl implements GitHub {
+final class GitHubImpl implements GitHub {
 
     private final RtGithub connector;
 
@@ -17,7 +17,7 @@ public final class GitHubImpl implements GitHub {
      * @param token The OAuth token.
      * @see <a href="https://developer.github.com/v3/oauth/">OAuth</a>
      */
-    public GitHubImpl(final String token) {
+    GitHubImpl(final String token) {
         connector = new RtGithub(new RtGithub(token).entry().through(CarefulWire.class, 50));
     }
 
@@ -27,7 +27,7 @@ public final class GitHubImpl implements GitHub {
      * @param username GitHub username
      * @param password GitHub password
      */
-    public GitHubImpl(final String username, final String password) {
+    GitHubImpl(final String username, final String password) {
         connector = new RtGithub(new RtGithub(username, password).entry().through(CarefulWire.class, 50));
     }
 

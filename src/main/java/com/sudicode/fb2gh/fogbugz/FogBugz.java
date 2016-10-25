@@ -5,7 +5,7 @@ import com.sudicode.fb2gh.FB2GHException;
 import java.util.List;
 
 /**
- * Entry point for the FogBugz API. The provided implementing class is {@link FogBugzImpl}.
+ * Entry point for the FogBugz API. Use {@link FBFactory} to instantiate.
  */
 public interface FogBugz {
 

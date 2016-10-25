@@ -1,7 +1,8 @@
 package com.sudicode.fb2gh.migrate;
 
 import com.sudicode.fb2gh.FB2GHException;
-import com.sudicode.fb2gh.FB2GHUtils;
+import com.sudicode.fb2gh.common.FB2GHUtils;
+import com.sudicode.fb2gh.common.ObjectBuilder;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FBCase;
 import com.sudicode.fb2gh.fogbugz.FBCaseEvent;
@@ -21,20 +22,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * <p>
  * Migrates FogBugz cases to GitHub issues.
  * </p>
  * <p>
- * This class cannot be instantiated using a traditional constructor. To instantiate, use the
- * <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a>, like so:
+ * This class cannot be instantiated using a traditional constructor. To instantiate, use the builder, like so:
  * </p>
  * <pre>
  * Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo) // Required
  *     .fbAttachmentConverter(fbAttachmentConverter) // Optional
- *     .get(); // Returns Migrator
+ *     .build(); // Returns Migrator
  * </pre>
  */
 public final class Migrator {
@@ -71,7 +70,7 @@ public final class Migrator {
     /**
      * Builder used to instantiate {@link Migrator}.
      */
-    public static final class Builder implements Supplier<Migrator> {
+    public static final class Builder implements ObjectBuilder<Migrator> {
         private final FogBugz fogBugz;
         private final List<FBCase> caseList;
         private final GHRepo ghRepo;
@@ -123,7 +122,7 @@ public final class Migrator {
         }
 
         @Override
-        public Migrator get() {
+        public Migrator build() {
             return new Migrator(this);
         }
     }

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLHandshakeException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -19,41 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>
- * This class uses the
- * <a href="http://help.fogcreek.com/the-fogbugz-api">FogBugz API</a> to
- * interact with the given FogBugz instance. You will need to supply the URL of
- * your FogBugz instance, which will be referenced here as <code>baseURL</code>.
- * </p>
- * <p>
- * If you have an <a href=
- * "http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">API
- * token</a>, you can instantiate this class like so:
- * </p>
- * <pre>
- * FogBugz fb = new FogBugzImpl(baseURL, authToken);
- * </pre>
- * <p>
- * Otherwise, you can alternatively use:
- * </p>
- * <pre>
- * FogBugz fb = new FogBugzImpl(baseURL, email, password);
- * </pre>
- * <p>
- * After instantiating this class, you may then use
- * <code>fb.getAuthToken();</code> to obtain a valid API token for later.
- * </p>
- * <p>
- * If the constructors of this class are throwing {@link SSLHandshakeException},
- * then your FogBugz instance is most likely using an invalid SSL certificate.
- * This can be bypassed (at your own risk) like so:
- * </p>
- * <pre>
- * FB2GHUtils.trustInvalidCertificates();
- * FogBugz fb = ...
- * </pre>
+ * {@link FogBugz} implementation.
  */
-public final class FogBugzImpl implements FogBugz {
+final class FogBugzImpl implements FogBugz {
 
     private static final Logger logger = LoggerFactory.getLogger(FogBugzImpl.class);
 
@@ -70,7 +37,7 @@ public final class FogBugzImpl implements FogBugz {
      * @see <a href="http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">How To Get a FogBugz XML API
      * Token</a>
      */
-    public FogBugzImpl(final String baseURL, final String authToken) throws FB2GHException {
+    FogBugzImpl(final String baseURL, final String authToken) throws FB2GHException {
         try {
             this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
         } catch (JAXBException e) {
@@ -89,7 +56,7 @@ public final class FogBugzImpl implements FogBugz {
      * @param password FogBugz password
      * @throws FB2GHException if there is an API issue.
      */
-    public FogBugzImpl(final String baseURL, final String email, final String password) throws FB2GHException {
+    FogBugzImpl(final String baseURL, final String email, final String password) throws FB2GHException {
         try {
             this.jaxb = JAXBContext.newInstance(FBResponse.class).createUnmarshaller();
         } catch (JAXBException e) {

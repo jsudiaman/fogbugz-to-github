@@ -1,10 +1,10 @@
-package com.sudicode.fb2gh.migrate.beta;
+package com.sudicode.fb2gh.migrate;
 
-import com.sudicode.fb2gh.FB2GHUtils;
+import com.sudicode.fb2gh.common.FB2GHUtils;
+import com.sudicode.fb2gh.common.ObjectBuilder;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHRepo;
-import com.sudicode.fb2gh.migrate.FBAttachmentConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 /**
  * <p>
@@ -34,13 +33,12 @@ import java.util.function.Supplier;
  * works for you, the more power to you.
  * </p>
  * <p>
- * This class cannot be instantiated using a traditional constructor. To instantiate, use the
- * <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a>, like so:
+ * This class cannot be instantiated using a traditional constructor. To instantiate, use the builder, like so:
  * </p>
  * <pre>
  * GHAttachmentUploader ghau = new GHAttachmentUploader.Builder(ghUsername, ghPassword, ghRepo) // Required
  *     .webDriver(webDriver) // Optional
- *     .get(); // Returns GHAttachmentUploader
+ *     .build(); // Returns GHAttachmentUploader
  * </pre>
  *
  * @see <a href=
@@ -89,7 +87,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     /**
      * Builder used to instantiate {@link GHAttachmentUploader}.
      */
-    public static final class Builder implements Supplier<GHAttachmentUploader> {
+    public static final class Builder implements ObjectBuilder<GHAttachmentUploader> {
         private final String ghUsername;
         private final String ghPassword;
         private final GHRepo ghRepo;
@@ -118,7 +116,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
         }
 
         @Override
-        public GHAttachmentUploader get() {
+        public GHAttachmentUploader build() {
             return new GHAttachmentUploader(this);
         }
     }

@@ -1,7 +1,7 @@
 package com.sudicode.fb2gh.github;
 
 /**
- * Entry point for the GitHub API. The provided implementing class is {@link GitHubImpl}.
+ * Entry point for the GitHub API. Use {@link GHFactory} to instantiate.
  */
 public interface GitHub {
 
