@@ -20,7 +20,7 @@ GitHub otherGh = GHFactory.newGitHub(githubUsername, githubPassword); // Using b
 GHRepo ghRepo = github.getRepo(repoOwner, repoName);                  // GitHub repository to migrate to
 
 // Migrate caseList to ghRepo
-Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).get();
+Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
 migrator.migrate();
 ```
 
