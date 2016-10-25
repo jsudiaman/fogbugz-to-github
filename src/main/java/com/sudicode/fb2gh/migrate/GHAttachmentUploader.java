@@ -1,7 +1,7 @@
 package com.sudicode.fb2gh.migrate;
 
+import com.sudicode.fb2gh.common.AbstractBuilder;
 import com.sudicode.fb2gh.common.FB2GHUtils;
-import com.sudicode.fb2gh.common.ObjectBuilder;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHRepo;
@@ -10,6 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -36,8 +37,8 @@ import java.util.concurrent.TimeUnit;
  * This class cannot be instantiated using a traditional constructor. To instantiate, use the builder, like so:
  * </p>
  * <pre>
- * GHAttachmentUploader ghau = new GHAttachmentUploader.Builder(ghUsername, ghPassword, ghRepo) // Required
- *     .webDriver(webDriver) // Optional
+ * GHAttachmentUploader ghau = new GHAttachmentUploader.Builder(ghUsername, ghPassword, ghRepo, GHAttachmentUploader.Browser.FIREFOX) // Required
+ *     .timeoutInSeconds(100) // Optional
  *     .build(); // Returns GHAttachmentUploader
  * </pre>
  *
@@ -48,18 +49,15 @@ import java.util.concurrent.TimeUnit;
 public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(GHAttachmentUploader.class);
-
-    /**
-     * The timeout used for blocking operations (downloading, uploading, etc.)
-     */
-    private static final int TIMEOUT_IN_SECONDS = 100;
+    private static final int DEFAULT_TIMEOUT_IN_SECONDS = 100;
 
     /**
      * File types supported by GitHub.
      */
     private static final String SUPPORTED_FILE_TYPES = "png|gif|jpg|docx|pptx|xlsx|txt|pdf|zip|gz";
 
-    private final WebDriver browser;
+    private final int timeoutInSeconds;
+    private final WebDriver webDriver;
     private final FluentWait<WebDriver> wait;
 
     /**
@@ -69,17 +67,17 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      */
     private GHAttachmentUploader(final Builder builder) {
         // Initialize
-        this.browser = builder.webDriver != null ? builder.webDriver
-                : newWebDriver();
-        this.wait = new WebDriverWait(this.browser, TIMEOUT_IN_SECONDS);
+        timeoutInSeconds = builder.timeoutInSeconds != 0 ? builder.timeoutInSeconds : DEFAULT_TIMEOUT_IN_SECONDS;
+        webDriver = newWebDriver(builder.browser);
+        wait = new WebDriverWait(webDriver, timeoutInSeconds);
 
         // Log in to GitHub (required to access the issues page)
-        browser.get("http://github.com/login/");
-        browser.findElement(By.id("login_field")).sendKeys(builder.ghUsername);
-        browser.findElement(By.id("password")).sendKeys(builder.ghPassword);
-        browser.findElement(By.name("commit")).click();
+        webDriver.get("http://github.com/login/");
+        webDriver.findElement(By.id("login_field")).sendKeys(builder.ghUsername);
+        webDriver.findElement(By.id("password")).sendKeys(builder.ghPassword);
+        webDriver.findElement(By.name("commit")).click();
         wait.until(ExpectedConditions.urlToBe("https://github.com/"));
-        browser.get(String.format("https://github.com/%s/%s/issues/new", builder.ghRepo.getOwner(),
+        webDriver.get(String.format("https://github.com/%s/%s/issues/new", builder.ghRepo.getOwner(),
                 builder.ghRepo.getName()));
         logger.info("Constructed successfully");
     }
@@ -87,11 +85,13 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     /**
      * Builder used to instantiate {@link GHAttachmentUploader}.
      */
-    public static final class Builder implements ObjectBuilder<GHAttachmentUploader> {
+    public static final class Builder extends AbstractBuilder<GHAttachmentUploader> {
         private final String ghUsername;
         private final String ghPassword;
         private final GHRepo ghRepo;
-        private WebDriver webDriver;
+        private final Browser browser;
+
+        private int timeoutInSeconds;
 
         /**
          * Constructor. Since GitHub issues cannot be submitted anonymously, valid credentials are required.
@@ -99,19 +99,21 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
          * @param ghUsername GitHub username
          * @param ghPassword GitHub password
          * @param ghRepo     GitHub repository to upload to
+         * @param browser    The {@link Browser} to use
          */
-        public Builder(final String ghUsername, final String ghPassword, final GHRepo ghRepo) {
+        public Builder(final String ghUsername, final String ghPassword, final GHRepo ghRepo, final Browser browser) {
             this.ghUsername = ghUsername;
             this.ghPassword = ghPassword;
             this.ghRepo = ghRepo;
+            this.browser = browser;
         }
 
         /**
-         * @param webDriver The {@link WebDriver} to use
+         * @param timeoutInSeconds The timeout used for blocking operations (downloading, uploading, etc.)
          * @return This object
          */
-        public Builder webDriver(final WebDriver webDriver) {
-            this.webDriver = webDriver;
+        public Builder timeoutInSeconds(final int timeoutInSeconds) {
+            this.timeoutInSeconds = timeoutInSeconds;
             return this;
         }
 
@@ -121,6 +123,12 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
         }
     }
 
+    /**
+     * Web browser.
+     */
+    public enum Browser {
+        FIREFOX, CHROME
+    }
 
     /**
      * Download the FogBugz attachment, then reupload it to GitHub Issues. If
@@ -141,7 +149,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             String extension = FilenameUtils.getExtension(filename);
             String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
             File temp = FB2GHUtils.createTempFile(filename);
-            int timeoutInMillis = Math.toIntExact(TimeUnit.SECONDS.toMillis(TIMEOUT_IN_SECONDS));
+            int timeoutInMillis = Math.toIntExact(TimeUnit.SECONDS.toMillis(timeoutInSeconds));
             FileUtils.copyURLToFile(new URL(fbURL), temp, timeoutInMillis, timeoutInMillis);
 
             // If file is incompatible, zip it
@@ -150,8 +158,8 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             }
 
             // Upload to GH Issues
-            browser.findElement(By.id("issue_body")).clear();
-            browser.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser"))
+            webDriver.findElement(By.id("issue_body")).clear();
+            webDriver.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser"))
                     .sendKeys(temp.getAbsolutePath());
             String url = wait.ignoring(StringIndexOutOfBoundsException.class).until(new ExpectedCondition<String>() {
                 @Override
@@ -170,32 +178,56 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     }
 
     /**
-     * Quit the browser.
+     * Quit the WebDriver.
      */
     @Override
     public void close() {
-        browser.quit();
+        webDriver.quit();
     }
 
     /**
      * Construct the {@link WebDriver} instance to be used.
      */
-    private static WebDriver newWebDriver() {
-        String name;
+    private static WebDriver newWebDriver(final Browser browser) {
+        final String driver, os;
+
+        // Determine driver
+        switch (browser) {
+            case FIREFOX:
+                driver = "gecko";
+                break;
+            case CHROME:
+                driver = "chrome";
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid browser: " + browser);
+        }
+
+        // Determine os
         if (SystemUtils.IS_OS_WINDOWS) {
-            name = "geckodriver-win.exe";
+            os = "win.exe";
         } else if (SystemUtils.IS_OS_MAC) {
-            name = "geckodriver-mac";
+            os = "mac";
         } else if (SystemUtils.IS_OS_LINUX) {
-            name = "geckodriver-linux";
+            os = "linux";
         } else {
             throw new UnsupportedOperationException("Unsupported OS: " + SystemUtils.OS_NAME);
         }
 
-        File geckoDriver = new File(GHAttachmentUploader.class.getResource(name).getFile());
-        geckoDriver.setExecutable(true);
-        System.setProperty("webdriver.gecko.driver", geckoDriver.getAbsolutePath());
-        return new FirefoxDriver();
+        // Return WebDriver
+        File exe = new File(GHAttachmentUploader.class.getResource(driver + "driver-" + os).getFile());
+        if (!exe.setExecutable(true)) {
+            logger.warn("Failed to set access permissions of file: {}", exe);
+        }
+        System.setProperty("webdriver." + driver + ".driver", exe.getAbsolutePath());
+        switch (browser) {
+            case FIREFOX:
+                return new FirefoxDriver();
+            case CHROME:
+                return new ChromeDriver();
+            default:
+                throw new IllegalArgumentException("Invalid browser: " + browser);
+        }
     }
 
 }

@@ -2,7 +2,7 @@ package com.sudicode.fb2gh.migrate;
 
 import com.sudicode.fb2gh.FB2GHException;
 import com.sudicode.fb2gh.common.FB2GHUtils;
-import com.sudicode.fb2gh.common.ObjectBuilder;
+import com.sudicode.fb2gh.common.AbstractBuilder;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FBCase;
 import com.sudicode.fb2gh.fogbugz.FBCaseEvent;
@@ -70,7 +70,7 @@ public final class Migrator {
     /**
      * Builder used to instantiate {@link Migrator}.
      */
-    public static final class Builder implements ObjectBuilder<Migrator> {
+    public static final class Builder extends AbstractBuilder<Migrator> {
         private final FogBugz fogBugz;
         private final List<FBCase> caseList;
         private final GHRepo ghRepo;

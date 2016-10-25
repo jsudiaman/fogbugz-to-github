@@ -15,9 +15,9 @@ System.out.println(otherFb.getAuthToken());
 List<FBCase> caseList = fogBugz.searchCases("123");
 
 // Login to GitHub
-GitHub github = GHFactory.newGitHub(githubOAuthToken);                // Using OAuth (https://github.com/settings/tokens/new)
+GitHub github = GHFactory.newGitHub(githubOAuthToken); // Using OAuth (https://github.com/settings/tokens/new)
 GitHub otherGh = GHFactory.newGitHub(githubUsername, githubPassword); // Using basic authentication
-GHRepo ghRepo = github.getRepo(repoOwner, repoName);                  // GitHub repository to migrate to
+GHRepo ghRepo = github.getRepo(repoOwner, repoName); // GitHub repository to migrate to
 
 // Migrate caseList to ghRepo
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
