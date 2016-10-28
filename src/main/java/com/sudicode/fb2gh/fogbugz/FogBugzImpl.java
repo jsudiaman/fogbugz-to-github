@@ -1,7 +1,6 @@
 package com.sudicode.fb2gh.fogbugz;
 
 import com.sudicode.fb2gh.FB2GHException;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,10 +8,8 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.xml.transform.stream.StreamSource;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,16 +126,10 @@ final class FogBugzImpl implements FogBugz {
         // Parse XML response
         String url = urlBuilder.toString();
         logger.info("Opening URL: {}", url);
-        InputStream inStream = null;
         try {
-            inStream = new URL(url).openStream();
-            return (FBResponse) jaxb.unmarshal(inStream);
-        } catch (IOException e) {
-            throw new FB2GHException("Could not open " + url, e);
+            return (FBResponse) jaxb.unmarshal(new StreamSource(url));
         } catch (JAXBException e) {
             throw new FB2GHException("Could not parse " + url, e);
-        } finally {
-            IOUtils.closeQuietly(inStream);
         }
     }
 
