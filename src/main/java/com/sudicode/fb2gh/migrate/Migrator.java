@@ -1,8 +1,8 @@
 package com.sudicode.fb2gh.migrate;
 
 import com.sudicode.fb2gh.FB2GHException;
-import com.sudicode.fb2gh.common.FB2GHUtils;
 import com.sudicode.fb2gh.common.AbstractBuilder;
+import com.sudicode.fb2gh.common.FB2GHUtils;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FBCase;
 import com.sudicode.fb2gh.fogbugz.FBCaseEvent;
@@ -46,6 +46,7 @@ public final class Migrator {
     private final FBAttachmentConverter fbAttachmentConverter;
     private final FBCaseLabeler fbCaseLabeler;
     private final Predicate<FBCase> closeIf;
+    private final Map<String, String> usernameMap;
 
     /**
      * Constructor.
@@ -65,6 +66,8 @@ public final class Migrator {
                 : fbCase -> Collections.singletonList(fbCase.getCategory());
         closeIf = builder.closeIf != null ? builder.closeIf
                 : fbCase -> !fbCase.isOpen();
+        usernameMap = builder.usernameMap != null ? builder.usernameMap
+                : Collections.emptyMap();
     }
 
     /**
@@ -77,6 +80,7 @@ public final class Migrator {
         private FBAttachmentConverter fbAttachmentConverter;
         private FBCaseLabeler fbCaseLabeler;
         private Predicate<FBCase> closeIf;
+        private Map<String, String> usernameMap;
 
         /**
          * Constructor.
@@ -118,6 +122,18 @@ public final class Migrator {
          */
         public Builder closeIf(final Predicate<FBCase> closeIf) {
             this.closeIf = closeIf;
+            return this;
+        }
+
+        /**
+         * Map FogBugz names to GitHub usernames.
+         *
+         * @param usernameMap A {@link Map} where <code>key</code> is a FogBugz name and <code>value</code> is the
+         *                    corresponding GitHub username.
+         * @return This object
+         */
+        public Builder usernameMap(final Map<String, String> usernameMap) {
+            this.usernameMap = usernameMap;
             return this;
         }
 
@@ -178,6 +194,11 @@ public final class Migrator {
                 issue.close();
             }
 
+            // Set assignee
+            if (usernameMap.containsKey(fbCase.getAssignee())) {
+                issue.assignTo(usernameMap.get(fbCase.getAssignee()));
+            }
+
             logger.info("Migrated case '{}'", title);
         }
     }
@@ -206,12 +227,15 @@ public final class Migrator {
             for (FBAttachment attachment : event.getAttachments()) {
                 String filename = attachment.getFilename();
                 String url = fbAttachmentConverter.convert(fogBugz, attachment);
+                boolean isImage = FilenameUtils.getExtension(url).toLowerCase().matches("png|gif|jpg");
 
-                // If it's an image, prepend '!' to the Markdown string
-                if (FilenameUtils.getExtension(url).toLowerCase().matches("png|gif|jpg")) {
-                    sb.append("!");
+                sb.append(String.format("<a href=\"%s\">", url));
+                if (isImage) {
+                    sb.append(String.format("<img src=\"%s\" alt=\"%s\">", url, filename));
+                } else {
+                    sb.append(filename);
                 }
-                sb.append("[").append(filename).append("](").append(url).append(")<br>");
+                sb.append("</a><br>");
             }
         }
 

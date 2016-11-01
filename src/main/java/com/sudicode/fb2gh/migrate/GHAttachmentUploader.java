@@ -37,7 +37,8 @@ import java.util.concurrent.TimeUnit;
  * This class cannot be instantiated using a traditional constructor. To instantiate, use the builder, like so:
  * </p>
  * <pre>
- * GHAttachmentUploader ghau = new GHAttachmentUploader.Builder(ghUsername, ghPassword, ghRepo, GHAttachmentUploader.Browser.FIREFOX) // Required
+ * GHAttachmentUploader ghau = new GHAttachmentUploader.Builder
+ *     (ghUsername, ghPassword, ghRepo, GHAttachmentUploader.Browser.FIREFOX) // Required
  *     .timeoutInSeconds(100) // Optional
  *     .build(); // Returns GHAttachmentUploader
  * </pre>

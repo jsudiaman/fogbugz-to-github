@@ -2,7 +2,7 @@ package com.sudicode.fb2gh.github;
 
 import com.jcabi.github.Coordinates;
 import com.jcabi.github.RtGithub;
-import com.jcabi.github.wire.CarefulWire;
+import com.jcabi.http.wire.RetryWire;
 
 /**
  * {@link GitHub} implementation.
@@ -18,7 +18,7 @@ final class GitHubImpl implements GitHub {
      * @see <a href="https://developer.github.com/v3/oauth/">OAuth</a>
      */
     GitHubImpl(final String token) {
-        connector = new RtGithub(new RtGithub(token).entry().through(CarefulWire.class, 50));
+        connector = new RtGithub(new RtGithub(token).entry().through(RetryWire.class));
     }
 
     /**
@@ -28,7 +28,7 @@ final class GitHubImpl implements GitHub {
      * @param password GitHub password
      */
     GitHubImpl(final String username, final String password) {
-        connector = new RtGithub(new RtGithub(username, password).entry().through(CarefulWire.class, 50));
+        connector = new RtGithub(new RtGithub(username, password).entry().through(RetryWire.class));
     }
 
     @Override
