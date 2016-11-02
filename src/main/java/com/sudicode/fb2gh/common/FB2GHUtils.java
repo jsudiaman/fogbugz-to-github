@@ -142,4 +142,21 @@ public final class FB2GHUtils {
         }
     }
 
+    /**
+     * A "quiet" version of {@link Thread#sleep(long)} which, rather than throwing {@link InterruptedException}, simply
+     * restores the <code>interrupted</code> status if interrupted. Also silently ignores invalid <code>millis</code>
+     * values which would normally throw {@link IllegalArgumentException}.
+     *
+     * @param millis The length of time to sleep in milliseconds. Can be negative, in which case the call will be
+     *               silently ignored.
+     */
+    public static void sleepQuietly(final long millis) {
+        if (millis <= 0) return;
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 }

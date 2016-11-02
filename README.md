@@ -1,6 +1,6 @@
 # FogBugz to GitHub (FB2GH)
 ![Logo](http://sudicode.com/images/fb2gh-logo.png)  
-**FB2GH** is designed to help you programatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/). It also can alternatively serve as a lightweight Java API for FogBugz or GH Issues.
+**FB2GH** is designed to help you programmatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/). It also can alternatively serve as a lightweight Java API for FogBugz or GH Issues.
 
 ## Usage
 ```java
@@ -23,6 +23,28 @@ GHRepo ghRepo = github.getRepo(repoOwner, repoName); // GitHub repository to mig
 // Migrate caseList to ghRepo
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
 migrator.migrate();
+```
+
+## Configuration
+The `Migrator` class uses the [builder pattern](https://en.wikipedia.org/wiki/Builder_pattern) which makes it flexible in terms of customization.
+
+For instance, here's how to define your own labelling function:
+```java
+Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
+        .fbCaseLabeler(new FBCaseLabeler() {
+            @Override
+            public List<String> getLabels(FBCase fbCase) {
+                List<String> list = new ArrayList<String>();
+                list.add("F" + fbCase.getId());
+                if (fbCase.getSalesforceCaseId() != 0) {
+                    list.add("S" + fbCase.getSalesforceCaseId());
+                }
+                list.add(fbCase.getCategory());
+                list.add(fbCase.getPriority());
+                return list;
+            }
+        })
+        .build();
 ```
 
 ## Troubleshooting

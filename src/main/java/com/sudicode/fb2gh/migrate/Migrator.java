@@ -38,6 +38,7 @@ import java.util.function.Predicate;
  */
 public final class Migrator {
 
+    private static final long DEFAULT_POST_DELAY = 1000;
     private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
 
     private final FogBugz fogBugz;
@@ -47,6 +48,7 @@ public final class Migrator {
     private final FBCaseLabeler fbCaseLabeler;
     private final Predicate<FBCase> closeIf;
     private final Map<String, String> usernameMap;
+    private final long postDelay;
 
     /**
      * Constructor.
@@ -68,6 +70,8 @@ public final class Migrator {
                 : fbCase -> !fbCase.isOpen();
         usernameMap = builder.usernameMap != null ? builder.usernameMap
                 : Collections.emptyMap();
+        postDelay = builder.postDelay != Long.MIN_VALUE ? builder.postDelay
+                : DEFAULT_POST_DELAY;
     }
 
     /**
@@ -81,6 +85,7 @@ public final class Migrator {
         private FBCaseLabeler fbCaseLabeler;
         private Predicate<FBCase> closeIf;
         private Map<String, String> usernameMap;
+        private long postDelay = Long.MIN_VALUE;
 
         /**
          * Constructor.
@@ -137,6 +142,19 @@ public final class Migrator {
             return this;
         }
 
+        /**
+         * @param postDelay Number of milliseconds to wait after posting an issue or comment, to avoid abuse detection.
+         * @return This object
+         * @throws IllegalArgumentException if <code>postDelay</code> is negative
+         */
+        public Builder postDelay(final long postDelay) {
+            if (postDelay < 0) {
+                throw new IllegalArgumentException("Post delay cannot be negative.");
+            }
+            this.postDelay = postDelay;
+            return this;
+        }
+
         @Override
         public Migrator build() {
             return new Migrator(this);
@@ -185,10 +203,12 @@ public final class Migrator {
 
             // Post the issue, along with remaining events (if any)
             GHIssue issue = ghRepo.addIssue(title, description);
+            FB2GHUtils.sleepQuietly(postDelay);
             issue.addLabels(issueLabels);
             issue.setMilestone(ghMilestone);
             for (int i = 1; i < events.size(); i++) {
                 issue.addComment(convertToComment(events.get(i)));
+                FB2GHUtils.sleepQuietly(postDelay);
             }
             if (closeIf.test(fbCase)) {
                 issue.close();
