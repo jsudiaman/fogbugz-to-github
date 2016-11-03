@@ -42,7 +42,6 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
                 list.add(new GHLabel(fbCase.getCategory(), Color.INDIGO)); // javafx.scene.paint.Color
                 list.add(new GHLabel(fbCase.getPriority())); // Default color
                 return list;
-
             }
         })
         .build();
