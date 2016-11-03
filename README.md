@@ -61,10 +61,6 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
         .build();
 ```
 
-| Tip                                                                                                                                                        |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Use [lambda expressions](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html) instead of anonymous classes to shorten up your code. |
-
 ## Troubleshooting
 
 ### Why am I getting the following error?
