@@ -8,6 +8,7 @@ import com.sudicode.fb2gh.fogbugz.FBCase;
 import com.sudicode.fb2gh.fogbugz.FBCaseEvent;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHIssue;
+import com.sudicode.fb2gh.github.GHLabel;
 import com.sudicode.fb2gh.github.GHMilestone;
 import com.sudicode.fb2gh.github.GHRepo;
 import org.apache.commons.io.FilenameUtils;
@@ -17,11 +18,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -38,7 +39,7 @@ import java.util.function.Predicate;
  */
 public final class Migrator {
 
-    private static final long DEFAULT_POST_DELAY = 1000;
+    private static final long DEFAULT_POST_DELAY = 100;
     private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
 
     private final FogBugz fogBugz;
@@ -65,7 +66,7 @@ public final class Migrator {
         fbAttachmentConverter = builder.fbAttachmentConverter != null ? builder.fbAttachmentConverter
                 : (fb, attachment) -> attachment.getAbsoluteUrl(fb);
         fbCaseLabeler = builder.fbCaseLabeler != null ? builder.fbCaseLabeler
-                : fbCase -> Collections.singletonList(fbCase.getCategory());
+                : fbCase -> Collections.singletonList(new GHLabel(fbCase.getCategory()));
         closeIf = builder.closeIf != null ? builder.closeIf
                 : fbCase -> !fbCase.isOpen();
         usernameMap = builder.usernameMap != null ? builder.usernameMap
@@ -168,7 +169,7 @@ public final class Migrator {
      */
     public void migrate() throws FB2GHException {
         // Internal caches
-        Set<String> labels = new HashSet<>(ghRepo.getLabels());
+        Set<String> labelNames = ghRepo.getLabels().stream().map(GHLabel::getName).collect(Collectors.toSet());
         Map<String, GHMilestone> milestones = new HashMap<>();
         for (GHMilestone milestone : ghRepo.getMilestones()) {
             milestones.put(milestone.getTitle(), milestone);
@@ -176,13 +177,13 @@ public final class Migrator {
 
         for (FBCase fbCase : caseList) {
             // Labels to attach to issue
-            List<String> issueLabels = fbCaseLabeler.getLabels(fbCase);
+            List<GHLabel> issueLabels = fbCaseLabeler.getLabels(fbCase);
 
             // If labels don't exist, create them
-            for (String label : issueLabels) {
-                if (!FB2GHUtils.containsIgnoreCase(labels, label)) {
+            for (GHLabel label : issueLabels) {
+                if (!FB2GHUtils.containsIgnoreCase(labelNames, label.getName())) {
                     ghRepo.addLabel(label);
-                    labels.add(label);
+                    labelNames.add(label.getName());
                 }
             }
 

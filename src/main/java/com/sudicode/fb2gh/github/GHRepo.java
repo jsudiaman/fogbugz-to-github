@@ -6,7 +6,6 @@ import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
 import com.sudicode.fb2gh.FB2GHException;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,52 +86,36 @@ public final class GHRepo {
     }
 
     /**
-     * Create a label with the default label color.
+     * Add a label.
      *
-     * @param name The name of the label.
+     * @param label The label to add.
      * @throws FB2GHException if an I/O error occurs
      */
-    public void addLabel(final String name) throws FB2GHException {
-        addLabel(name, DEFAULT_LABEL_COLOR);
-    }
-
-    /**
-     * Create a label with a specific label color.
-     *
-     * @param name  The name of the label.
-     * @param color The {@link Color} to use.
-     * @throws FB2GHException if an I/O error occurs
-     */
-    public void addLabel(final String name, final Color color) throws FB2GHException {
-        addLabel(name, String.format("%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue()));
-    }
-
-    /**
-     * Create a label with a specific label color.
-     *
-     * @param name     The name of the label.
-     * @param hexColor A 6 character hex code, without the leading #, identifying the color.
-     * @throws FB2GHException if an I/O error occurs
-     */
-    public void addLabel(final String name, final String hexColor) throws FB2GHException {
+    public void addLabel(final GHLabel label) throws FB2GHException {
         try {
-            repo.labels().create(name, hexColor);
+            repo.labels().create(label.getName(), label.getHexColor());
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
     }
 
     /**
-     * Get the names of all labels within this repository.
+     * Get the labels within this repository.
      *
-     * @return A list of the label names.
+     * @return A list of the labels.
+     * @throws FB2GHException if an I/O error occurs
      */
-    public List<String> getLabels() {
-        List<String> labels = new ArrayList<>();
-        for (Label label : repo.labels().iterate()) {
-            labels.add(label.name());
+    public List<GHLabel> getLabels() throws FB2GHException {
+        try {
+            List<GHLabel> labels = new ArrayList<>();
+            for (Label label : repo.labels().iterate()) {
+                Label.Smart smartLabel = new Label.Smart(label);
+                labels.add(new GHLabel(smartLabel.name(), smartLabel.color()));
+            }
+            return labels;
+        } catch (IOException e) {
+            throw new FB2GHException(e);
         }
-        return labels;
     }
 
     /**

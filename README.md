@@ -28,20 +28,21 @@ migrator.migrate();
 ## Configuration
 The `Migrator` class uses the [builder pattern](https://en.wikipedia.org/wiki/Builder_pattern) which makes it flexible in terms of customization.
 
-For instance, here's how to define your own labelling function:
+For instance, here's how to define your own labeling function:
 ```java
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
         .fbCaseLabeler(new FBCaseLabeler() {
             @Override
-            public List<String> getLabels(FBCase fbCase) {
-                List<String> list = new ArrayList<String>();
-                list.add("F" + fbCase.getId());
+            public List<GHLabel> getLabels(FBCase fbCase) {
+                List<GHLabel> list = new ArrayList<GHLabel>();
+                list.add(new GHLabel("F" + fbCase.getId(), "92602c")); // Hex color
                 if (fbCase.getSalesforceCaseId() != 0) {
-                    list.add("S" + fbCase.getSalesforceCaseId());
+                    list.add(new GHLabel("S" + fbCase.getSalesforceCaseId(), "178cda")); // Hex color
                 }
-                list.add(fbCase.getCategory());
-                list.add(fbCase.getPriority());
+                list.add(new GHLabel(fbCase.getCategory(), Color.INDIGO)); // javafx.scene.paint.Color
+                list.add(new GHLabel(fbCase.getPriority())); // Default color
                 return list;
+
             }
         })
         .build();

@@ -1,6 +1,7 @@
 package com.sudicode.fb2gh.migrate;
 
 import com.sudicode.fb2gh.fogbugz.FBCase;
+import com.sudicode.fb2gh.github.GHLabel;
 
 import java.util.List;
 
@@ -17,6 +18,6 @@ public interface FBCaseLabeler {
      * @param fbCase The {@link FBCase}
      * @return A {@link List} of labels to add
      */
-    List<String> getLabels(FBCase fbCase);
+    List<GHLabel> getLabels(FBCase fbCase);
 
 }

@@ -6,7 +6,7 @@ import com.sudicode.fb2gh.FB2GHException;
 import javax.json.Json;
 import javax.json.JsonObject;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * GitHub issue.
@@ -25,24 +25,14 @@ public final class GHIssue {
     }
 
     /**
-     * Add label(s) to this issue.
+     * Add labels to this issue.
      *
-     * @param labels The label(s) to add
+     * @param labels The labels to add
      * @throws FB2GHException if an I/O error occurs
      */
-    public void addLabels(final String... labels) throws FB2GHException {
-        addLabels(Arrays.asList(labels));
-    }
-
-    /**
-     * Add label(s) to this issue.
-     *
-     * @param labels An <code>Iterable</code> (usually some sort of <code>Collection</code>) of the label(s) to add
-     * @throws FB2GHException if an I/O error occurs
-     */
-    public void addLabels(final Iterable<String> labels) throws FB2GHException {
+    public void addLabels(final List<GHLabel> labels) throws FB2GHException {
         try {
-            issue.labels().add(labels);
+            issue.labels().add(() -> labels.stream().map(GHLabel::getName).iterator());
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
