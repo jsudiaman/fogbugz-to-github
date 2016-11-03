@@ -50,11 +50,19 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
 You can set as many options as you want before building, like so:
 ```java
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
-        .closeIf(fbCase -> !fbCase.isOpen() || fbCase.getStatus().matches("Fixed|Tested"))
+        .closeIf(new Predicate<FBCase>() {
+            @Override
+            public boolean test(FBCase fbCase) {
+                return !fbCase.isOpen() || fbCase.getStatus().matches("Fixed|Tested");
+            }
+        })
         .usernameMap(Collections.singletonMap("Jonathan Sudiaman", "sudiamanj"))
         .postDelay(500L)
         .build();
 ```
+
+| **Tip** | You can use [lambda expressions](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html) instead of anonymous classes to shorten up your code. |
+|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ## Troubleshooting
 
