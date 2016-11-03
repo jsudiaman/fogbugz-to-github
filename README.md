@@ -61,8 +61,8 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
         .build();
 ```
 
-| **Tip** | You can use [lambda expressions](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html) instead of anonymous classes to shorten up your code. |
-|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Tip | You can use [lambda expressions](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html) instead of anonymous classes to shorten up your code. |
+|-----|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 
 ## Troubleshooting
 
