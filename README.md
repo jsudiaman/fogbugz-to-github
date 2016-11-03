@@ -47,6 +47,15 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
         .build();
 ```
 
+You can stack up as many configuration parameters as you want before building, like so:
+```java
+Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
+        .closeIf(fbCase -> !fbCase.isOpen() || fbCase.getStatus().matches("Fixed|Tested"))
+        .usernameMap(Collections.singletonMap("Jonathan Sudiaman", "sudiamanj"))
+        .postDelay(500L)
+        .build();
+```
+
 ## Troubleshooting
 
 ### Why am I getting the following error?
