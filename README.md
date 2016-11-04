@@ -53,7 +53,7 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
         .closeIf(new Predicate<FBCase>() {
             @Override
             public boolean test(FBCase fbCase) {
-                return !fbCase.isOpen() || fbCase.getStatus().matches("Fixed|Tested");
+                return !fbCase.getStatus().equals("Active");
             }
         })
         .usernameMap(Collections.singletonMap("Jonathan Sudiaman", "sudiamanj"))
