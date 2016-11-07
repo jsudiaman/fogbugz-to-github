@@ -1,7 +1,5 @@
 package com.sudicode.fb2gh.github;
 
-import javafx.scene.paint.Color;
-
 /**
  * GitHub label.
  */
@@ -22,20 +20,6 @@ public final class GHLabel {
      */
     public GHLabel(final String name) {
         this(name, DEFAULT_LABEL_COLOR);
-    }
-
-    /**
-     * Create a label with a specific label color.
-     *
-     * @param name  The name of the label.
-     * @param color The {@link Color} to use.
-     */
-    public GHLabel(final String name, final Color color) {
-        this(name, String.format("%02x%02x%02x",
-                (int) (color.getRed() * 255),
-                (int) (color.getGreen() * 255),
-                (int) (color.getBlue() * 255))
-        );
     }
 
     /**

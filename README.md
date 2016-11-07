@@ -35,12 +35,12 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
             @Override
             public List<GHLabel> getLabels(FBCase fbCase) {
                 List<GHLabel> list = new ArrayList<GHLabel>();
-                list.add(new GHLabel("F" + fbCase.getId(), "92602c")); // Hex color
+                list.add(new GHLabel("F" + fbCase.getId(), "92602c"));
                 if (fbCase.getSalesforceCaseId() != 0) {
-                    list.add(new GHLabel("S" + fbCase.getSalesforceCaseId(), "178cda")); // Hex color
+                    list.add(new GHLabel("S" + fbCase.getSalesforceCaseId(), "178cda"));
                 }
-                list.add(new GHLabel(fbCase.getCategory(), Color.INDIGO)); // javafx.scene.paint.Color
-                list.add(new GHLabel(fbCase.getPriority())); // Default color
+                list.add(new GHLabel(fbCase.getCategory()));
+                list.add(new GHLabel(fbCase.getPriority()));
                 return list;
             }
         })
