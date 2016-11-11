@@ -63,7 +63,7 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
 
 ## Troubleshooting
 
-### Why am I getting the following error?
+### Why am I seeing the following message?
 ```
 SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
 SLF4J: Defaulting to no-operation (NOP) logger implementation
@@ -71,3 +71,20 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 ```
 
 This project uses [SLF4J](http://www.slf4j.org), which allows end users to choose a logging facility at runtime. If you don't care about logging and want to disable this message, simply add [slf4j-nop](http://search.maven.org/#artifactdetails%7Corg.slf4j%7Cslf4j-nop%7C1.7.21%7Cjar) to your CLASSPATH. If you want to use SLF4J's logger, use [slf4j-simple](http://search.maven.org/#artifactdetails%7Corg.slf4j%7Cslf4j-simple%7C1.7.21%7Cjar). For more options, see [SLF4J user manual](http://www.slf4j.org/manual.html).
+
+### Why am I getting an AssertionError?
+These are usually thrown by the GitHub API, looking something like this:
+```
+Exception in thread "main" java.lang.AssertionError: HTTP response status is not equal to 200:
+404 Not Found [https://api.github.com/repos/foo/bar/labels]
+Server: GitHub.com
+... 
+{"message":"Not Found","documentation_url":"https://developer.github.com/v3"}>
+	at org.hamcrest.MatcherAssert.assertThat(MatcherAssert.java:20)
+	at com.jcabi.http.response.RestResponse.assertStatus(RestResponse.java:111)
+	at com.jcabi.github.RtValuePagination$Items.fetch(RtValuePagination.java:193)
+	at com.jcabi.github.RtValuePagination$Items.hasNext(RtValuePagination.java:179)
+	at com.sudicode.fb2gh.github.GHRepo.getLabels(GHRepo.java:111)
+	at CallingClass.main(CallingClass.java:30)
+```
+This means that you're trying to do something which wouldn't be possible on GitHub (e.g. access a nonexistent repo, add duplicate labels, etc). Read through the error message to figure out what's going on. If the error persists, please [raise an issue](https://github.com/sudiamanj/fogbugz-to-github/issues).
