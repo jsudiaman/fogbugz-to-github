@@ -87,4 +87,4 @@ Server: GitHub.com
 	at com.sudicode.fb2gh.github.GHRepo.getLabels(GHRepo.java:111)
 	at CallingClass.main(CallingClass.java:30)
 ```
-This means that you're trying to do something which wouldn't be possible on GitHub (e.g. access a nonexistent repo, add duplicate labels, etc). Read through the error message to figure out what's going on. If the error persists, please [raise an issue](https://github.com/sudiamanj/fogbugz-to-github/issues).
+This means that you're trying to do something which wouldn't be possible on GitHub (e.g. access a nonexistent repo, add duplicate labels, etc). Read through your error message to figure out exactly what's going on. If the error persists, please [raise an issue](https://github.com/sudiamanj/fogbugz-to-github/issues).
