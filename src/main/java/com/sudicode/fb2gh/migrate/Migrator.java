@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  *     .build(); // Returns Migrator
  * </pre>
  */
-public final class Migrator {
+public class Migrator {
 
     private static final long DEFAULT_POST_DELAY = 100;
     private static final Logger logger = LoggerFactory.getLogger(Migrator.class);

@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * FogBugz case event attachment.
  */
 @XmlRootElement(name = "attachment")
-public final class FBAttachment {
+public class FBAttachment {
 
     private String filename;
     private String url;

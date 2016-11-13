@@ -10,7 +10,7 @@ import java.util.List;
  * FogBugz case.
  */
 @XmlRootElement(name = "case")
-public final class FBCase {
+public class FBCase {
 
     private int id;
     private int parentCaseId;

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * GitHub repository.
  */
-public final class GHRepo {
+public class GHRepo {
 
     /**
      * Hex code of the default label color.

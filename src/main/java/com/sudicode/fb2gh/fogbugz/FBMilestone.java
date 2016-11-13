@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * FogBugz milestone.
  */
 @XmlRootElement(name = "fixfor")
-public final class FBMilestone {
+public class FBMilestone {
 
     private int id;
     private String name;

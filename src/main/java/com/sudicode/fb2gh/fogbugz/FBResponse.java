@@ -10,7 +10,7 @@ import java.util.List;
  * given by all FogBugz API requests.
  */
 @XmlRootElement(name = "response")
-final class FBResponse {
+class FBResponse {
 
     private String token;
     private List<FBCase> cases;

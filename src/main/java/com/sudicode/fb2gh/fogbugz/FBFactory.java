@@ -27,7 +27,7 @@ import com.sudicode.fb2gh.FB2GHException;
  * FogBugz fb = ...
  * </pre>
  */
-public final class FBFactory {
+public class FBFactory {
 
     /**
      * This class is not designed for instantiation.

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * {@link FogBugz} implementation.
  */
-final class FogBugzImpl implements FogBugz {
+class FogBugzImpl implements FogBugz {
 
     private static final Logger logger = LoggerFactory.getLogger(FogBugzImpl.class);
 

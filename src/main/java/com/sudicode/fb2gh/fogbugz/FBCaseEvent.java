@@ -10,7 +10,7 @@ import java.util.List;
  * FogBugz case event.
  */
 @XmlRootElement(name = "event")
-public final class FBCaseEvent {
+public class FBCaseEvent {
 
     private int id;
     private int caseId;

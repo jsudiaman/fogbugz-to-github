@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * GitHub issue.
  */
-public final class GHIssue {
+public class GHIssue {
 
     private final Issue.Smart issue;
 

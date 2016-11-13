@@ -3,7 +3,7 @@ package com.sudicode.fb2gh.github;
 /**
  * GitHub label.
  */
-public final class GHLabel {
+public class GHLabel {
 
     /**
      * Hex code of the default label color.

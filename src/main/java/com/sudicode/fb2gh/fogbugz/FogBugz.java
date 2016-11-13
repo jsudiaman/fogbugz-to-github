@@ -39,9 +39,8 @@ public interface FogBugz {
      * </p>
      *
      * @return The URL of this FogBugz instance.
-     * @throws FB2GHException if there is an API issue.
      */
-    default String getBaseURL() throws FB2GHException {
+    default String getBaseURL() {
         return "";
     }
 
@@ -54,9 +53,8 @@ public interface FogBugz {
      * </p>
      *
      * @return The <code>token</code> parameter used to access the API.
-     * @throws FB2GHException if there is an API issue.
      */
-    default String getAuthToken() throws FB2GHException {
+    default String getAuthToken() {
         return "";
     }
 

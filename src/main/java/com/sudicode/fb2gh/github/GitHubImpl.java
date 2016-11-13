@@ -7,7 +7,7 @@ import com.jcabi.http.wire.RetryWire;
 /**
  * {@link GitHub} implementation.
  */
-final class GitHubImpl implements GitHub {
+class GitHubImpl implements GitHub {
 
     private final RtGithub connector;
 

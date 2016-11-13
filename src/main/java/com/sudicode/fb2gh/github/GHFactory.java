@@ -6,6 +6,12 @@ package com.sudicode.fb2gh.github;
 public final class GHFactory {
 
     /**
+     * This is a factory class which is not designed for instantiation.
+     */
+    private GHFactory() {
+    }
+
+    /**
      * Construct a new {@link GitHub}, authenticating via OAuth.
      *
      * @param token The OAuth token.
