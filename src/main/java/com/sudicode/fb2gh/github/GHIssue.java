@@ -1,12 +1,16 @@
 package com.sudicode.fb2gh.github;
 
+import com.jcabi.github.Comment;
 import com.jcabi.github.Issue;
+import com.jcabi.github.Label;
 import com.sudicode.fb2gh.FB2GHException;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * GitHub issue.
@@ -25,6 +29,25 @@ public class GHIssue {
     }
 
     /**
+     * Get labels from this issue.
+     *
+     * @return The labels
+     * @throws FB2GHException if an I/O error occurs
+     */
+    public List<GHLabel> getLabels() throws FB2GHException {
+        try {
+            List<GHLabel> list = new ArrayList<>();
+            for (Label label : issue.labels().iterate()) {
+                Label.Smart smartLabel = new Label.Smart(label);
+                list.add(new GHLabel(smartLabel.name(), smartLabel.color()));
+            }
+            return list;
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
      * Add labels to this issue.
      *
      * @param labels The labels to add
@@ -33,6 +56,25 @@ public class GHIssue {
     public void addLabels(final List<GHLabel> labels) throws FB2GHException {
         try {
             issue.labels().add(() -> labels.stream().map(GHLabel::getName).iterator());
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
+     * Get comments.
+     *
+     * @return All comments on this issue.
+     * @throws FB2GHException if an I/O error occurs
+     */
+    public List<String> getComments() throws FB2GHException {
+        try {
+            List<String> list = new ArrayList<>();
+            for (Comment comment : issue.comments().iterate()) {
+                Comment.Smart smartComment = new Comment.Smart(comment);
+                list.add(smartComment.body());
+            }
+            return list;
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -80,6 +122,24 @@ public class GHIssue {
     }
 
     /**
+     * Get the milestone of this issue, if one exists.
+     *
+     * @return An {@link Optional} which contains the milestone if one exists.
+     * @throws FB2GHException if an I/O error occurs
+     */
+    public Optional<GHMilestone> getMilestone() throws FB2GHException {
+        try {
+            if (issue.json().isNull("milestone")) {
+                return Optional.empty();
+            }
+            int number = issue.json().getJsonObject("milestone").getInt("number");
+            return Optional.of(new GHMilestone(issue.repo().milestones().get(number)));
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
      * Add this issue to a milestone. <em>NOTE: Only users with push access can
      * set the milestone for issues. The milestone is silently dropped
      * otherwise.</em>
@@ -94,6 +154,34 @@ public class GHIssue {
             } else {
                 issue.patch(Json.createObjectBuilder().add("milestone", JsonObject.NULL).build());
             }
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
+     * Get the title of this issue.
+     *
+     * @return Title of issue
+     * @throws FB2GHException if an I/O error occurs
+     */
+    public String getTitle() throws FB2GHException {
+        try {
+            return issue.title();
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
+     * Get the body of this issue.
+     *
+     * @return Body of issue
+     * @throws FB2GHException if an I/O error occurs
+     */
+    public String getBody() throws FB2GHException {
+        try {
+            return issue.body();
         } catch (IOException e) {
             throw new FB2GHException(e);
         }

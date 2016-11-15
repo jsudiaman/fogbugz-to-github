@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+    <cases>
+        <case ixBug="1">
+            <sPersonAssignedTo>CLOSED</sPersonAssignedTo>
+            <sCategory>Bug</sCategory>
+            <ixBugOriginal>0</ixBugOriginal>
+            <events>
+                <event ixBug="1" ixBugEvent="1">
+                    <rgAttachments/>
+                    <sHtml>Something is wrong with our product.</sHtml>
+                    <sChanges/>
+                    <dt>2007-06-27T16:37:13Z</dt>
+                    <evtDescription>Opened by Alice Adams</evtDescription>
+                </event>
+                <event ixBug="1" ixBugEvent="2">
+                    <rgAttachments/>
+                    <sHtml/>
+                    <sChanges/>
+                    <dt>2007-06-27T16:37:13Z</dt>
+                    <evtDescription>Assigned to Bob Brown by Alice Adams</evtDescription>
+                </event>
+                <event ixBug="1" ixBugEvent="5553">
+                    <rgAttachments/>
+                    <sHtml/>
+                    <sChanges>Status changed from 'Active' to 'Resolved (Won't Fix)'.</sChanges>
+                    <dt>2009-01-07T22:04:31Z</dt>
+                    <evtDescription>Resolved (Won't Fix) and assigned to Alice Adams by Alice Adams</evtDescription>
+                </event>
+                <event ixBug="1" ixBugEvent="5554">
+                    <rgAttachments/>
+                    <sHtml/>
+                    <sChanges/>
+                    <dt>2009-01-07T22:04:31Z</dt>
+                    <evtDescription>Closed by Alice Adams</evtDescription>
+                </event>
+            </events>
+            <ixFixFor>1</ixFixFor>
+            <sFixFor>Undecided</sFixFor>
+            <fOpen>false</fOpen>
+            <ixBugParent>0</ixBugParent>
+            <sPriority>High</sPriority>
+            <sCase>0</sCase>
+            <sStatus>Closed (Won't Fix)</sStatus>
+            <sTitle>Sample Bug</sTitle>
+        </case>
+    </cases>
+</response>

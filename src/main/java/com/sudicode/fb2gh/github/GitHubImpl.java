@@ -33,7 +33,7 @@ class GitHubImpl implements GitHub {
 
     @Override
     public GHRepo getRepo(final String repoOwner, final String repoName) {
-        return new GHRepo(connector.repos().get(new Coordinates.Simple(repoOwner, repoName)));
+        return new GHRepoImpl(connector.repos().get(new Coordinates.Simple(repoOwner, repoName)));
     }
 
 }

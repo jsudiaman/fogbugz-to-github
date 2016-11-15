@@ -1,0 +1,94 @@
+package com.sudicode.fb2gh.github;
+
+import com.google.common.collect.ImmutableMap;
+import com.jcabi.github.Label;
+import com.jcabi.github.Milestone;
+import com.jcabi.github.Repo;
+import com.sudicode.fb2gh.FB2GHException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * {@link GHRepo} implementation.
+ */
+class GHRepoImpl implements GHRepo {
+
+    private final Repo.Smart repo;
+
+    /**
+     * Constructor.
+     *
+     * @param repo The {@link Repo} instance used to access the repository.
+     */
+    GHRepoImpl(final Repo repo) {
+        this.repo = new Repo.Smart(repo);
+    }
+
+    @Override
+    public GHMilestone addMilestone(final String title) throws FB2GHException {
+        try {
+            return new GHMilestone(repo.milestones().create(title));
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    @Override
+    public List<GHMilestone> getMilestones() {
+        List<GHMilestone> milestones = new ArrayList<>();
+        for (Milestone milestone : repo.milestones().iterate(ImmutableMap.of("state", "all"))) {
+            milestones.add(new GHMilestone(milestone));
+        }
+        return milestones;
+    }
+
+    @Override
+    public GHIssue addIssue(final String title, final String description) throws FB2GHException {
+        try {
+            return new GHIssue(repo.issues().create(title, description));
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    @Override
+    public GHIssue getIssue(final int number) {
+        return new GHIssue(repo.issues().get(number));
+    }
+
+    @Override
+    public void addLabel(final GHLabel label) throws FB2GHException {
+        try {
+            repo.labels().create(label.getName(), label.getHexColor());
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    @Override
+    public List<GHLabel> getLabels() throws FB2GHException {
+        try {
+            List<GHLabel> labels = new ArrayList<>();
+            for (Label label : repo.labels().iterate()) {
+                Label.Smart smartLabel = new Label.Smart(label);
+                labels.add(new GHLabel(smartLabel.name(), smartLabel.color()));
+            }
+            return labels;
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    @Override
+    public String getOwner() {
+        return repo.coordinates().user();
+    }
+
+    @Override
+    public String getName() {
+        return repo.coordinates().repo();
+    }
+
+}
