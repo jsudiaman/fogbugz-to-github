@@ -5,6 +5,8 @@ import com.jcabi.github.Label;
 import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
 import com.sudicode.fb2gh.FB2GHException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +16,8 @@ import java.util.List;
  * {@link GHRepo} implementation.
  */
 class GHRepoImpl implements GHRepo {
+
+    private static final Logger logger = LoggerFactory.getLogger(GHRepoImpl.class);
 
     private final Repo.Smart repo;
 
@@ -39,7 +43,11 @@ class GHRepoImpl implements GHRepo {
     public List<GHMilestone> getMilestones() {
         List<GHMilestone> milestones = new ArrayList<>();
         for (Milestone milestone : repo.milestones().iterate(ImmutableMap.of("state", "all"))) {
-            milestones.add(new GHMilestone(milestone));
+            try {
+                milestones.add(new GHMilestone(milestone));
+            } catch (FB2GHException e) {
+                logger.warn("Couldn't get milestone.", e);
+            }
         }
         return milestones;
     }

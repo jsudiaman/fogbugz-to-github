@@ -132,8 +132,10 @@ public class GHIssue {
             if (issue.json().isNull("milestone")) {
                 return Optional.empty();
             }
-            int number = issue.json().getJsonObject("milestone").getInt("number");
-            return Optional.of(new GHMilestone(issue.repo().milestones().get(number)));
+            JsonObject milestone = issue.json().getJsonObject("milestone");
+            int number = milestone.getInt("number");
+            String title = milestone.getString("title");
+            return Optional.of(new GHMilestone(number, title));
         } catch (IOException e) {
             throw new FB2GHException(e);
         }

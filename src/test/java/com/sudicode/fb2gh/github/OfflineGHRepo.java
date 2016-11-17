@@ -5,7 +5,12 @@ import com.sudicode.fb2gh.FB2GHException;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static org.joor.Reflect.*;
+import static org.mockito.Mockito.*;
 
 /**
  * An in-memory GitHub repository for testing purposes.
@@ -13,6 +18,7 @@ import java.util.List;
 public class OfflineGHRepo implements GHRepo {
 
     private final GHRepo impl;
+    private final List<GHMilestone> milestones;
 
     /**
      * Construct a new <code>OfflineGHRepo</code>.
@@ -20,6 +26,7 @@ public class OfflineGHRepo implements GHRepo {
     public OfflineGHRepo() {
         try {
             this.impl = new GHRepoImpl(new MkGithub().randomRepo());
+            this.milestones = new ArrayList<>();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -27,12 +34,14 @@ public class OfflineGHRepo implements GHRepo {
 
     @Override
     public GHMilestone addMilestone(String title) throws FB2GHException {
-        return impl.addMilestone(title);
+        GHMilestone mls = new GHMilestone(milestones.size() + 1, title);
+        milestones.add(mls);
+        return mls;
     }
 
     @Override
     public List<GHMilestone> getMilestones() {
-        return impl.getMilestones();
+        return milestones;
     }
 
     @Override
@@ -42,7 +51,24 @@ public class OfflineGHRepo implements GHRepo {
 
     @Override
     public GHIssue getIssue(int number) {
-        return impl.getIssue(number);
+        try {
+            // Create spy object
+            GHIssue ghIssue = spy(impl.getIssue(number));
+
+            // If milestone != null, fetch it from memory
+            doAnswer(call -> {
+                String mlsNumber = on(ghIssue).field("issue").call("json").call("getString", "milestone").get();
+                if (mlsNumber.equals("null")) {
+                    return Optional.empty();
+                }
+                return Optional.of(milestones.get(Integer.parseInt(mlsNumber) - 1));
+            }).when(ghIssue).getMilestone();
+
+            // Return spy object
+            return ghIssue;
+        } catch (FB2GHException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
