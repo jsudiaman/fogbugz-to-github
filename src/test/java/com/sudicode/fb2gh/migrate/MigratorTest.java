@@ -46,7 +46,7 @@ public class MigratorTest {
         migrator.migrate();
 
         // Repo milestones
-        GHMilestone undecided = on("com.sudicode.fb2gh.github.GHMilestone").create(1, "Undecided").get();
+        GHMilestone undecided = on(GHMilestone.class).create(1, "Undecided").get();
         assertThat(ghRepo.getMilestones(), contains(undecided));
 
         GHIssue issue = ghRepo.getIssue(1);

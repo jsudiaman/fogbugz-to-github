@@ -1,5 +1,6 @@
 # FogBugz to GitHub (FB2GH)
 ![Logo](http://sudicode.com/images/fb2gh-logo.png)  
+[![CircleCI](https://circleci.com/gh/sudiamanj/fogbugz-to-github.svg?style=svg)](https://circleci.com/gh/sudiamanj/fogbugz-to-github)  
 **FB2GH** is designed to help you programmatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/).
 
 ## Usage
