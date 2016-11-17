@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.transform.stream.StreamSource;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.*;
@@ -25,24 +26,23 @@ import static org.mockito.Mockito.*;
  */
 public class MigratorTest {
 
+    private FogBugz fogBugz;
+    private List<FBCase> caseList;
     private GHRepo ghRepo;
-    private Migrator migrator;
 
     @Before
     public void setUp() throws Exception {
-        FogBugz fogBugz = mock(FogBugz.class);
-        List<FBCase> caseList = on(JAXBContext
-                .newInstance(Class.forName("com.sudicode.fb2gh.fogbugz.FBResponse"))
+        fogBugz = mock(FogBugz.class);
+        caseList = on(JAXBContext.newInstance(Class.forName("com.sudicode.fb2gh.fogbugz.FBResponse"))
                 .createUnmarshaller()
-                .unmarshal(new StreamSource(getClass().getResourceAsStream("FogBugz.xml"))))
-                .call("getCases")
-                .get();
+                .unmarshal(new StreamSource(getClass().getResourceAsStream("FogBugz.xml")))
+        ).call("getCases").get();
         ghRepo = new OfflineGHRepo();
-        migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
     }
 
     @Test
     public void migrate() throws Exception {
+        Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
         migrator.migrate();
 
         // Repo milestones
@@ -67,6 +67,28 @@ public class MigratorTest {
         // Issue milestone
         assertThat(issue.getMilestone().isPresent(), is(equalTo(true)));
         assertThat(issue.getMilestone().get(), is(equalTo(undecided)));
+    }
+
+    @Test
+    public void migrateWithLabels() throws Exception {
+        Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
+                .fbCaseLabeler(fbCase -> {
+                    List<GHLabel> list = new ArrayList<>();
+                    list.add(new GHLabel("F" + fbCase.getId(), "92602c"));
+                    if (fbCase.getSalesforceCaseId() != 0) {
+                        list.add(new GHLabel("S" + fbCase.getSalesforceCaseId(), "178cda"));
+                    }
+                    list.add(new GHLabel(fbCase.getCategory()));
+                    list.add(new GHLabel(fbCase.getPriority()));
+                    return list;
+                })
+                .build();
+        migrator.migrate();
+
+        GHIssue issue = ghRepo.getIssue(1);
+
+        // Issue labels
+        assertThat(issue.getLabels(), contains(new GHLabel("F1", "92602c"), new GHLabel("Bug"), new GHLabel("High")));
     }
 
 }

@@ -61,7 +61,7 @@ public class OfflineGHRepo implements GHRepo {
                 if (mlsNumber.equals("null")) {
                     return Optional.empty();
                 }
-                return Optional.of(milestones.get(Integer.parseInt(mlsNumber) - 1));
+                return Optional.of(getMilestones().get(Integer.parseInt(mlsNumber) - 1));
             }).when(ghIssue).getMilestone();
 
             // Return spy object
