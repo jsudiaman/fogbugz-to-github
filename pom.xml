@@ -21,6 +21,13 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <JCabi-Version>0.28</JCabi-Version>
+                            <JCabi-Date>2016-06-05 07:16</JCabi-Date>
+                            <JCabi-Build>cce246f</JCabi-Build>
+                        </manifestEntries>
+                    </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
