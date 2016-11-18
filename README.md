@@ -26,8 +26,8 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
 migrator.migrate();
 ```
 
-## Download
-Maven:  
+## Dependency Information
+Apache Maven
 ```xml
 <repositories>
     <repository>
