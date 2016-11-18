@@ -26,6 +26,28 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
 migrator.migrate();
 ```
 
+## Download
+JAR File:  
+[fb2gh-1.0.jar](https://github.com/sudiamanj/maven-repo/raw/master/com/sudicode/fb2gh/1.0/fb2gh-1.0.jar)
+
+Maven:  
+```
+<repositories>
+    <repository>
+        <id>sudiamanj</id>
+        <name>maven-repo</name>
+        <url>https://github.com/sudiamanj/maven-repo/raw/master/</url>
+    </repository>
+</repositories>
+<dependencies>
+    <dependency>
+        <groupId>com.sudicode</groupId>
+        <artifactId>fb2gh</artifactId>
+        <version>1.0</version>
+    </dependency>
+</dependencies>
+```
+
 ## Configuration
 The `Migrator` class uses the [builder pattern](https://en.wikipedia.org/wiki/Builder_pattern) which makes it flexible in terms of customization.
 
