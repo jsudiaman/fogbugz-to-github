@@ -31,7 +31,7 @@ JAR File:
 [fb2gh-1.0.jar](https://github.com/sudiamanj/maven-repo/raw/master/com/sudicode/fb2gh/1.0/fb2gh-1.0.jar)
 
 Maven:  
-```
+```xml
 <repositories>
     <repository>
         <id>sudiamanj</id>
