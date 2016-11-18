@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sudicode</groupId>
     <artifactId>fb2gh</artifactId>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
     <name>fogbugz-to-github</name>
     <description>Migrates FogBugz cases to GitHub issues.</description>
     <build>
