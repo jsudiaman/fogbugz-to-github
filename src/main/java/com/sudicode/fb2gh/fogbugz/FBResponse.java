@@ -15,6 +15,10 @@ class FBResponse {
     private String token;
     private List<FBCase> cases;
     private List<FBMilestone> milestones;
+    private List<FBProject> projects;
+    private List<FBArea> areas;
+    private List<FBCategory> categories;
+    private List<FBStatus> statuses;
 
     FBResponse() {
     }
@@ -55,6 +59,58 @@ class FBResponse {
     @XmlElement(name = "fixfor")
     void setMilestones(List<FBMilestone> milestones) {
         this.milestones = milestones;
+    }
+
+    /**
+     * @return Contents of the descendant <code>&lt;projects&gt;</code> element
+     */
+    public List<FBProject> getProjects() {
+        return projects;
+    }
+
+    @XmlElementWrapper
+    @XmlElement(name = "project")
+    void setProjects(List<FBProject> projects) {
+        this.projects = projects;
+    }
+
+    /**
+     * @return Contents of the descendant <code>&lt;areas&gt;</code> element
+     */
+    public List<FBArea> getAreas() {
+        return areas;
+    }
+
+    @XmlElementWrapper
+    @XmlElement(name = "area")
+    void setAreas(List<FBArea> areas) {
+        this.areas = areas;
+    }
+
+    /**
+     * @return Contents of the descendant <code>&lt;categories&gt;</code> element
+     */
+    public List<FBCategory> getCategories() {
+        return categories;
+    }
+
+    @XmlElementWrapper
+    @XmlElement(name = "category")
+    void setCategories(List<FBCategory> categories) {
+        this.categories = categories;
+    }
+
+    /**
+     * @return Contents of the descendant <code>&lt;statuses&gt;</code> element
+     */
+    public List<FBStatus> getStatuses() {
+        return statuses;
+    }
+
+    @XmlElementWrapper
+    @XmlElement(name = "status")
+    public void setStatuses(List<FBStatus> statuses) {
+        this.statuses = statuses;
     }
 
 }

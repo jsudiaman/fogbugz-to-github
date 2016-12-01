@@ -7,65 +7,36 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * FogBugz milestone.
+ * FogBugz category ('Bug', 'Feature', etc).
  */
-@XmlRootElement(name = "fixfor")
-public class FBMilestone {
+@XmlRootElement(name = "category")
+public class FBCategory {
 
     private int id;
     private String name;
-    private int projectId;
-    private String projectName;
-
-    FBMilestone() {
-    }
 
     /**
-     * @return ID of the milestone
+     * @return ID of the category.
      */
     public int getId() {
         return id;
     }
 
-    @XmlElement(name = "ixFixFor")
+    @XmlElement(name = "ixCategory")
     void setId(int id) {
         this.id = id;
     }
 
     /**
-     * @return Name of the milestone
+     * @return Name of the category.
      */
     public String getName() {
         return name;
     }
 
-    @XmlElement(name = "sFixFor")
+    @XmlElement(name = "sCategory")
     void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * @return Project ID
-     */
-    public int getProjectId() {
-        return projectId;
-    }
-
-    @XmlElement(name = "ixProject")
-    void setProjectId(int projectId) {
-        this.projectId = projectId;
-    }
-
-    /**
-     * @return Project name
-     */
-    public String getProjectName() {
-        return projectName;
-    }
-
-    @XmlElement(name = "sProject")
-    void setProjectName(String projectName) {
-        this.projectName = projectName;
     }
 
     @Override
@@ -74,13 +45,11 @@ public class FBMilestone {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        FBMilestone that = (FBMilestone) o;
+        FBCategory that = (FBCategory) o;
 
         return new EqualsBuilder()
                 .append(id, that.id)
-                .append(projectId, that.projectId)
                 .append(name, that.name)
-                .append(projectName, that.projectName)
                 .isEquals();
     }
 
@@ -89,8 +58,6 @@ public class FBMilestone {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .append(name)
-                .append(projectId)
-                .append(projectName)
                 .toHashCode();
     }
 

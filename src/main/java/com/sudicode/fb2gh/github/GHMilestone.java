@@ -4,8 +4,6 @@ import com.jcabi.github.Milestone;
 import com.sudicode.fb2gh.FB2GHException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.IOException;
 
@@ -82,10 +80,7 @@ public class GHMilestone {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("number", number)
-                .append("title", title)
-                .toString();
+        return title;
     }
 
 }

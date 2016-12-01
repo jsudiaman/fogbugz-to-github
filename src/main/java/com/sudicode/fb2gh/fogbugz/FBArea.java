@@ -7,45 +7,45 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * FogBugz milestone.
+ * FogBugz area.
  */
-@XmlRootElement(name = "fixfor")
-public class FBMilestone {
+@XmlRootElement(name = "area")
+public class FBArea {
 
     private int id;
     private String name;
     private int projectId;
     private String projectName;
 
-    FBMilestone() {
+    FBArea() {
     }
 
     /**
-     * @return ID of the milestone
+     * @return ID of the area
      */
     public int getId() {
         return id;
     }
 
-    @XmlElement(name = "ixFixFor")
+    @XmlElement(name = "ixArea")
     void setId(int id) {
         this.id = id;
     }
 
     /**
-     * @return Name of the milestone
+     * @return Name of the area
      */
     public String getName() {
         return name;
     }
 
-    @XmlElement(name = "sFixFor")
+    @XmlElement(name = "sArea")
     void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @return Project ID
+     * @return ID of the associated project
      */
     public int getProjectId() {
         return projectId;
@@ -57,7 +57,7 @@ public class FBMilestone {
     }
 
     /**
-     * @return Project name
+     * @return Name of the associated project
      */
     public String getProjectName() {
         return projectName;
@@ -74,13 +74,13 @@ public class FBMilestone {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        FBMilestone that = (FBMilestone) o;
+        FBArea fbArea = (FBArea) o;
 
         return new EqualsBuilder()
-                .append(id, that.id)
-                .append(projectId, that.projectId)
-                .append(name, that.name)
-                .append(projectName, that.projectName)
+                .append(id, fbArea.id)
+                .append(projectId, fbArea.projectId)
+                .append(name, fbArea.name)
+                .append(projectName, fbArea.projectName)
                 .isEquals();
     }
 

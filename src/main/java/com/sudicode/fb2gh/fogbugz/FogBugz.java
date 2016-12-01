@@ -10,12 +10,71 @@ import java.util.List;
 public interface FogBugz {
 
     /**
+     * Get a list of all projects from this FogBugz instance.
+     *
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBProject> listProjects() throws FB2GHException;
+
+    /**
      * Get a list of all milestones from this FogBugz instance.
      *
      * @return The list
      * @throws FB2GHException if there is an API issue.
      */
     List<FBMilestone> listMilestones() throws FB2GHException;
+
+    /**
+     * Get a list of all milestones from this FogBugz instance.
+     *
+     * @param project Only list milestones for this project.
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBMilestone> listMilestones(FBProject project) throws FB2GHException;
+
+    /**
+     * Get a list of all areas from this FogBugz instance.
+     *
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBArea> listAreas() throws FB2GHException;
+
+    /**
+     * Get a list of all areas from this FogBugz instance.
+     *
+     * @param project Only list areas for this project.
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBArea> listAreas(FBProject project) throws FB2GHException;
+
+    /**
+     * Get a list of all categories from this FogBugz instance.
+     *
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBCategory> listCategories() throws FB2GHException;
+
+    /**
+     * Get a list of all statuses from this FogBugz instance.
+     *
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBStatus> listStatuses() throws FB2GHException;
+
+    /**
+     * Get a list of all statuses from this FogBugz instance.
+     *
+     * @param category Only list statues from this category.
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBStatus> listStatuses(FBCategory category) throws FB2GHException;
 
     /**
      * Search for cases.

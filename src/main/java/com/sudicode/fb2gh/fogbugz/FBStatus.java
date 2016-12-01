@@ -7,65 +7,49 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * FogBugz milestone.
+ * FogBugz status ('Active', 'Resolved', etc).
  */
-@XmlRootElement(name = "fixfor")
-public class FBMilestone {
+@XmlRootElement(name = "status")
+public class FBStatus {
 
     private int id;
     private String name;
-    private int projectId;
-    private String projectName;
-
-    FBMilestone() {
-    }
+    private int categoryId;
 
     /**
-     * @return ID of the milestone
+     * @return ID of the status.
      */
     public int getId() {
         return id;
     }
 
-    @XmlElement(name = "ixFixFor")
+    @XmlElement(name = "ixStatus")
     void setId(int id) {
         this.id = id;
     }
 
     /**
-     * @return Name of the milestone
+     * @return Name of the status.
      */
     public String getName() {
         return name;
     }
 
-    @XmlElement(name = "sFixFor")
+    @XmlElement(name = "sStatus")
     void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @return Project ID
+     * @return ID of the associated category.
      */
-    public int getProjectId() {
-        return projectId;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    @XmlElement(name = "ixProject")
-    void setProjectId(int projectId) {
-        this.projectId = projectId;
-    }
-
-    /**
-     * @return Project name
-     */
-    public String getProjectName() {
-        return projectName;
-    }
-
-    @XmlElement(name = "sProject")
-    void setProjectName(String projectName) {
-        this.projectName = projectName;
+    @XmlElement(name = "ixCategory")
+    void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     @Override
@@ -74,13 +58,12 @@ public class FBMilestone {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        FBMilestone that = (FBMilestone) o;
+        FBStatus fbStatus = (FBStatus) o;
 
         return new EqualsBuilder()
-                .append(id, that.id)
-                .append(projectId, that.projectId)
-                .append(name, that.name)
-                .append(projectName, that.projectName)
+                .append(id, fbStatus.id)
+                .append(categoryId, fbStatus.categoryId)
+                .append(name, fbStatus.name)
                 .isEquals();
     }
 
@@ -89,8 +72,7 @@ public class FBMilestone {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .append(name)
-                .append(projectId)
-                .append(projectName)
+                .append(categoryId)
                 .toHashCode();
     }
 

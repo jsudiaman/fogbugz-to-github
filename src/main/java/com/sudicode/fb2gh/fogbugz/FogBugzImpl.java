@@ -68,8 +68,43 @@ class FogBugzImpl implements FogBugz {
     }
 
     @Override
+    public List<FBProject> listProjects() throws FB2GHException {
+        return parseApiRequest("listProjects").getProjects();
+    }
+
+    @Override
     public List<FBMilestone> listMilestones() throws FB2GHException {
         return parseApiRequest("listFixFors").getMilestones();
+    }
+
+    @Override
+    public List<FBMilestone> listMilestones(final FBProject project) throws FB2GHException {
+        return parseApiRequest("listFixFors", "ixProject=" + project.getId()).getMilestones();
+    }
+
+    @Override
+    public List<FBArea> listAreas() throws FB2GHException {
+        return parseApiRequest("listAreas").getAreas();
+    }
+
+    @Override
+    public List<FBArea> listAreas(final FBProject project) throws FB2GHException {
+        return parseApiRequest("listAreas", "ixProject=" + project.getId()).getAreas();
+    }
+
+    @Override
+    public List<FBCategory> listCategories() throws FB2GHException {
+        return parseApiRequest("listCategories").getCategories();
+    }
+
+    @Override
+    public List<FBStatus> listStatuses() throws FB2GHException {
+        return parseApiRequest("listStatuses").getStatuses();
+    }
+
+    @Override
+    public List<FBStatus> listStatuses(final FBCategory category) throws FB2GHException {
+        return parseApiRequest("listStatuses", "ixCategory=" + category.getId()).getStatuses();
     }
 
     @Override

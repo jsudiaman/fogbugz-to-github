@@ -2,8 +2,6 @@ package com.sudicode.fb2gh.github;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * GitHub label.
@@ -76,10 +74,7 @@ public class GHLabel {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-                .append("name", name)
-                .append("hexColor", hexColor)
-                .toString();
+        return name;
     }
 
 }
