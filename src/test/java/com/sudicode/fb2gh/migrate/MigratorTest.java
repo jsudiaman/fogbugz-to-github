@@ -1,5 +1,6 @@
 package com.sudicode.fb2gh.migrate;
 
+import com.sudicode.fb2gh.FB2GHException;
 import com.sudicode.fb2gh.fogbugz.FBCase;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHIssue;
@@ -14,11 +15,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.transform.stream.StreamSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.joor.Reflect.*;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 /**
@@ -67,6 +69,10 @@ public class MigratorTest {
         // Issue milestone
         assertThat(issue.getMilestone().isPresent(), is(equalTo(true)));
         assertThat(issue.getMilestone().get(), is(equalTo(undecided)));
+
+        // Issue status
+        assertThat(issue.isOpen(), is(equalTo(false)));
+        assertThat(issue.isClosed(), is(equalTo(true)));
     }
 
     @Test
@@ -89,6 +95,43 @@ public class MigratorTest {
 
         // Issue labels
         assertThat(issue.getLabels(), contains(new GHLabel("F1", "92602c"), new GHLabel("Bug"), new GHLabel("High")));
+    }
+
+    @Test
+    public void migrateWithCondition() throws Exception {
+        Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
+                .migrateIf(FBCase::isOpen)
+                .build();
+        migrator.migrate();
+
+        // Nonexistent issue
+        try {
+            GHIssue issue = ghRepo.getIssue(1);
+            issue.getTitle();
+            fail("Expected IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException expected) {
+        }
+    }
+
+    @Test
+    public void migrateWithAfter() throws Exception {
+        AtomicBoolean postMigrate = new AtomicBoolean();
+
+        Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).afterMigrate((fbCase, ghIssue) -> {
+            try {
+                // Verify that fbCase and ghIssue are accurate
+                assertThat(fbCase.getId(), is(equalTo(1)));
+                assertThat(ghIssue.getTitle(), is(equalTo("Sample Bug")));
+
+                // Indicate that this method was successfully invoked
+                postMigrate.set(true);
+            } catch (FB2GHException e) {
+                fail(e.getMessage());
+            }
+        }).build();
+        migrator.migrate();
+
+        assertThat(postMigrate.get(), is(equalTo(true)));
     }
 
 }

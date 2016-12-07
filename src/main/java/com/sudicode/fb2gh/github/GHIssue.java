@@ -108,6 +108,34 @@ public class GHIssue {
     }
 
     /**
+     * @return <code>true</code> if the issue is open. <code>false</code> if it
+     *         is closed
+     * @throws FB2GHException
+     *             if an I/O error occurs
+     */
+    public boolean isOpen() throws FB2GHException {
+        try {
+            return issue.state().equals(Issue.OPEN_STATE);
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
+     * @return <code>true</code> if the issue is closed. <code>false</code> if
+     *         it is open
+     * @throws FB2GHException
+     *             if an I/O error occurs
+     */
+    public boolean isClosed() throws FB2GHException {
+        try {
+            return issue.state().equals(Issue.CLOSED_STATE);
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
      * Assign this issue to another user.
      *
      * @param ghUsername GitHub username

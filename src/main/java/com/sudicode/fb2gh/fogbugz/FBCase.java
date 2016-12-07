@@ -67,6 +67,14 @@ public class FBCase {
     }
 
     /**
+     * @return <code>true</code> if the case is closed. <code>false</code> if it
+     * is open
+     */
+    public boolean isClosed() {
+        return !open;
+    }
+
+    /**
      * @return The title of the case
      */
     public String getTitle() {

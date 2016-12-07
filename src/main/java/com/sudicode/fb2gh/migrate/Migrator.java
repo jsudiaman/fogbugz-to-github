@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,8 @@ public class Migrator {
     private final Predicate<FBCase> closeIf;
     private final Map<String, String> usernameMap;
     private final long postDelay;
+    private final Predicate<FBCase> migrateIf;
+    private final BiConsumer<FBCase, GHIssue> afterMigrate;
 
     /**
      * Constructor.
@@ -68,11 +71,14 @@ public class Migrator {
         fbCaseLabeler = builder.fbCaseLabeler != null ? builder.fbCaseLabeler
                 : fbCase -> Collections.singletonList(new GHLabel(fbCase.getCategory()));
         closeIf = builder.closeIf != null ? builder.closeIf
-                : fbCase -> !fbCase.isOpen();
+                : fbCase -> fbCase.isClosed();
         usernameMap = builder.usernameMap != null ? builder.usernameMap
                 : Collections.emptyMap();
-        postDelay = builder.postDelay != Long.MIN_VALUE ? builder.postDelay
-                : DEFAULT_POST_DELAY;
+        postDelay = builder.postDelay;
+        migrateIf = builder.migrateIf != null ? builder.migrateIf
+                : fbCase -> true;
+        afterMigrate = builder.afterMigrate != null ? builder.afterMigrate
+                : (fbCase, ghIssue) -> {};
     }
 
     /**
@@ -86,7 +92,9 @@ public class Migrator {
         private FBCaseLabeler fbCaseLabeler;
         private Predicate<FBCase> closeIf;
         private Map<String, String> usernameMap;
-        private long postDelay = Long.MIN_VALUE;
+        private long postDelay = DEFAULT_POST_DELAY;
+        private Predicate<FBCase> migrateIf;
+        private BiConsumer<FBCase, GHIssue> afterMigrate;
 
         /**
          * Constructor.
@@ -156,6 +164,32 @@ public class Migrator {
             return this;
         }
 
+        /**
+         * Only migrate FogBugz cases that pass the given {@link Predicate}. By default, all cases will be migrated.
+         * 
+         * @param migrateIf The {@link Predicate} to use
+         * @return This object
+         */
+        public Builder migrateIf(final Predicate<FBCase> migrateIf) {
+            this.migrateIf = migrateIf;
+            return this;
+        }
+
+        /**
+         * After migrating a case to GitHub, perform some action specified by
+         * the given {@link BiConsumer}.
+         * 
+         * @param afterMigrate
+         *            {@link BiConsumer} to use. The {@link BiConsumer} receives
+         *            (1) the FogBugz case that was migrated, and (2) the GitHub
+         *            issue that was posted.
+         * @return This object
+         */
+        public Builder afterMigrate(final BiConsumer<FBCase, GHIssue> afterMigrate) {
+            this.afterMigrate = afterMigrate;
+            return this;
+        }
+
         @Override
         public Migrator build() {
             return new Migrator(this);
@@ -176,6 +210,11 @@ public class Migrator {
         }
 
         for (FBCase fbCase : caseList) {
+            // Skip if case shouldn't be migrated
+            if (!migrateIf.test(fbCase)) {
+                continue;
+            }
+
             // Labels to attach to issue
             List<GHLabel> issueLabels = fbCaseLabeler.getLabels(fbCase);
 
@@ -219,6 +258,9 @@ public class Migrator {
             if (usernameMap.containsKey(fbCase.getAssignee())) {
                 issue.assignTo(usernameMap.get(fbCase.getAssignee()));
             }
+
+            // Post-migration action
+            afterMigrate.accept(fbCase, issue);
 
             logger.info("Migrated case '{}'", title);
         }
