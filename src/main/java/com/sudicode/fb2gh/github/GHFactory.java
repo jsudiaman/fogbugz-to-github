@@ -15,6 +15,7 @@ public final class GHFactory {
      * Construct a new {@link GitHub}, authenticating via OAuth.
      *
      * @param token The OAuth token.
+     * @return The {@link GitHub}
      * @see <a href="https://developer.github.com/v3/oauth/">OAuth</a>
      */
     public static GitHub newGitHub(final String token) {
@@ -26,6 +27,7 @@ public final class GHFactory {
      *
      * @param username GitHub username
      * @param password GitHub password
+     * @return The {@link GitHub}
      */
     public static GitHub newGitHub(final String username, final String password) {
         return new GitHubImpl(username, password);

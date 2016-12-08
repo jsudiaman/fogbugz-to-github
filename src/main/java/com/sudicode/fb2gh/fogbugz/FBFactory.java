@@ -41,6 +41,7 @@ public class FBFactory {
      *
      * @param baseURL   The FogBugz URL
      * @param authToken FogBugz API token
+     * @return The {@link FogBugz}
      * @throws FB2GHException if there is an API issue.
      * @see <a href="http://help.fogcreek.com/8447/how-to-get-a-fogbugz-xml-api-token">How To Get a FogBugz XML API
      * Token</a>
@@ -55,6 +56,7 @@ public class FBFactory {
      * @param baseURL  The FogBugz URL
      * @param email    FogBugz email
      * @param password FogBugz password
+     * @return The {@link FogBugz}
      * @throws FB2GHException if there is an API issue.
      */
     public static FogBugz newFogBugz(final String baseURL, final String email, final String password) throws FB2GHException {
