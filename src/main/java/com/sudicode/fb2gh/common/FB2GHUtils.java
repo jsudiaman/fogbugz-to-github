@@ -50,7 +50,7 @@ public final class FB2GHUtils {
      * @return <code>true</code> if <code>searchString</code> is found in <code>strings</code>, regardless of case
      */
     public static boolean containsIgnoreCase(final Collection<String> strings, final String searchString) {
-        return strings.stream().filter(s -> s.equalsIgnoreCase(searchString)).findFirst().isPresent();
+        return strings.stream().anyMatch(s -> s.equalsIgnoreCase(searchString));
     }
 
     /**
