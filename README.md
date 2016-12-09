@@ -51,34 +51,34 @@ The `Migrator` class uses the [builder pattern](https://en.wikipedia.org/wiki/Bu
 For instance, here's how to define your own labeling function:
 ```java
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
-        .fbCaseLabeler(new FBCaseLabeler() {
-            @Override
-            public List<GHLabel> getLabels(FBCase fbCase) {
-                List<GHLabel> list = new ArrayList<GHLabel>();
-                list.add(new GHLabel("F" + fbCase.getId(), "92602c"));
-                if (fbCase.getSalesforceCaseId() != 0) {
-                    list.add(new GHLabel("S" + fbCase.getSalesforceCaseId(), "178cda"));
-                }
-                list.add(new GHLabel(fbCase.getCategory()));
-                list.add(new GHLabel(fbCase.getPriority()));
-                return list;
+    .fbCaseLabeler(new FBCaseLabeler() {
+        @Override
+        public List<GHLabel> getLabels(FBCase fbCase) {
+            List<GHLabel> list = new ArrayList<GHLabel>();
+            list.add(new GHLabel("F" + fbCase.getId(), "92602c"));
+            if (fbCase.getSalesforceCaseId() != 0) {
+                list.add(new GHLabel("S" + fbCase.getSalesforceCaseId(), "178cda"));
             }
-        })
-        .build();
+            list.add(new GHLabel(fbCase.getCategory()));
+            list.add(new GHLabel(fbCase.getPriority()));
+            return list;
+        }
+    })
+    .build();
 ```
 
 You can set as many options as you want before building, like so:
 ```java
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
-        .closeIf(new Predicate<FBCase>() {
-            @Override
-            public boolean test(FBCase fbCase) {
-                return !fbCase.getStatus().equals("Active");
-            }
-        })
-        .usernameMap(Collections.singletonMap("Jonathan Sudiaman", "sudiamanj"))
-        .postDelay(500L)
-        .build();
+    .closeIf(new Predicate<FBCase>() {
+        @Override
+        public boolean test(FBCase fbCase) {
+            return !fbCase.getStatus().equals("Active");
+        }
+    })
+    .usernameMap(Collections.singletonMap("Jonathan Sudiaman", "sudiamanj"))
+    .postDelay(500L)
+    .build();
 ```
 
 ## Troubleshooting
