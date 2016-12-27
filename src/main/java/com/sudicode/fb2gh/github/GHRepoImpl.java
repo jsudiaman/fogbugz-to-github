@@ -34,28 +34,36 @@ class GHRepoImpl implements GHRepo {
     public GHMilestone addMilestone(final String title) throws FB2GHException {
         try {
             return new GHMilestone(repo.milestones().create(title));
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
     }
 
     @Override
-    public List<GHMilestone> getMilestones() {
-        List<GHMilestone> milestones = new ArrayList<>();
-        for (Milestone milestone : repo.milestones().iterate(ImmutableMap.of("state", "all"))) {
-            try {
-                milestones.add(new GHMilestone(milestone));
-            } catch (FB2GHException e) {
-                logger.warn("Couldn't get milestone.", e);
+    public List<GHMilestone> getMilestones() throws FB2GHException {
+        try {
+            List<GHMilestone> milestones = new ArrayList<>();
+            for (Milestone milestone : repo.milestones().iterate(ImmutableMap.of("state", "all"))) {
+                try {
+                    milestones.add(new GHMilestone(milestone));
+                } catch (FB2GHException e) {
+                    logger.warn("Couldn't get milestone.", e);
+                }
             }
+            return milestones;
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         }
-        return milestones;
     }
 
     @Override
     public GHIssue addIssue(final String title, final String description) throws FB2GHException {
         try {
             return new GHIssue(repo.issues().create(title, description));
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -70,6 +78,8 @@ class GHRepoImpl implements GHRepo {
     public void addLabel(final GHLabel label) throws FB2GHException {
         try {
             repo.labels().create(label.getName(), label.getHexColor());
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -84,6 +94,8 @@ class GHRepoImpl implements GHRepo {
                 labels.add(new GHLabel(smartLabel.name(), smartLabel.color()));
             }
             return labels;
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -99,4 +111,8 @@ class GHRepoImpl implements GHRepo {
         return repo.coordinates().repo();
     }
 
+    @Override
+    public String toString() {
+        return getOwner() + "/" + getName();
+    }
 }

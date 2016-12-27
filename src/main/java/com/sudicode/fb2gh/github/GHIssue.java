@@ -32,7 +32,7 @@ public class GHIssue {
      * Get labels from this issue.
      *
      * @return The labels
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public List<GHLabel> getLabels() throws FB2GHException {
         try {
@@ -42,6 +42,8 @@ public class GHIssue {
                 list.add(new GHLabel(smartLabel.name(), smartLabel.color()));
             }
             return list;
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -51,11 +53,13 @@ public class GHIssue {
      * Add labels to this issue.
      *
      * @param labels The labels to add
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public void addLabels(final List<GHLabel> labels) throws FB2GHException {
         try {
             issue.labels().add(() -> labels.stream().map(GHLabel::getName).iterator());
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -65,7 +69,7 @@ public class GHIssue {
      * Get comments.
      *
      * @return All comments on this issue.
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public List<String> getComments() throws FB2GHException {
         try {
@@ -75,6 +79,8 @@ public class GHIssue {
                 list.add(smartComment.body());
             }
             return list;
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -84,11 +90,13 @@ public class GHIssue {
      * Add a comment.
      *
      * @param comment The contents of the comment. Supports Markdown.
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public void addComment(final String comment) throws FB2GHException {
         try {
             issue.comments().post(comment);
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -97,11 +105,13 @@ public class GHIssue {
     /**
      * Close this issue.
      *
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public void close() throws FB2GHException {
         try {
             issue.close();
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -109,13 +119,14 @@ public class GHIssue {
 
     /**
      * @return <code>true</code> if the issue is open. <code>false</code> if it
-     *         is closed
-     * @throws FB2GHException
-     *             if an I/O error occurs
+     * is closed
+     * @throws FB2GHException if a GitHub error occurs
      */
     public boolean isOpen() throws FB2GHException {
         try {
             return issue.state().equals(Issue.OPEN_STATE);
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -123,13 +134,14 @@ public class GHIssue {
 
     /**
      * @return <code>true</code> if the issue is closed. <code>false</code> if
-     *         it is open
-     * @throws FB2GHException
-     *             if an I/O error occurs
+     * it is open
+     * @throws FB2GHException if a GitHub error occurs
      */
     public boolean isClosed() throws FB2GHException {
         try {
             return issue.state().equals(Issue.CLOSED_STATE);
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -139,11 +151,13 @@ public class GHIssue {
      * Assign this issue to another user.
      *
      * @param ghUsername GitHub username
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public void assignTo(final String ghUsername) throws FB2GHException {
         try {
             issue.assign(ghUsername);
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -153,7 +167,7 @@ public class GHIssue {
      * Get the milestone of this issue, if one exists.
      *
      * @return An {@link Optional} which contains the milestone if one exists.
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public Optional<GHMilestone> getMilestone() throws FB2GHException {
         try {
@@ -164,6 +178,8 @@ public class GHIssue {
             int number = milestone.getInt("number");
             String title = milestone.getString("title");
             return Optional.of(new GHMilestone(number, title));
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -175,7 +191,7 @@ public class GHIssue {
      * otherwise.</em>
      *
      * @param milestone The {@link GHMilestone} to associate this issue with or <code>null</code> to remove current.
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public void setMilestone(final GHMilestone milestone) throws FB2GHException {
         try {
@@ -184,6 +200,8 @@ public class GHIssue {
             } else {
                 issue.patch(Json.createObjectBuilder().add("milestone", JsonObject.NULL).build());
             }
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -193,11 +211,13 @@ public class GHIssue {
      * Get the title of this issue.
      *
      * @return Title of issue
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public String getTitle() throws FB2GHException {
         try {
             return issue.title();
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -207,13 +227,24 @@ public class GHIssue {
      * Get the body of this issue.
      *
      * @return Body of issue
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     public String getBody() throws FB2GHException {
         try {
             return issue.body();
+        } catch (AssertionError e) {
+            throw new FB2GHException("GitHub error.", e);
         } catch (IOException e) {
             throw new FB2GHException(e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return getTitle();
+        } catch (FB2GHException e) {
+            return super.toString();
         }
     }
 

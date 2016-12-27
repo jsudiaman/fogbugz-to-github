@@ -12,6 +12,13 @@ class GitHubImpl implements GitHub {
     private final RtGithub connector;
 
     /**
+     * Constructor which does not authenticate.
+     */
+    GitHubImpl() {
+        connector = new RtGithub(new RtGithub().entry().through(RetryWire.class));
+    }
+
+    /**
      * Constructor which authenticates via OAuth.
      *
      * @param token The OAuth token.

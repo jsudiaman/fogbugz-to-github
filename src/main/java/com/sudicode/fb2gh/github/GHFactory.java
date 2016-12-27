@@ -1,7 +1,7 @@
 package com.sudicode.fb2gh.github;
 
 /**
- * Factory used to authenticate and interact with <a href="https://github.com">GitHub</a>.
+ * Factory used to interact with <a href="https://github.com">GitHub</a>.
  */
 public final class GHFactory {
 
@@ -9,6 +9,15 @@ public final class GHFactory {
      * This is a factory class which is not designed for instantiation.
      */
     private GHFactory() {
+    }
+
+    /**
+     * Construct a new {@link GitHub} without authentication.
+     *
+     * @return The {@link GitHub}
+     */
+    public static GitHub newGitHub() {
+        return new GitHubImpl();
     }
 
     /**
