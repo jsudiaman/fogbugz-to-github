@@ -239,13 +239,4 @@ public class GHIssue {
         }
     }
 
-    @Override
-    public String toString() {
-        try {
-            return getTitle();
-        } catch (FB2GHException e) {
-            return super.toString();
-        }
-    }
-
 }

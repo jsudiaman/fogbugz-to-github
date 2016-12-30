@@ -149,7 +149,7 @@ class FogBugzImpl implements FogBugz {
     private FBResponse parseApiRequest(final String cmd, final String... parameters) throws FB2GHException {
         // Required
         StringBuilder urlBuilder = new StringBuilder(getBaseURL()).append("/api.asp?cmd=").append(cmd);
-        if (!cmd.equals("logon")) {
+        if (!"logon".equals(cmd)) {
             urlBuilder.append("&token=").append(getAuthToken());
         }
 
@@ -170,21 +170,22 @@ class FogBugzImpl implements FogBugz {
 
     /**
      * Remove trailing "default.asp" (if present) from the given URL. This
-     * method might a bit of a misnomer, as it does not perform a fully
+     * method might be a bit of a misnomer, as it does not perform a fully
      * extensive URL normalization. It does, however, suffice for the purpose of
      * this class.
      *
      * @param baseURL The URL
      * @return The normalized URL
      */
-    private static String normalize(String baseURL) {
-        while (baseURL.endsWith("/")) {
-            baseURL = StringUtils.chop(baseURL);
+    private static String normalize(final String baseURL) {
+        String url = baseURL;
+        while (url.endsWith("/")) {
+            url = StringUtils.chop(url);
         }
-        if (baseURL.endsWith("default.asp")) {
-            baseURL = StringUtils.removeEnd(baseURL, "default.asp");
+        if (url.endsWith("default.asp")) {
+            url = StringUtils.removeEnd(url, "default.asp");
         }
-        return baseURL;
+        return url;
     }
 
 }

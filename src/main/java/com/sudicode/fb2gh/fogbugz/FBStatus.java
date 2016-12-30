@@ -1,7 +1,7 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * FogBugz status ('Active', 'Resolved', etc).
  */
+@EqualsAndHashCode
+@ToString(of = "name")
 @XmlRootElement(name = "status")
 public class FBStatus {
 
@@ -50,35 +52,6 @@ public class FBStatus {
     @XmlElement(name = "ixCategory")
     void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        FBStatus fbStatus = (FBStatus) o;
-
-        return new EqualsBuilder()
-                .append(id, fbStatus.id)
-                .append(categoryId, fbStatus.categoryId)
-                .append(name, fbStatus.name)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(id)
-                .append(name)
-                .append(categoryId)
-                .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
 }

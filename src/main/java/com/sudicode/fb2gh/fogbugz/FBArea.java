@@ -1,7 +1,7 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * FogBugz area.
  */
+@EqualsAndHashCode
+@ToString(of = "name")
 @XmlRootElement(name = "area")
 public class FBArea {
 
@@ -66,37 +68,6 @@ public class FBArea {
     @XmlElement(name = "sProject")
     void setProjectName(String projectName) {
         this.projectName = projectName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        FBArea fbArea = (FBArea) o;
-
-        return new EqualsBuilder()
-                .append(id, fbArea.id)
-                .append(projectId, fbArea.projectId)
-                .append(name, fbArea.name)
-                .append(projectName, fbArea.projectName)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(id)
-                .append(name)
-                .append(projectId)
-                .append(projectName)
-                .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
 }

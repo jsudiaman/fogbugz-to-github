@@ -78,7 +78,8 @@ public class Migrator {
         migrateIf = builder.migrateIf != null ? builder.migrateIf
                 : fbCase -> true;
         afterMigrate = builder.afterMigrate != null ? builder.afterMigrate
-                : (fbCase, ghIssue) -> {};
+                : (fbCase, ghIssue) -> {
+        };
     }
 
     /**
@@ -166,7 +167,7 @@ public class Migrator {
 
         /**
          * Only migrate FogBugz cases that pass the given {@link Predicate}. By default, all cases will be migrated.
-         * 
+         *
          * @param migrateIf The {@link Predicate} to use
          * @return This object
          */
@@ -178,11 +179,10 @@ public class Migrator {
         /**
          * After migrating a case to GitHub, perform some action specified by
          * the given {@link BiConsumer}.
-         * 
-         * @param afterMigrate
-         *            {@link BiConsumer} to use. The {@link BiConsumer} receives
-         *            (1) the FogBugz case that was migrated, and (2) the GitHub
-         *            issue that was posted.
+         *
+         * @param afterMigrate {@link BiConsumer} to use. The {@link BiConsumer} receives
+         *                     (1) the FogBugz case that was migrated, and (2) the GitHub
+         *                     issue that was posted.
          * @return This object
          */
         public Builder afterMigrate(final BiConsumer<FBCase, GHIssue> afterMigrate) {
@@ -285,7 +285,7 @@ public class Migrator {
             sb.append("<hr>").append(event.getBody());
         }
 
-        if (event.getAttachments().size() > 0) {
+        if (!event.getAttachments().isEmpty()) {
             sb.append("<hr>");
             for (FBAttachment attachment : event.getAttachments()) {
                 String filename = attachment.getFilename();

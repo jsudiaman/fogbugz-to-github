@@ -2,14 +2,16 @@ package com.sudicode.fb2gh.github;
 
 import com.jcabi.github.Milestone;
 import com.sudicode.fb2gh.FB2GHException;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.IOException;
 
 /**
  * GitHub milestone.
  */
+@EqualsAndHashCode
+@ToString(of = "title")
 public class GHMilestone {
 
     private final int number;
@@ -53,33 +55,6 @@ public class GHMilestone {
      * @return The title of the milestone.
      */
     public String getTitle() {
-        return title;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        GHMilestone milestone = (GHMilestone) o;
-
-        return new EqualsBuilder()
-                .append(number, milestone.number)
-                .append(title, milestone.title)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(number)
-                .append(title)
-                .toHashCode();
-    }
-
-    @Override
-    public String toString() {
         return title;
     }
 

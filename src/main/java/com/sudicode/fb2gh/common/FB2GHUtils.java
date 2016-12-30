@@ -86,17 +86,17 @@ public final class FB2GHUtils {
         File zipFile = createTempFile(file.getName() + ".zip");
 
         // Output file to zip file
-        ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(zipFile));
-        ZipEntry zipEntry = new ZipEntry(file.getName());
-        zipStream.putNextEntry(zipEntry);
-        try (FileInputStream fileStream = new FileInputStream(file)) {
-            int bytesRead;
-            while ((bytesRead = fileStream.read(buff)) > 0) {
-                zipStream.write(buff, 0, bytesRead);
+        try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(zipFile))) {
+            ZipEntry zipEntry = new ZipEntry(file.getName());
+            zipStream.putNextEntry(zipEntry);
+            try (FileInputStream fileStream = new FileInputStream(file)) {
+                int bytesRead;
+                while ((bytesRead = fileStream.read(buff)) > 0) {
+                    zipStream.write(buff, 0, bytesRead);
+                }
             }
+            zipStream.closeEntry();
         }
-        zipStream.closeEntry();
-        zipStream.close();
 
         // Return zip file
         return zipFile;

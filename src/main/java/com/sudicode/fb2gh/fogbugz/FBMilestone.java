@@ -1,7 +1,7 @@
 package com.sudicode.fb2gh.fogbugz;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * FogBugz milestone.
  */
+@EqualsAndHashCode
+@ToString(of = "name")
 @XmlRootElement(name = "fixfor")
 public class FBMilestone {
 
@@ -66,37 +68,6 @@ public class FBMilestone {
     @XmlElement(name = "sProject")
     void setProjectName(String projectName) {
         this.projectName = projectName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        FBMilestone that = (FBMilestone) o;
-
-        return new EqualsBuilder()
-                .append(id, that.id)
-                .append(projectId, that.projectId)
-                .append(name, that.name)
-                .append(projectName, that.projectName)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(id)
-                .append(name)
-                .append(projectId)
-                .append(projectName)
-                .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 
 }
