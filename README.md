@@ -1,6 +1,6 @@
 # FogBugz to GitHub (FB2GH)
 ![Logo](http://sudicode.com/images/fb2gh-logo.png)  
-[![CircleCI](https://circleci.com/gh/sudiamanj/fogbugz-to-github.svg?style=shield)](https://circleci.com/gh/sudiamanj/fogbugz-to-github) [![Javadoc](https://img.shields.io/badge/javadoc-html-blue.svg)](http://sudicode.com/fogbugz-to-github)  
+[![Build Status](https://travis-ci.org/sudiamanj/fogbugz-to-github.svg?branch=master)](https://travis-ci.org/sudiamanj/fogbugz-to-github) [![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.sudicode:fb2gh)](https://sonarqube.com/dashboard/index/com.sudicode:fb2gh) [![Javadoc](https://img.shields.io/badge/javadoc-html-blue.svg)](http://sudicode.com/fogbugz-to-github)
 **FB2GH** is designed to help you programmatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/).
 
 ## Usage
