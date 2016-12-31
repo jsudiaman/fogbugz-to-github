@@ -26,6 +26,8 @@ Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
 migrator.migrate();
 ```
 
+Also, [here](https://gist.github.com/sudiamanj/eae2597d7b1de8c9f4f54456cabfe8de) is a more comprehensive example which uses configuration options (including the experimental [GHAttachmentUploader](http://sudicode.com/fogbugz-to-github/com/sudicode/fb2gh/migrate/GHAttachmentUploader.html) feature).
+
 ## Dependency Information
 Apache Maven
 ```xml
