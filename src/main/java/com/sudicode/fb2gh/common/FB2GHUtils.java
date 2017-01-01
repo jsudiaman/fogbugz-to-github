@@ -116,20 +116,22 @@ public final class FB2GHUtils {
      */
     public static void trustInvalidCertificates() throws FB2GHException {
         // Create a trust manager that does not validate certificate chains
-        TrustManager[] tm = new TrustManager[]{new X509TrustManager() {
+        TrustManager[] tm = new TrustManager[1];
+        tm[1] = new X509TrustManager() {
             @Override
             public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];
             }
 
             @Override
-            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
+                // Trusted.
             }
 
             @Override
-            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
+                // Trusted.
             }
-        }
         };
 
         // Install the trust manager
@@ -163,6 +165,7 @@ public final class FB2GHUtils {
      * Perform no operation.
      */
     public static void nop() {
+        // Do nothing.
     }
 
 }
