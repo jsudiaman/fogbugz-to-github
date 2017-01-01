@@ -59,7 +59,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * @param ghRepo     GitHub repository to upload to
      * @param browser    The {@link Browser} to use
      */
-    private GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
+    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
                                  final Browser browser) {
         this(ghUsername, ghPassword, ghRepo, browser, DEFAULT_TIMEOUT_IN_SECONDS);
     }
@@ -73,7 +73,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * @param browser          The {@link Browser} to use
      * @param timeoutInSeconds The timeout used for blocking operations (downloading, uploading, etc.)
      */
-    private GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
+    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
                                  final Browser browser, final int timeoutInSeconds) {
         // Initialize
         this.timeoutInSeconds = timeoutInSeconds;

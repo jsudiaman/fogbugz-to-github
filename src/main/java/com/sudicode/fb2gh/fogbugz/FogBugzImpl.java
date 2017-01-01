@@ -131,6 +131,7 @@ class FogBugzImpl implements FogBugz {
                         currentCase = getCase(currentId);
                         return true;
                     } catch (FB2GHException e) {
+                        logger.debug("Caught FB2GHException.", e);
                         currentId++;
                     }
                 }
