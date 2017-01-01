@@ -1,6 +1,7 @@
 package com.sudicode.fb2gh.fogbugz;
 
 import com.sudicode.fb2gh.FB2GHException;
+import lombok.Lombok;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +13,10 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * {@link FogBugz} implementation.
@@ -119,32 +122,18 @@ class FogBugzImpl implements FogBugz {
 
     @Override
     public Iterable<FBCase> iterateCases(final int minId, final int maxId) throws FB2GHException {
-        Iterator<FBCase> iter = new Iterator<FBCase>() {
-            private int currentId = minId;
-            private FBCase currentCase;
-
-            @Override
-            public boolean hasNext() {
-                // Try to advance to the next valid case. Return false if none.
-                while (currentId <= maxId) {
+        return () -> IntStream.rangeClosed(minId, maxId)
+                .mapToObj(value -> {
                     try {
-                        currentCase = getCase(currentId);
-                        return true;
+                        return searchCases(String.valueOf(value));
                     } catch (FB2GHException e) {
-                        logger.debug("Caught FB2GHException.", e);
-                        currentId++;
+                        // Method throws FB2GHException, so this is safe to do
+                        throw Lombok.sneakyThrow(e);
                     }
-                }
-                return false;
-            }
-
-            @Override
-            public FBCase next() {
-                currentId++;
-                return currentCase;
-            }
-        };
-        return () -> iter;
+                })
+                .filter(list -> !list.isEmpty())
+                .flatMap(Collection::stream)
+                .iterator();
     }
 
     @Override
