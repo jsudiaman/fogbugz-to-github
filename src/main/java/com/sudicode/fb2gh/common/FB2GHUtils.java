@@ -117,7 +117,7 @@ public final class FB2GHUtils {
     public static void trustInvalidCertificates() throws FB2GHException {
         // Create a trust manager that does not validate certificate chains
         TrustManager[] tm = new TrustManager[1];
-        tm[1] = new X509TrustManager() {
+        tm[0] = new X509TrustManager() {
             @Override
             public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];
