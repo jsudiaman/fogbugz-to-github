@@ -8,6 +8,7 @@ import com.sudicode.fb2gh.github.GHLabel;
 import com.sudicode.fb2gh.github.GHMilestone;
 import com.sudicode.fb2gh.github.GHRepo;
 import com.sudicode.fb2gh.github.OfflineGHRepo;
+import org.joor.Reflect;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,11 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.joor.Reflect.*;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for {@link Migrator}.
@@ -35,7 +35,7 @@ public class MigratorTest {
     @Before
     public void setUp() throws Exception {
         fogBugz = mock(FogBugz.class);
-        caseList = on(JAXBContext.newInstance(Class.forName("com.sudicode.fb2gh.fogbugz.FBResponse"))
+        caseList = Reflect.on(JAXBContext.newInstance(Class.forName("com.sudicode.fb2gh.fogbugz.FBResponse"))
                 .createUnmarshaller()
                 .unmarshal(new StreamSource(getClass().getResourceAsStream("FogBugz.xml")))
         ).call("getCases").get();
@@ -48,7 +48,7 @@ public class MigratorTest {
         migrator.migrate();
 
         // Repo milestones
-        GHMilestone undecided = on(GHMilestone.class).create(1, "Undecided").get();
+        GHMilestone undecided = Reflect.on(GHMilestone.class).create(1, "Undecided").get();
         assertThat(ghRepo.getMilestones(), contains(undecided));
 
         GHIssue issue = ghRepo.getIssue(1);
@@ -67,12 +67,11 @@ public class MigratorTest {
         assertThat(issue.getLabels(), contains(new GHLabel("bug")));
 
         // Issue milestone
-        assertThat(issue.getMilestone().isPresent(), is(equalTo(true)));
-        assertThat(issue.getMilestone().get(), is(equalTo(undecided)));
+        assertThat(issue.getMilestone().orElseThrow(() -> new AssertionError("Milestone was not present")), is(equalTo(undecided)));
 
         // Issue status
-        assertThat(issue.isOpen(), is(equalTo(false)));
-        assertThat(issue.isClosed(), is(equalTo(true)));
+        assertFalse(issue.isOpen());
+        assertTrue(issue.isClosed());
     }
 
     @Test

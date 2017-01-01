@@ -1,6 +1,5 @@
 package com.sudicode.fb2gh.migrate;
 
-import com.sudicode.fb2gh.common.AbstractBuilder;
 import com.sudicode.fb2gh.common.FB2GHUtils;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
@@ -33,15 +32,6 @@ import java.util.concurrent.TimeUnit;
  * implementation is therefore unstable and should be handled as such. But if it
  * works for you, the more power to you.
  * </p>
- * <p>
- * This class cannot be instantiated using a traditional constructor. To instantiate, use the builder, like so:
- * </p>
- * <pre>
- * GHAttachmentUploader ghau = new GHAttachmentUploader.Builder
- *     (ghUsername, ghPassword, ghRepo, GHAttachmentUploader.Browser.FIREFOX) // Required
- *     .timeoutInSeconds(100) // Optional
- *     .build(); // Returns GHAttachmentUploader
- * </pre>
  *
  * @see <a href=
  * "https://help.github.com/articles/file-attachments-on-issues-and-pull-requests/">File
@@ -64,64 +54,40 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     /**
      * Constructor.
      *
-     * @param builder The {@link Builder} to initialize with
+     * @param ghUsername GitHub username
+     * @param ghPassword GitHub password
+     * @param ghRepo     GitHub repository to upload to
+     * @param browser    The {@link Browser} to use
      */
-    private GHAttachmentUploader(final Builder builder) {
+    private GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
+                                 final Browser browser) {
+        this(ghUsername, ghPassword, ghRepo, browser, DEFAULT_TIMEOUT_IN_SECONDS);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param ghUsername       GitHub username
+     * @param ghPassword       GitHub password
+     * @param ghRepo           GitHub repository to upload to
+     * @param browser          The {@link Browser} to use
+     * @param timeoutInSeconds The timeout used for blocking operations (downloading, uploading, etc.)
+     */
+    private GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
+                                 final Browser browser, final int timeoutInSeconds) {
         // Initialize
-        timeoutInSeconds = builder.timeoutInSeconds != 0 ? builder.timeoutInSeconds : DEFAULT_TIMEOUT_IN_SECONDS;
-        webDriver = newWebDriver(builder.browser);
+        this.timeoutInSeconds = timeoutInSeconds;
+        webDriver = newWebDriver(browser);
         wait = new WebDriverWait(webDriver, timeoutInSeconds);
 
         // Log in to GitHub (required to access the issues page)
         webDriver.get("http://github.com/login/");
-        webDriver.findElement(By.id("login_field")).sendKeys(builder.ghUsername);
-        webDriver.findElement(By.id("password")).sendKeys(builder.ghPassword);
+        webDriver.findElement(By.id("login_field")).sendKeys(ghUsername);
+        webDriver.findElement(By.id("password")).sendKeys(ghPassword);
         webDriver.findElement(By.name("commit")).click();
         wait.until(ExpectedConditions.urlToBe("https://github.com/"));
-        webDriver.get(String.format("https://github.com/%s/%s/issues/new", builder.ghRepo.getOwner(),
-                builder.ghRepo.getName()));
+        webDriver.get(String.format("https://github.com/%s/%s/issues/new", ghRepo.getOwner(), ghRepo.getName()));
         logger.info("Constructed successfully");
-    }
-
-    /**
-     * Builder used to instantiate {@link GHAttachmentUploader}.
-     */
-    public static final class Builder extends AbstractBuilder<GHAttachmentUploader> {
-        private final String ghUsername;
-        private final String ghPassword;
-        private final GHRepo ghRepo;
-        private final Browser browser;
-
-        private int timeoutInSeconds;
-
-        /**
-         * Constructor. Since GitHub issues cannot be submitted anonymously, valid credentials are required.
-         *
-         * @param ghUsername GitHub username
-         * @param ghPassword GitHub password
-         * @param ghRepo     GitHub repository to upload to
-         * @param browser    The {@link Browser} to use
-         */
-        public Builder(final String ghUsername, final String ghPassword, final GHRepo ghRepo, final Browser browser) {
-            this.ghUsername = ghUsername;
-            this.ghPassword = ghPassword;
-            this.ghRepo = ghRepo;
-            this.browser = browser;
-        }
-
-        /**
-         * @param timeoutInSeconds The timeout used for blocking operations (downloading, uploading, etc.)
-         * @return This object
-         */
-        public Builder timeoutInSeconds(final int timeoutInSeconds) {
-            this.timeoutInSeconds = timeoutInSeconds;
-            return this;
-        }
-
-        @Override
-        public GHAttachmentUploader build() {
-            return new GHAttachmentUploader(this);
-        }
     }
 
     /**

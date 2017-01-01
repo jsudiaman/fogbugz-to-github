@@ -2,6 +2,7 @@ package com.sudicode.fb2gh.github;
 
 import com.jcabi.github.mock.MkGithub;
 import com.sudicode.fb2gh.FB2GHException;
+import org.joor.Reflect;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.joor.Reflect.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -57,7 +57,7 @@ public class OfflineGHRepo implements GHRepo {
 
             // If milestone != null, fetch it from memory
             doAnswer(call -> {
-                String mlsNumber = on(ghIssue).field("issue").call("json").call("getString", "milestone").get();
+                String mlsNumber = Reflect.on(ghIssue).field("issue").call("json").call("getString", "milestone").get();
                 if (mlsNumber.equals("null")) {
                     return Optional.empty();
                 }

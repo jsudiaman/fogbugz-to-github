@@ -12,6 +12,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ class FogBugzImpl implements FogBugz {
             throw new FB2GHException("Failed to initialize XML parser", e);
         }
         this.baseURL = normalize(baseURL);
-        this.authToken = authToken; // TODO Validate the token
+        this.authToken = authToken;
     }
 
     /**
@@ -108,6 +109,44 @@ class FogBugzImpl implements FogBugz {
     }
 
     @Override
+    public FBCase getCase(final int caseId) throws FB2GHException {
+        List<FBCase> caseList = searchCases(String.valueOf(caseId));
+        if (caseList.isEmpty()) {
+            throw new FB2GHException("Case " + caseId + " not found");
+        }
+        return caseList.get(0);
+    }
+
+    @Override
+    public Iterable<FBCase> iterateCases(final int minId, final int maxId) throws FB2GHException {
+        Iterator<FBCase> iter = new Iterator<FBCase>() {
+            private int currentId = minId;
+            private FBCase currentCase;
+
+            @Override
+            public boolean hasNext() {
+                // Try to advance to the next valid case. Return false if none.
+                while (currentId <= maxId) {
+                    try {
+                        currentCase = getCase(currentId);
+                        return true;
+                    } catch (FB2GHException e) {
+                        currentId++;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public FBCase next() {
+                currentId++;
+                return currentCase;
+            }
+        };
+        return () -> iter;
+    }
+
+    @Override
     public List<FBCase> searchCases(final String query) throws FB2GHException {
         String encodedQuery;
         try {
@@ -162,7 +201,11 @@ class FogBugzImpl implements FogBugz {
         String url = urlBuilder.toString();
         logger.info("Opening URL: {}", url);
         try {
-            return (FBResponse) jaxb.unmarshal(new StreamSource(url));
+            FBResponse response = (FBResponse) jaxb.unmarshal(new StreamSource(url));
+            if (response.getError() != null) {
+                throw new FB2GHException(response.getError());
+            }
+            return response;
         } catch (JAXBException e) {
             throw new FB2GHException("Could not parse " + url, e);
         }

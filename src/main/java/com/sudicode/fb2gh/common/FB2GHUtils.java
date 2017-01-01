@@ -159,4 +159,10 @@ public final class FB2GHUtils {
         }
     }
 
+    /**
+     * Perform no operation.
+     */
+    public static void nop() {
+    }
+
 }

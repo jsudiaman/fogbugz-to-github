@@ -1,5 +1,8 @@
 package com.sudicode.fb2gh.fogbugz;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -10,6 +13,8 @@ import java.util.List;
  * FogBugz case.
  */
 @XmlRootElement(name = "case")
+@EqualsAndHashCode
+@ToString(of = {"id", "title"})
 public class FBCase {
 
     private int id;

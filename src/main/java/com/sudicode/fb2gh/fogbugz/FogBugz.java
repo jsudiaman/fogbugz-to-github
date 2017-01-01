@@ -77,6 +77,25 @@ public interface FogBugz {
     List<FBStatus> listStatuses(FBCategory category) throws FB2GHException;
 
     /**
+     * Get a single case.
+     *
+     * @param caseId Case number
+     * @return The case
+     * @throws FB2GHException if there is an API issue.
+     */
+    FBCase getCase(int caseId) throws FB2GHException;
+
+    /**
+     * Iterate multiple cases within a range.
+     *
+     * @param minId Case number to start at (inclusive)
+     * @param maxId Case number to stop at (inclusive)
+     * @return An {@link Iterable} of the cases
+     * @throws FB2GHException if there is an API issue.
+     */
+    Iterable<FBCase> iterateCases(int minId, int maxId) throws FB2GHException;
+
+    /**
      * Search for cases.
      *
      * @param query The query term you are searching for. Can be a string, a case

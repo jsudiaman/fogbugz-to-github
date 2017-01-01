@@ -19,6 +19,7 @@ class FBResponse {
     private List<FBArea> areas;
     private List<FBCategory> categories;
     private List<FBStatus> statuses;
+    private String error;
 
     FBResponse() {
     }
@@ -111,6 +112,15 @@ class FBResponse {
     @XmlElement(name = "status")
     public void setStatuses(List<FBStatus> statuses) {
         this.statuses = statuses;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    @XmlElement
+    public void setError(String error) {
+        this.error = error;
     }
 
 }

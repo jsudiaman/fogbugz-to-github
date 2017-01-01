@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
  * This class cannot be instantiated using a traditional constructor. To instantiate, use the builder, like so:
  * </p>
  * <pre>
- * Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo) // Required
- *     .fbAttachmentConverter(fbAttachmentConverter) // Optional
- *     .build(); // Returns Migrator
+ * Migrator migrator = new Migrator.Builder(fogBugz, cases, ghRepo) // Required
+ *     .fbAttachmentConverter(fbAttachmentConverter)                // Optional
+ *     .build();                                                    // Returns Migrator
  * </pre>
  */
 public class Migrator {
@@ -44,7 +44,7 @@ public class Migrator {
     private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
 
     private final FogBugz fogBugz;
-    private final List<FBCase> caseList;
+    private final Iterable<FBCase> cases;
     private final GHRepo ghRepo;
     private final FBAttachmentConverter fbAttachmentConverter;
     private final FBCaseLabeler fbCaseLabeler;
@@ -62,7 +62,7 @@ public class Migrator {
     private Migrator(final Builder builder) {
         // Required
         fogBugz = builder.fogBugz;
-        caseList = builder.caseList;
+        cases = builder.cases;
         ghRepo = builder.ghRepo;
 
         // Optional
@@ -71,15 +71,14 @@ public class Migrator {
         fbCaseLabeler = builder.fbCaseLabeler != null ? builder.fbCaseLabeler
                 : fbCase -> Collections.singletonList(new GHLabel(fbCase.getCategory()));
         closeIf = builder.closeIf != null ? builder.closeIf
-                : fbCase -> fbCase.isClosed();
+                : FBCase::isClosed;
         usernameMap = builder.usernameMap != null ? builder.usernameMap
                 : Collections.emptyMap();
         postDelay = builder.postDelay;
         migrateIf = builder.migrateIf != null ? builder.migrateIf
                 : fbCase -> true;
         afterMigrate = builder.afterMigrate != null ? builder.afterMigrate
-                : (fbCase, ghIssue) -> {
-        };
+                : (fbCase, ghIssue) -> FB2GHUtils.nop();
     }
 
     /**
@@ -87,7 +86,7 @@ public class Migrator {
      */
     public static final class Builder extends AbstractBuilder<Migrator> {
         private final FogBugz fogBugz;
-        private final List<FBCase> caseList;
+        private final Iterable<FBCase> cases;
         private final GHRepo ghRepo;
         private FBAttachmentConverter fbAttachmentConverter;
         private FBCaseLabeler fbCaseLabeler;
@@ -100,13 +99,13 @@ public class Migrator {
         /**
          * Constructor.
          *
-         * @param fogBugz  The FogBugz instance
-         * @param caseList A list of cases to migrate
-         * @param ghRepo   The GitHub repository to migrate to
+         * @param fogBugz The FogBugz instance
+         * @param cases   Cases to migrate
+         * @param ghRepo  The GitHub repository to migrate to
          */
-        public Builder(final FogBugz fogBugz, final List<FBCase> caseList, final GHRepo ghRepo) {
+        public Builder(final FogBugz fogBugz, final Iterable<FBCase> cases, final GHRepo ghRepo) {
             this.fogBugz = fogBugz;
-            this.caseList = caseList;
+            this.cases = cases;
             this.ghRepo = ghRepo;
         }
 
@@ -209,7 +208,7 @@ public class Migrator {
             milestones.put(milestone.getTitle(), milestone);
         }
 
-        for (FBCase fbCase : caseList) {
+        for (FBCase fbCase : cases) {
             // Skip if case shouldn't be migrated
             if (!migrateIf.test(fbCase)) {
                 continue;
@@ -263,6 +262,10 @@ public class Migrator {
             afterMigrate.accept(fbCase, issue);
 
             logger.info("Migrated case '{}'", title);
+            if (Thread.interrupted()) {
+                logger.info("Migration interrupted.");
+                break;
+            }
         }
     }
 
