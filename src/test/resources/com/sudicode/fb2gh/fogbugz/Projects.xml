@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+    <projects>
+        <project>
+            <ixProject>10</ixProject>
+            <sProject><![CDATA[Kakapo]]></sProject>
+            <ixPersonOwner>15</ixPersonOwner>
+            <sPersonOwner><![CDATA[Evelyn the Project Manager]]></sPersonOwner>
+            <sEmail><![CDATA[evelyn@kakapo.com]]></sEmail>
+            <sPhone/>
+            <fInbox>false</fInbox>
+            <ixWorkflow>1</ixWorkflow>
+            <fDeleted>false</fDeleted>
+        </project>
+    </projects>
+</response>

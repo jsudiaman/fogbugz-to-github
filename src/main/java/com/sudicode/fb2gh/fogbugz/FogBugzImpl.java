@@ -65,9 +65,6 @@ class FogBugzImpl implements FogBugz {
         }
         this.baseURL = normalize(baseURL);
         this.authToken = parseApiRequest("logon", "email=" + email, "password=" + password).getToken();
-        if (this.authToken == null) {
-            throw new FB2GHException("Authentication failed.");
-        }
         logger.info("Generated API token: {}", this.authToken);
     }
 
