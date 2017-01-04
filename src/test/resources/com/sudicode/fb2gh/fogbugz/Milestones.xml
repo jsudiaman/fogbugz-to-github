@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+    <fixfors>
+        <fixfor>
+            <ixFixFor>9</ixFixFor>
+            <sFixFor><![CDATA[Version 1.0]]></sFixFor>
+            <fDeleted>false</fDeleted>
+            <dt>2016-09-14T22:00:00Z</dt>
+            <dtStart>2016-04-03T22:00:00Z</dtStart>
+            <sStartNote/>
+            <ixProject>10</ixProject>
+            <sProject><![CDATA[Kakapo]]></sProject>
+            <setixFixForDependency/>
+            <fReallyDeleted>false</fReallyDeleted>
+        </fixfor>
+    </fixfors>
+</response>

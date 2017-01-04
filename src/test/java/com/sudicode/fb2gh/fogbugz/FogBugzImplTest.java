@@ -1,12 +1,15 @@
 package com.sudicode.fb2gh.fogbugz;
 
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.sudicode.fb2gh.FB2GHException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.Matchers.is;
@@ -31,7 +34,7 @@ public class FogBugzImplTest {
      *
      * @param mappingBuilder The mapping
      */
-    private void supposeThat(MappingBuilder mappingBuilder) {
+    private void supposeThat(final MappingBuilder mappingBuilder) {
         server.givenThat(mappingBuilder);
     }
 
@@ -44,13 +47,24 @@ public class FogBugzImplTest {
         return any(urlPathEqualTo("/api.asp"));
     }
 
+    /**
+     * Define the response.
+     *
+     * @param xmlFile Name of the XML resource
+     * @return The {@link ResponseDefinitionBuilder} to use
+     * @throws IOException if an I/O exception occurs.
+     */
+    private ResponseDefinitionBuilder theContentsOf(String xmlFile) throws IOException {
+        return aResponse()
+                .withHeader("Content-Type", "text/xml")
+                .withBody(IOUtils.toString(getClass().getResource(xmlFile)));
+    }
+
     @Test
     public void testListProjects() throws Exception {
         supposeThat(aRequest()
                 .withQueryParam("cmd", equalTo("listProjects"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody(IOUtils.toString(getClass().getResource("Projects.xml")))));
+                .willReturn(theContentsOf("Projects.xml")));
 
         FBProject project = fogBugz.listProjects().get(0);
         assertThat(project.getId(), is(10));
@@ -61,9 +75,7 @@ public class FogBugzImplTest {
     @Test
     public void testBadToken() throws Exception {
         supposeThat(aRequest()
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody(IOUtils.toString(getClass().getResource("Error3.xml")))));
+                .willReturn(theContentsOf("Error3.xml")));
 
         try {
             fogBugz.listProjects(); // The actual command doesn't really matter
@@ -77,9 +89,7 @@ public class FogBugzImplTest {
     public void testBadCredentials() throws Exception {
         supposeThat(aRequest()
                 .withQueryParam("cmd", equalTo("logon"))
-                .willReturn(aResponse()
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody(IOUtils.toString(getClass().getResource("Error1.xml")))));
+                .willReturn(theContentsOf("Error1.xml")));
 
         try {
             new FogBugzImpl(fogBugz.getBaseURL(), "foo", "bar");
@@ -87,6 +97,19 @@ public class FogBugzImplTest {
         } catch (FB2GHException expected) {
             assertThat(expected.getMessage(), is("Incorrect password or username"));
         }
+    }
+
+    @Test
+    public void testListMilestones() throws Exception {
+        supposeThat(aRequest()
+                .withQueryParam("cmd", equalTo("listFixFors"))
+                .willReturn(theContentsOf("Milestones.xml")));
+
+        FBMilestone milestone = fogBugz.listMilestones().get(0);
+        assertThat(milestone.getId(), is(9));
+        assertThat(milestone.getName(), is("Version 1.0"));
+        assertThat(milestone.getProjectId(), is(10));
+        assertThat(milestone.getProjectName(), is("Kakapo"));
     }
 
 }
