@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+    <areas>
+        <area>
+            <ixArea>6</ixArea>
+            <sArea><![CDATA[Spam]]></sArea>
+            <ixProject>2</ixProject>
+            <ixPersonOwner/>
+            <sPersonOwner/>
+            <sProject><![CDATA[Inbox]]></sProject>
+            <nType>3</nType>
+            <cDoc>2</cDoc>
+        </area>
+    </areas>
+</response>

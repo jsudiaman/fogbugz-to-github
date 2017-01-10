@@ -112,4 +112,17 @@ public class FogBugzImplTest {
         assertThat(milestone.getProjectName(), is("Kakapo"));
     }
 
+    @Test
+    public void testListAreas() throws Exception {
+        supposeThat(aRequest()
+                .withQueryParam("cmd", equalTo("listAreas"))
+                .willReturn(theContentsOf("Areas.xml")));
+
+        FBArea area = fogBugz.listAreas().get(0);
+        assertThat(area.getId(), is(6));
+        assertThat(area.getName(), is("Spam"));
+        assertThat(area.getProjectId(), is(2));
+        assertThat(area.getProjectName(), is("Inbox"));
+    }
+
 }
