@@ -43,7 +43,7 @@ public class GHIssue {
             }
             return list;
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -59,7 +59,7 @@ public class GHIssue {
         try {
             issue.labels().add(() -> labels.stream().map(GHLabel::getName).iterator());
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -80,7 +80,7 @@ public class GHIssue {
             }
             return list;
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -96,7 +96,7 @@ public class GHIssue {
         try {
             issue.comments().post(comment);
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -111,7 +111,7 @@ public class GHIssue {
         try {
             issue.close();
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -126,7 +126,7 @@ public class GHIssue {
         try {
             return issue.state().equals(Issue.OPEN_STATE);
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -141,7 +141,7 @@ public class GHIssue {
         try {
             return issue.state().equals(Issue.CLOSED_STATE);
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -157,7 +157,7 @@ public class GHIssue {
         try {
             issue.assign(ghUsername);
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -179,7 +179,7 @@ public class GHIssue {
             String title = milestone.getString("title");
             return Optional.of(new GHMilestone(number, title));
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -201,7 +201,7 @@ public class GHIssue {
                 issue.patch(Json.createObjectBuilder().add("milestone", JsonObject.NULL).build());
             }
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -217,7 +217,7 @@ public class GHIssue {
         try {
             return issue.title();
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -233,7 +233,7 @@ public class GHIssue {
         try {
             return issue.body();
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }

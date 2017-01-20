@@ -42,6 +42,12 @@ Apache Maven
         <artifactId>fb2gh</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
+    <!-- Do NOT include this if you already have an SLF4J binding: -->
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-nop</artifactId>
+        <version>1.7.21</version>
+    </dependency>
 </dependencies>
 ```
 

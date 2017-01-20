@@ -35,7 +35,7 @@ class GHRepoImpl implements GHRepo {
         try {
             return new GHMilestone(repo.milestones().create(title));
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -54,7 +54,7 @@ class GHRepoImpl implements GHRepo {
             }
             return milestones;
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         }
     }
 
@@ -63,7 +63,7 @@ class GHRepoImpl implements GHRepo {
         try {
             return new GHIssue(repo.issues().create(title, description));
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -79,7 +79,7 @@ class GHRepoImpl implements GHRepo {
         try {
             repo.labels().create(label.getName(), label.getHexColor());
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }
@@ -95,7 +95,7 @@ class GHRepoImpl implements GHRepo {
             }
             return labels;
         } catch (AssertionError e) {
-            throw new FB2GHException("GitHub error.", e);
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }

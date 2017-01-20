@@ -9,6 +9,7 @@ public final class GHFactory {
      * This is a factory class which is not designed for instantiation.
      */
     private GHFactory() {
+        throw new AssertionError("Cannot instantiate.");
     }
 
     /**
