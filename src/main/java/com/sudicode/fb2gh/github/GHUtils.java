@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.json.Json;
-import javax.json.JsonObject;
+import javax.json.JsonReader;
 import java.io.StringReader;
 
 /**
@@ -45,14 +45,15 @@ final class GHUtils {
         try {
             // Parse e.getMessage() for GitHub's JSON response.
             String error = e.getMessage();
-            String response = StringUtils.removeEnd(error.substring(error.lastIndexOf("\n")).trim(), ">");
+            String response = StringUtils.removeEnd(error.substring(error.lastIndexOf('\n')).trim(), ">");
 
             // Log it.
             logger.error("GitHub error: {}", response);
 
             // Parse the JSON and throw FB2GHException.
-            JsonObject json = Json.createReader(new StringReader(response)).readObject();
-            throw new FB2GHException(json.getString("message"));
+            try (JsonReader reader = Json.createReader(new StringReader(response))) {
+                throw new FB2GHException(reader.readObject().getString("message"));
+            }
         } catch (RuntimeException ex) {
             logger.debug("Could not parse JSON response.", ex);
             throw new FB2GHException("GitHub error.");
