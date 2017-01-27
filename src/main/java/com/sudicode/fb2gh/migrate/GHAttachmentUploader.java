@@ -4,10 +4,12 @@ import com.sudicode.fb2gh.common.FB2GHUtils;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHRepo;
+import lombok.Lombok;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -22,7 +24,9 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,7 +64,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * @param browser    The {@link Browser} to use
      */
     public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
-                                 final Browser browser) {
+                                final Browser browser) {
         this(ghUsername, ghPassword, ghRepo, browser, DEFAULT_TIMEOUT_IN_SECONDS);
     }
 
@@ -74,7 +78,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      * @param timeoutInSeconds The timeout used for blocking operations (downloading, uploading, etc.)
      */
     public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
-                                 final Browser browser, final int timeoutInSeconds) {
+                                final Browser browser, final int timeoutInSeconds) {
         // Initialize
         this.timeoutInSeconds = timeoutInSeconds;
         webDriver = newWebDriver(browser);
@@ -119,8 +123,13 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             int timeoutInMillis = Math.toIntExact(TimeUnit.SECONDS.toMillis(timeoutInSeconds));
             FileUtils.copyURLToFile(new URL(fbURL), temp, timeoutInMillis, timeoutInMillis);
 
+            // GitHub won't accept files over 10MB
+            if (temp.length() >= 10000000L) {
+                return fbURL;
+            }
+
             // If file is incompatible, zip it
-            if (!extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
+            if (temp.length() == 0L || !extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
                 temp = FB2GHUtils.createTempZipFile(temp);
             }
 
@@ -138,9 +147,10 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             });
             logger.info("Uploaded file '{}' to URL '{}'", temp.getAbsolutePath(), url);
             return url;
-        } catch (IOException e) {
-            // Checked exceptions are incompatible with the supertype
-            throw new UncheckedIOException(e);
+        } catch (IOException | TimeoutException e) {
+            String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
+            logger.error("Could not convert: " + fbURL, e);
+            return fbURL;
         }
     }
 
@@ -186,7 +196,12 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
         if (!exe.setExecutable(true)) {
             logger.warn("Failed to set access permissions of file: {}", exe);
         }
-        System.setProperty("webdriver." + driver + ".driver", exe.getAbsolutePath());
+        try {
+            System.setProperty("webdriver." + driver + ".driver", URLDecoder.decode(exe.getAbsolutePath(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            // Shouldn't happen
+            throw Lombok.sneakyThrow(e);
+        }
         switch (browser) {
             case FIREFOX:
                 return new FirefoxDriver();

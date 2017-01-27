@@ -138,11 +138,12 @@ class FogBugzImpl implements FogBugz {
         try {
             encodedQuery = URLEncoder.encode(query, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new FB2GHException("Caught UnsupportedEncodingException which should NOT happen. "
-                    + "Please raise an issue at: https://github.com/sudiamanj/fogbugz-to-github/issues", e);
+            // Shouldn't happen
+            throw Lombok.sneakyThrow(e);
         }
         String cols = String.join(",", "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus",
-                "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase");
+                "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase", "ixProject",
+                "sProject");
         List<FBCase> list = parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases();
         if (list == null) {
             list = new ArrayList<>();

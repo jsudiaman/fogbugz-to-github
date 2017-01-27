@@ -34,6 +34,10 @@ public final class GHFactory {
 
     /**
      * Construct a new {@link GitHub}, authenticating via username and password.
+     * <p>
+     * (Note: This method will <strong>not</strong> work with two-factor authentication. Accounts protected
+     * by 2FA must use {@link GHFactory#newGitHub(String)} instead.)
+     * </p>
      *
      * @param username GitHub username
      * @param password GitHub password

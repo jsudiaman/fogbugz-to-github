@@ -30,6 +30,8 @@ public class FBCase {
     private String category;
     private List<FBCaseEvent> events;
     private int salesforceCaseId;
+    private int projectId;
+    private String projectName;
 
     FBCase() {
     }
@@ -199,6 +201,30 @@ public class FBCase {
     @XmlElement(name = "sCase")
     void setSalesforceCaseId(int salesforceCaseId) {
         this.salesforceCaseId = salesforceCaseId;
+    }
+
+    /**
+     * @return Project ID
+     */
+    public int getProjectId() {
+        return projectId;
+    }
+
+    @XmlElement(name = "ixProject")
+    public void setProjectId(int projectId) {
+        this.projectId = projectId;
+    }
+
+    /**
+     * @return Project name
+     */
+    public String getProjectName() {
+        return projectName;
+    }
+
+    @XmlElement(name = "sProject")
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
 }
