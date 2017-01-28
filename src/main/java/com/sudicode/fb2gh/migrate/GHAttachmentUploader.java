@@ -122,14 +122,15 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             int timeoutInMillis = Math.toIntExact(TimeUnit.SECONDS.toMillis(timeoutInSeconds));
             FileUtils.copyURLToFile(new URL(fbURL), temp, timeoutInMillis, timeoutInMillis);
 
-            // GitHub won't accept files over 10MB
-            if (temp.length() >= 10000000L) {
-                return fbURL;
+            // If file is incompatible, zip it
+            final long tenMB = 10L * 1000000;
+            if (temp.length() == 0L || temp.length() >= tenMB || !extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
+                temp = FB2GHUtils.createTempZipFile(temp);
             }
 
-            // If file is incompatible, zip it
-            if (temp.length() == 0L || !extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
-                temp = FB2GHUtils.createTempZipFile(temp);
+            // GitHub won't accept files over 10MB
+            if (temp.length() >= tenMB) {
+                return fbURL;
             }
 
             // Upload to GH Issues
