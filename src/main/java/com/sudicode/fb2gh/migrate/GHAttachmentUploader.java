@@ -44,6 +44,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(GHAttachmentUploader.class);
     private static final int DEFAULT_TIMEOUT_IN_SECONDS = 100;
+    private static final FBAttachmentConverter DEFAULT_ATTACHMENT_CONVERTER = (fb, attachment) -> attachment.getAbsoluteUrl(fb);
 
     /**
      * File types supported by GitHub.
@@ -53,6 +54,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     private final int timeoutInSeconds;
     private final WebDriver webDriver;
     private final FluentWait<WebDriver> wait;
+    private final FBAttachmentConverter fallback;
 
     /**
      * Constructor.
@@ -64,7 +66,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      */
     public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
                                 final Browser browser) {
-        this(ghUsername, ghPassword, ghRepo, browser, DEFAULT_TIMEOUT_IN_SECONDS);
+        this(ghUsername, ghPassword, ghRepo, browser, DEFAULT_TIMEOUT_IN_SECONDS, DEFAULT_ATTACHMENT_CONVERTER);
     }
 
     /**
@@ -78,8 +80,38 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
      */
     public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
                                 final Browser browser, final int timeoutInSeconds) {
+        this(ghUsername, ghPassword, ghRepo, browser, timeoutInSeconds, DEFAULT_ATTACHMENT_CONVERTER);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param ghUsername GitHub username
+     * @param ghPassword GitHub password
+     * @param ghRepo     GitHub repository to upload to
+     * @param browser    The {@link Browser} to use
+     * @param fallback   The {@link FBAttachmentConverter} to use if uploading to GitHub fails.
+     */
+    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
+                                final Browser browser, final FBAttachmentConverter fallback) {
+        this(ghUsername, ghPassword, ghRepo, browser, DEFAULT_TIMEOUT_IN_SECONDS, fallback);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param ghUsername       GitHub username
+     * @param ghPassword       GitHub password
+     * @param ghRepo           GitHub repository to upload to
+     * @param browser          The {@link Browser} to use
+     * @param timeoutInSeconds The timeout used for blocking operations (downloading, uploading, etc.)
+     * @param fallback         The {@link FBAttachmentConverter} to use if uploading to GitHub fails.
+     */
+    public GHAttachmentUploader(final String ghUsername, final String ghPassword, final GHRepo ghRepo,
+                                final Browser browser, final int timeoutInSeconds, final FBAttachmentConverter fallback) {
         // Initialize
         this.timeoutInSeconds = timeoutInSeconds;
+        this.fallback = fallback;
         webDriver = newWebDriver(browser);
         wait = new WebDriverWait(webDriver, timeoutInSeconds);
 
@@ -130,7 +162,8 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
             // GitHub won't accept files over 10MB
             if (temp.length() >= tenMB) {
-                return fbURL;
+                logger.error("File '{}' too large.", temp.getAbsolutePath());
+                return fallback.convert(fogBugz, fbAttachment);
             }
 
             // Upload to GH Issues
@@ -148,9 +181,8 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             logger.info("Uploaded file '{}' to URL '{}'", temp.getAbsolutePath(), url);
             return url;
         } catch (IOException | TimeoutException e) {
-            String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
-            logger.error("Could not convert: " + fbURL, e);
-            return fbURL;
+            logger.error("Could not convert: " + fbAttachment.getAbsoluteUrl(fogBugz), e);
+            return fallback.convert(fogBugz, fbAttachment);
         }
     }
 
@@ -164,6 +196,8 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
     /**
      * Construct the {@link WebDriver} instance to be used.
+     *
+     * @param browser The web browser to use.
      */
     private static WebDriver newWebDriver(final Browser browser) {
         final String driver, os;
