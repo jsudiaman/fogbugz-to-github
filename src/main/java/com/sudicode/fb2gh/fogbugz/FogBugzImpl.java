@@ -143,7 +143,7 @@ class FogBugzImpl implements FogBugz {
         }
         String cols = String.join(",", "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus",
                 "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase", "ixProject",
-                "sProject");
+                "sProject", "sArea");
         List<FBCase> list = parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases();
         if (list == null) {
             list = new ArrayList<>();

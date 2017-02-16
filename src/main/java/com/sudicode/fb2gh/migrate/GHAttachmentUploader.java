@@ -27,6 +27,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -174,6 +176,14 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
                 @Override
                 public String apply(final WebDriver webDriver) {
                     String body = webDriver.findElement(By.id("issue_body")).getAttribute("value");
+
+                    // HTML
+                    if (body.startsWith("<img")) {
+                        Matcher matcher = Pattern.compile("src=\"(.*?)\"").matcher(body);
+                        return matcher.find() ? matcher.group(1) : null;
+                    }
+
+                    // Markdown
                     body = body.substring(body.lastIndexOf('(') + 1, body.lastIndexOf(')'));
                     return body.length() > 0 ? body : null;
                 }

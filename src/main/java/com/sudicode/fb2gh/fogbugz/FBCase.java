@@ -32,6 +32,7 @@ public class FBCase {
     private int salesforceCaseId;
     private int projectId;
     private String projectName;
+    private String area;
 
     FBCase() {
     }
@@ -211,7 +212,7 @@ public class FBCase {
     }
 
     @XmlElement(name = "ixProject")
-    public void setProjectId(int projectId) {
+    void setProjectId(int projectId) {
         this.projectId = projectId;
     }
 
@@ -223,8 +224,20 @@ public class FBCase {
     }
 
     @XmlElement(name = "sProject")
-    public void setProjectName(String projectName) {
+    void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    /**
+     * @return the area
+     */
+    public String getArea() {
+        return area;
+    }
+
+    @XmlElement(name = "sArea")
+    void setArea(String area) {
+        this.area = area;
     }
 
 }
