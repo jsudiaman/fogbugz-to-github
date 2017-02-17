@@ -4,9 +4,9 @@ import com.sudicode.fb2gh.common.FB2GHUtils;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHRepo;
-import lombok.Lombok;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -22,8 +22,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.concurrent.TimeUnit;
@@ -235,17 +238,36 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             throw new UnsupportedOperationException("Unsupported OS: " + SystemUtils.OS_NAME);
         }
 
-        // Return WebDriver
-        File exe = new File(GHAttachmentUploader.class.getResource(driver + "driver-" + os).getFile());
-        if (!exe.setExecutable(true)) {
-            logger.warn("Failed to set access permissions of file: {}", exe);
-        }
+        // Install driver file into temp directory
+        InputStream src = null;
+        OutputStream dest = null;
         try {
-            System.setProperty("webdriver." + driver + ".driver", URLDecoder.decode(exe.getAbsolutePath(), "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            // Shouldn't happen
-            throw Lombok.sneakyThrow(e);
+            // Create temp file
+            File tmp = FB2GHUtils.createTempFile(driver + "driver-" + os);
+
+            // Initialize streams
+            src = GHAttachmentUploader.class.getResourceAsStream(driver + "driver-" + os);
+            dest = new FileOutputStream(tmp);
+
+            // Copy driver to temp file
+            IOUtils.copy(src, dest);
+            if (!tmp.setExecutable(true)) {
+                logger.warn("Failed to set access permissions of file: {}", tmp);
+            }
+
+            // Set driver property
+            String key = "webdriver." + driver + ".driver";
+            String value = URLDecoder.decode(tmp.getAbsolutePath(), "UTF-8");
+            System.setProperty(key, value);
+            logger.info("System property '{}' was set to '{}'.", key, value);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } finally {
+            IOUtils.closeQuietly(src);
+            IOUtils.closeQuietly(dest);
         }
+
+        // Return WebDriver
         switch (browser) {
             case FIREFOX:
                 return new FirefoxDriver();
