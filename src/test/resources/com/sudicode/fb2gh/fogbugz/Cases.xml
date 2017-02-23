@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+    <cases>
+        <case ixBug="123" operations="edit,assign,resolve,reactivate,close,reopen,reply,forward,email,move,spam">
+            <ixBug>123</ixBug>
+            <ixBugParent>234</ixBugParent>
+            <ixBugChildren>456,876</ixBugChildren>
+            <tags>
+                <tag><![CDATA[first]]></tag>
+                <tag><![CDATA[second]]></tag>
+                <tag><![CDATA[third]]></tag>
+            </tags>
+            <fOpen>true</fOpen>
+            <sTitle>Duck, Duck... but No Goose!</sTitle>
+            <sOriginalTitle>Problem finding the goose...</sOriginalTitle>
+            <sLatestTextSummary>I searched the docs, but no goose!</sLatestTextSummary>
+            <ixBugEventLatestText>1151</ixBugEventLatestText>
+            <ixProject>22</ixProject>
+            <sProject>The Farm</sProject>
+            <ixArea>35</ixArea>
+            <sArea>Pond</sArea>
+            <ixGroup>6</ixGroup>
+            <ixPersonAssignedTo>1</ixPersonAssignedTo>
+            <sPersonAssignedTo>Old MacDonald</sPersonAssignedTo>
+            <sEmailAssignedTo>grandpa@oldmacdonald.com</sEmailAssignedTo>
+            <ixPersonOpenedBy>2</ixPersonOpenedBy>
+            <ixPersonResolvedBy>2</ixPersonResolvedBy>
+            <ixPersonClosedBy />
+            <ixPersonLastEditedBy>0</ixPersonLastEditedBy>
+            <ixStatus>2</ixStatus>
+            <ixBugDuplicates>321</ixBugDuplicates>
+            <ixBugOriginal>654</ixBugOriginal>
+            <sStatus>Geschlossen (Fixed)</sStatus>
+            <ixPriority>3</ixPriority>
+            <sPriority>Must Fix</sPriority>
+            <ixFixFor>3</ixFixFor>
+            <sFixFor>Test</sFixFor>
+            <dtFixFor>2007-05-06T22:47:59Z</dtFixFor>
+            <sVersion />
+            <sComputer />
+            <hrsOrigEst>0</hrsOrigEst>
+            <hrsCurrEst>0</hrsCurrEst>
+            <hrsElapsed>0</hrsElapsed>
+            <c>0</c>
+            <sCustomerEmail />
+            <ixMailbox>0</ixMailbox>
+            <ixCategory>1</ixCategory>
+            <sCategory>Feature</sCategory>
+            <dtOpened>2007-05-06T22:47:59Z</dtOpened>
+            <dtResolved>2007-05-06T22:47:59Z</dtResolved>
+            <dtClosed>2007-05-06T22:47:59Z</dtClosed>
+            <ixBugEventLatest>1151</ixBugEventLatest>
+            <dtLastUpdated>2007-05-06T22:47:59Z</dtLastUpdated>
+            <fReplied>false</fReplied>
+            <fForwarded>false</fForwarded>
+            <sTicket />
+            <ixDiscussTopic>0</ixDiscussTopic>
+            <dtDue />
+            <sReleaseNotes />
+            <ixBugEventLastView>1151</ixBugEventLastView>
+            <dtLastView>2007-05-06T22:47:59Z</dtLastView>
+            <ixRelatedBugs>345,267,2920</ixRelatedBugs>
+            <sScoutDescription>Main.cpp:165</sScoutDescription>
+            <sScoutMessage>Please contact us or visit our knowledge base to
+				resolve.</sScoutMessage>
+            <fScoutStopReporting>false</fScoutStopReporting>
+            <dtLastOccurrence>2007-05-06T22:47:59Z</dtLastOccurrence>
+            <fSubscribed>true</fSubscribed>
+            <dblStoryPts>2</dblStoryPts>
+            <nFixForOrder>10</nFixForOrder>
+        </case>
+    </cases>
+</response>

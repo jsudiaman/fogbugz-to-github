@@ -125,4 +125,22 @@ public class FogBugzImplTest {
         assertThat(area.getProjectName(), is("Inbox"));
     }
 
+    @Test
+    public void testGetCase() throws Exception {
+        supposeThat(aRequest()
+                .withQueryParam("cmd", equalTo("search"))
+                .withQueryParam("q", equalTo("123"))
+                .willReturn(theContentsOf("Cases.xml")));
+
+        FBCase fbCase = fogBugz.getCase(123);
+        assertThat(fbCase.getParentCaseId(), is(234));
+        assertFalse(fbCase.isClosed());
+        assertThat(fbCase.getStatus(), is("Geschlossen (Fixed)"));
+        assertThat(fbCase.getDuplicateOfId(), is(654));
+        assertThat(fbCase.getMilestoneId(), is(3));
+        assertThat(fbCase.getProjectId(), is(22));
+        assertThat(fbCase.getProjectName(), is("The Farm"));
+        assertThat(fbCase.getArea(), is("Pond"));
+    }
+
 }
