@@ -25,7 +25,7 @@
             <sEmailAssignedTo>grandpa@oldmacdonald.com</sEmailAssignedTo>
             <ixPersonOpenedBy>2</ixPersonOpenedBy>
             <ixPersonResolvedBy>2</ixPersonResolvedBy>
-            <ixPersonClosedBy />
+            <ixPersonClosedBy/>
             <ixPersonLastEditedBy>0</ixPersonLastEditedBy>
             <ixStatus>2</ixStatus>
             <ixBugDuplicates>321</ixBugDuplicates>
@@ -36,13 +36,13 @@
             <ixFixFor>3</ixFixFor>
             <sFixFor>Test</sFixFor>
             <dtFixFor>2007-05-06T22:47:59Z</dtFixFor>
-            <sVersion />
-            <sComputer />
+            <sVersion/>
+            <sComputer/>
             <hrsOrigEst>0</hrsOrigEst>
             <hrsCurrEst>0</hrsCurrEst>
             <hrsElapsed>0</hrsElapsed>
             <c>0</c>
-            <sCustomerEmail />
+            <sCustomerEmail/>
             <ixMailbox>0</ixMailbox>
             <ixCategory>1</ixCategory>
             <sCategory>Feature</sCategory>
@@ -53,16 +53,15 @@
             <dtLastUpdated>2007-05-06T22:47:59Z</dtLastUpdated>
             <fReplied>false</fReplied>
             <fForwarded>false</fForwarded>
-            <sTicket />
+            <sTicket/>
             <ixDiscussTopic>0</ixDiscussTopic>
-            <dtDue />
-            <sReleaseNotes />
+            <dtDue/>
+            <sReleaseNotes/>
             <ixBugEventLastView>1151</ixBugEventLastView>
             <dtLastView>2007-05-06T22:47:59Z</dtLastView>
             <ixRelatedBugs>345,267,2920</ixRelatedBugs>
             <sScoutDescription>Main.cpp:165</sScoutDescription>
-            <sScoutMessage>Please contact us or visit our knowledge base to
-				resolve.</sScoutMessage>
+            <sScoutMessage>Please contact us or visit our knowledge base to resolve.</sScoutMessage>
             <fScoutStopReporting>false</fScoutStopReporting>
             <dtLastOccurrence>2007-05-06T22:47:59Z</dtLastOccurrence>
             <fSubscribed>true</fSubscribed>
