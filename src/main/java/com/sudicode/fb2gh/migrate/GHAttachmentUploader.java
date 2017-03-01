@@ -156,11 +156,11 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
             String extension = FilenameUtils.getExtension(filename);
             String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
             File temp = FB2GHUtils.createTempFile(filename);
-            int timeoutInMillis = Math.toIntExact(TimeUnit.SECONDS.toMillis(timeoutInSeconds));
+            int timeoutInMillis = timeoutInSeconds * 1000;
             FileUtils.copyURLToFile(new URL(fbURL), temp, timeoutInMillis, timeoutInMillis);
 
             // If file is incompatible, zip it
-            final long tenMB = 10L * 1000000;
+            long tenMB = 10L * 1000000;
             if (temp.length() == 0L || temp.length() >= tenMB || !extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
                 temp = FB2GHUtils.createTempZipFile(temp);
             }

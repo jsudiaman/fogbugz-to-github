@@ -3,15 +3,15 @@ package com.sudicode.fb2gh.migrate;
 import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHRepo;
-import org.joor.Reflect;
+import org.apache.commons.io.FilenameUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -21,35 +21,53 @@ import static org.mockito.Mockito.when;
  */
 public class GHAttachmentUploaderTest {
 
-    @Test
-    public void testConvert() {
-        // Dependencies
+    private GHAttachmentUploader ghAttachmentUploader;
+    private FogBugz fogBugz;
+
+    @Before
+    public void setUp() {
+        // Init ghAttachmentUploader
         GHRepo ghRepo = mock(GHRepo.class);
         when(ghRepo.getOwner()).thenReturn(System.getenv("GH_USER"));
         when(ghRepo.getName()).thenReturn(System.getenv("GH_REPO"));
+        ghAttachmentUploader = new GHAttachmentUploader(
+                System.getenv("GH_USER"),
+                System.getenv("GH_PASS"),
+                ghRepo,
+                GHAttachmentUploader.Browser.FIREFOX,
+                (fb, fbAttachment) -> "Upload failed!"
+        );
 
-        FogBugz fogBugz = mock(FogBugz.class);
+        // Init fogBugz
+        fogBugz = mock(FogBugz.class);
+    }
+
+    @After
+    public void tearDown() {
+        ghAttachmentUploader.close();
+    }
+
+    /**
+     * The resource to be uploaded. Used as a stub for {@link FBAttachment}.
+     *
+     * @param name name of the desired resource
+     */
+    private FBAttachment resource(final String name) {
+        String url = getClass().getResource(name).toString();
         FBAttachment fbAttachment = mock(FBAttachment.class);
-        when(fbAttachment.getFilename()).thenReturn("blank.jpg");
-        when(fbAttachment.getAbsoluteUrl(any(FogBugz.class))).thenReturn(getClass().getResource("blank.jpg").toString());
-
-        // Convert
-        try (GHAttachmentUploader ghau = new GHAttachmentUploader(System.getenv("GH_USER"), System.getenv("GH_PASS"), ghRepo, GHAttachmentUploader.Browser.FIREFOX)) {
-            assertThat(ghau.convert(fogBugz, fbAttachment), startsWith("https://cloud.githubusercontent.com/assets/"));
-        }
+        when(fbAttachment.getFilename()).thenReturn(FilenameUtils.getName(url));
+        when(fbAttachment.getAbsoluteUrl(any(FogBugz.class))).thenReturn(url);
+        return fbAttachment;
     }
 
     @Test
-    public void testNewFirefoxDriver() {
-        WebDriver webDriver = null;
-        try {
-            webDriver = Reflect.on(GHAttachmentUploader.class).call("newWebDriver", GHAttachmentUploader.Browser.FIREFOX).get();
-            assertThat(webDriver, is(instanceOf(FirefoxDriver.class)));
-        } finally {
-            if (webDriver != null) {
-                webDriver.quit();
-            }
-        }
+    public void testConvert() {
+        assertThat(ghAttachmentUploader.convert(fogBugz, resource("blank.jpg")), startsWith("https://cloud.githubusercontent.com/assets/"));
+    }
+
+    @Test
+    public void testConvertLarge() {
+        assertThat(ghAttachmentUploader.convert(fogBugz, resource("10MB.zip")), is(equalTo("Upload failed!")));
     }
 
 }
