@@ -173,8 +173,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
 
             // Upload to GH Issues
             webDriver.findElement(By.id("issue_body")).clear();
-            webDriver.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser"))
-                    .sendKeys(temp.getAbsolutePath());
+            webDriver.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser")).sendKeys(temp.getAbsolutePath());
             String url = wait.ignoring(StringIndexOutOfBoundsException.class).until(new ExpectedCondition<String>() {
                 @Override
                 public String apply(final WebDriver webDriver) {
