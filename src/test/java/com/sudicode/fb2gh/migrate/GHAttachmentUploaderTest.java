@@ -30,8 +30,8 @@ public class GHAttachmentUploaderTest {
 
         FogBugz fogBugz = mock(FogBugz.class);
         FBAttachment fbAttachment = mock(FBAttachment.class);
-        when(fbAttachment.getFilename()).thenReturn("Blank.JPG");
-        when(fbAttachment.getAbsoluteUrl(any(FogBugz.class))).thenReturn("https://upload.wikimedia.org/wikipedia/en/4/48/Blank.JPG");
+        when(fbAttachment.getFilename()).thenReturn("blank.jpg");
+        when(fbAttachment.getAbsoluteUrl(any(FogBugz.class))).thenReturn(getClass().getResource("blank.jpg").toString());
 
         // Convert
         try (GHAttachmentUploader ghau = new GHAttachmentUploader(System.getenv("GH_USER"), System.getenv("GH_PASS"), ghRepo, GHAttachmentUploader.Browser.FIREFOX)) {
