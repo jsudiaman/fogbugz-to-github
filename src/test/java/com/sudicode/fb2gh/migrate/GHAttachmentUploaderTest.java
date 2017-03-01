@@ -4,7 +4,6 @@ import com.sudicode.fb2gh.fogbugz.FBAttachment;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
 import com.sudicode.fb2gh.github.GHRepo;
 import org.joor.Reflect;
-import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -22,15 +21,6 @@ import static org.mockito.Mockito.when;
  */
 public class GHAttachmentUploaderTest {
 
-    private WebDriver webDriver;
-
-    @After
-    public void tearDown() {
-        if (webDriver != null) {
-            webDriver.quit();
-        }
-    }
-
     @Test
     public void testConvert() {
         // Dependencies
@@ -43,18 +33,23 @@ public class GHAttachmentUploaderTest {
         when(fbAttachment.getFilename()).thenReturn("Blank.JPG");
         when(fbAttachment.getAbsoluteUrl(any(FogBugz.class))).thenReturn("https://upload.wikimedia.org/wikipedia/en/4/48/Blank.JPG");
 
-        // Construct
-        GHAttachmentUploader ghau = new GHAttachmentUploader(System.getenv("GH_USER"), System.getenv("GH_PASS"), ghRepo, GHAttachmentUploader.Browser.FIREFOX);
-        webDriver = Reflect.on(ghau).get("webDriver");
-
         // Convert
-        assertThat(ghau.convert(fogBugz, fbAttachment), startsWith("https://cloud.githubusercontent.com/assets/"));
+        try (GHAttachmentUploader ghau = new GHAttachmentUploader(System.getenv("GH_USER"), System.getenv("GH_PASS"), ghRepo, GHAttachmentUploader.Browser.FIREFOX)) {
+            assertThat(ghau.convert(fogBugz, fbAttachment), startsWith("https://cloud.githubusercontent.com/assets/"));
+        }
     }
 
     @Test
     public void testNewFirefoxDriver() {
-        webDriver = Reflect.on(GHAttachmentUploader.class).call("newWebDriver", GHAttachmentUploader.Browser.FIREFOX).get();
-        assertThat(webDriver, is(instanceOf(FirefoxDriver.class)));
+        WebDriver webDriver = null;
+        try {
+            webDriver = Reflect.on(GHAttachmentUploader.class).call("newWebDriver", GHAttachmentUploader.Browser.FIREFOX).get();
+            assertThat(webDriver, is(instanceOf(FirefoxDriver.class)));
+        } finally {
+            if (webDriver != null) {
+                webDriver.quit();
+            }
+        }
     }
 
 }
