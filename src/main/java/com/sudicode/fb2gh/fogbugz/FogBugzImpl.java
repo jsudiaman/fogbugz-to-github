@@ -142,8 +142,9 @@ class FogBugzImpl implements FogBugz {
             throw Lombok.sneakyThrow(e);
         }
         String cols = String.join(",", "ixBugParent", "fOpen", "sTitle", "sPersonAssignedTo", "sStatus",
-                "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events", "sCase", "ixProject",
-                "sProject", "sArea");
+                "ixBugOriginal", "sPriority", "ixFixFor", "sFixFor", "sCategory", "events",
+                "plugin_customfields_at_fogcreek_com_scasexxs01", "ixProject", "sProject", "sArea",
+                "plugin_customfields_at_fogcreek_com_customery84");
         List<FBCase> list = parseApiRequest("search", "q=" + encodedQuery, "cols=" + cols).getCases();
         if (list == null) {
             list = new ArrayList<>();

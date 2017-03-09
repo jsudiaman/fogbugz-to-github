@@ -10,8 +10,11 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,6 +29,10 @@ public class GHAttachmentUploaderTest {
 
     @Before
     public void setUp() {
+        assumeThat(System.getenv("GH_USER"), is(not(nullValue())));
+        assumeThat(System.getenv("GH_REPO"), is(not(nullValue())));
+        assumeThat(System.getenv("GH_PASS"), is(not(nullValue())));
+
         // Init ghAttachmentUploader
         GHRepo ghRepo = mock(GHRepo.class);
         when(ghRepo.getOwner()).thenReturn(System.getenv("GH_USER"));

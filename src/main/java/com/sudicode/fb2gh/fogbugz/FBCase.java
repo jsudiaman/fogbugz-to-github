@@ -33,6 +33,7 @@ public class FBCase {
     private int projectId;
     private String projectName;
     private String area;
+    private String customer;
 
     FBCase() {
     }
@@ -199,7 +200,7 @@ public class FBCase {
         return salesforceCaseId;
     }
 
-    @XmlElement(name = "sCase")
+    @XmlElement(name = "plugin_customfields_at_fogcreek_com_scasexxs01")
     void setSalesforceCaseId(int salesforceCaseId) {
         this.salesforceCaseId = salesforceCaseId;
     }
@@ -238,6 +239,18 @@ public class FBCase {
     @XmlElement(name = "sArea")
     void setArea(String area) {
         this.area = area;
+    }
+
+    /**
+     * @return The customer (Requires Salesforce plugin)
+     */
+    public String getCustomer() {
+        return customer;
+    }
+
+    @XmlElement(name = "plugin_customfields_at_fogcreek_com_customery84")
+    void setCustomer(String customer) {
+        this.customer = customer;
     }
 
 }
