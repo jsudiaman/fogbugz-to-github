@@ -17,6 +17,9 @@ public class FBCheckin {
     private int revisionNumber;
     private String filename;
 
+    FBCheckin() {
+    }
+
     /**
      * @return The post-checkin revision number.
      */
