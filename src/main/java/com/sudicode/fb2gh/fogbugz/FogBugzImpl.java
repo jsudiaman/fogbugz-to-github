@@ -154,6 +154,11 @@ class FogBugzImpl implements FogBugz {
     }
 
     @Override
+    public List<FBCheckin> listCheckins(final FBCase fbCase) throws FB2GHException {
+        return parseApiRequest("listCheckins", "ixBug=" + fbCase.getId()).getCheckins();
+    }
+
+    @Override
     public String getBaseURL() {
         return baseURL;
     }

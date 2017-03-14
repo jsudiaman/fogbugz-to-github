@@ -21,13 +21,6 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <JCabi-Version>0.28</JCabi-Version>
-                            <JCabi-Date>2016-06-05 07:16</JCabi-Date>
-                            <JCabi-Build>cce246f</JCabi-Build>
-                        </manifestEntries>
-                    </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
@@ -82,7 +75,7 @@
         <dependency>
             <groupId>com.jcabi</groupId>
             <artifactId>jcabi-github</artifactId>
-            <version>0.28</version>
+            <version>0.30</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>

@@ -109,6 +109,15 @@ public interface FogBugz {
     List<FBCase> searchCases(String query) throws FB2GHException;
 
     /**
+     * Get a list of all checkins from this FogBugz instance.
+     *
+     * @param fbCase Only list checkins associated with this case.
+     * @return The list
+     * @throws FB2GHException if there is an API issue.
+     */
+    List<FBCheckin> listCheckins(FBCase fbCase) throws FB2GHException;
+
+    /**
      * <p>
      * Get the FogBugz URL.
      * </p>

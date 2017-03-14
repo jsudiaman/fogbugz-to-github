@@ -10,6 +10,7 @@ import javax.json.JsonObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,7 +92,7 @@ public class GHIssue {
     public List<String> getComments() throws FB2GHException {
         try {
             List<String> list = new ArrayList<>();
-            for (Comment comment : issue.comments().iterate()) {
+            for (Comment comment : issue.comments().iterate(new Date(0))) {
                 Comment.Smart smartComment = new Comment.Smart(comment);
                 list.add(smartComment.body());
             }

@@ -143,4 +143,18 @@ public class FogBugzImplTest {
         assertThat(fbCase.getArea(), is("Pond"));
     }
 
+    @Test
+    public void testListCheckins() throws Exception {
+        supposeThat(aRequest()
+                .withQueryParam("cmd", equalTo("listCheckins"))
+                .withQueryParam("ixBug", equalTo("123"))
+                .willReturn(theContentsOf("Checkins.xml")));
+
+        FBCase fbCase = new FBCase();
+        fbCase.setId(123);
+        FBCheckin checkin = fogBugz.listCheckins(fbCase).get(0);
+        assertThat(checkin.getRevisionNumber(), is(13));
+        assertThat(checkin.getFilename(), is("changedFile.py"));
+    }
+
 }

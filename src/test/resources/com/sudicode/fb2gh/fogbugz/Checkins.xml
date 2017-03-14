@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+    <checkins>
+        <checkin>
+            <ixCVS>30</ixCVS>
+            <ixBug>12</ixBug>
+            <sFile><![CDATA[changedFile.py]]></sFile>
+            <sPrev><![CDATA[12]]></sPrev>
+            <sNew><![CDATA[13]]></sNew>
+            <ixRepository>1</ixRepository>
+        </checkin>
+    </checkins>
+</response>

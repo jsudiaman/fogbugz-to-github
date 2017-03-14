@@ -20,6 +20,7 @@ class FBResponse {
     private List<FBCategory> categories;
     private List<FBStatus> statuses;
     private String error;
+    private List<FBCheckin> checkins;
 
     FBResponse() {
     }
@@ -110,17 +111,33 @@ class FBResponse {
 
     @XmlElementWrapper
     @XmlElement(name = "status")
-    public void setStatuses(List<FBStatus> statuses) {
+    void setStatuses(List<FBStatus> statuses) {
         this.statuses = statuses;
     }
 
+    /**
+     * @return Contents of the descendant <code>&lt;error&gt;</code> element
+     */
     public String getError() {
         return error;
     }
 
     @XmlElement
-    public void setError(String error) {
+    void setError(String error) {
         this.error = error;
+    }
+
+    /**
+     * @return Contents of the descendant <code>&lt;checkins&gt;</code> element
+     */
+    public List<FBCheckin> getCheckins() {
+        return checkins;
+    }
+
+    @XmlElementWrapper
+    @XmlElement(name = "checkin")
+    void setCheckins(List<FBCheckin> checkins) {
+        this.checkins = checkins;
     }
 
 }
