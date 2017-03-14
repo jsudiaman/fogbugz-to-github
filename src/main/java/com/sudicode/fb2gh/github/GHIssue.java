@@ -9,6 +9,7 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,22 @@ public class GHIssue {
                 list.add(new GHLabel(smartLabel.name(), smartLabel.color()));
             }
             return list;
+        } catch (AssertionError e) {
+            throw GHUtils.rethrow(e);
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
+     * Add label to this issue.
+     *
+     * @param label The label to add
+     * @throws FB2GHException if a GitHub error occurs
+     */
+    public void addLabel(final GHLabel label) throws FB2GHException {
+        try {
+            issue.labels().add(Collections.singleton(label.getName()));
         } catch (AssertionError e) {
             throw GHUtils.rethrow(e);
         } catch (IOException e) {
