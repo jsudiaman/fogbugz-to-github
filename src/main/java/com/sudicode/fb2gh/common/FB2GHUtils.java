@@ -109,7 +109,7 @@ public final class FB2GHUtils {
      * </p>
      * <p>
      * If you're using this to resolve {@link javax.net.ssl.SSLHandshakeException}, this might be a better idea:
-     * <a href="http://stackoverflow.com/a/6742204/6268626">How to solve javax.net.ssl.SSLHandshakeException Error?</a>
+     * <a href="https://docs.oracle.com/javase/tutorial/security/toolsign/rstep2.html">Import the Certificate as a Trusted Certificate</a>
      * </p>
      *
      * @throws FB2GHException if the trust manager could not be disabled
