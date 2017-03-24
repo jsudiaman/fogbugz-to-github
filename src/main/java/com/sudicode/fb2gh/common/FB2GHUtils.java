@@ -1,13 +1,8 @@
 package com.sudicode.fb2gh.common;
 
-import com.sudicode.fb2gh.FB2GHException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,10 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -100,48 +91,6 @@ public final class FB2GHUtils {
 
         // Return zip file
         return zipFile;
-    }
-
-    /**
-     * <p>
-     * Trust invalid security certificates when browsing using HTTPS. <strong>Not</strong> recommended for production
-     * code.
-     * </p>
-     * <p>
-     * If you're using this to resolve {@link javax.net.ssl.SSLHandshakeException}, this might be a better idea:
-     * <a href="https://docs.oracle.com/javase/tutorial/security/toolsign/rstep2.html">Import the Certificate as a Trusted Certificate</a>
-     * </p>
-     *
-     * @throws FB2GHException if the trust manager could not be disabled
-     */
-    public static void trustInvalidCertificates() throws FB2GHException {
-        // Create a trust manager that does not validate certificate chains
-        TrustManager[] tm = new TrustManager[1];
-        tm[0] = new X509TrustManager() {
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return new X509Certificate[0];
-            }
-
-            @Override
-            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
-                // Trusted.
-            }
-
-            @Override
-            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
-                // Trusted.
-            }
-        };
-
-        // Install the trust manager
-        try {
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, tm, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
-        } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            throw new FB2GHException("Failed to disable the trust manager", e);
-        }
     }
 
     /**

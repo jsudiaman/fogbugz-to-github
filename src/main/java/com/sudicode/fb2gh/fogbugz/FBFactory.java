@@ -18,14 +18,6 @@ import com.sudicode.fb2gh.FB2GHException;
  * FogBugz fb = FBFactory.newFogBugz(baseURL, email, password);
  * </pre>
  * After instantiating, you may then use <code>fb.getAuthToken();</code> to obtain a valid API token for later.
- * <p>
- * If the methods of this factory are throwing {@link javax.net.ssl.SSLHandshakeException}, then your FogBugz instance
- * is most likely using an invalid SSL certificate. This can be bypassed (at your own risk) like so:
- * </p>
- * <pre>
- * FB2GHUtils.trustInvalidCertificates();
- * FogBugz fb = ...
- * </pre>
  */
 public class FBFactory {
 

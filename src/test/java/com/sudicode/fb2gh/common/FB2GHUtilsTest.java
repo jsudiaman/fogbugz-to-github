@@ -1,17 +1,14 @@
 package com.sudicode.fb2gh.common;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,17 +59,6 @@ public class FB2GHUtilsTest {
             }
         }
         assertArrayEquals(randomBytes, baos.toByteArray());
-    }
-
-    @Test
-    public void testTrustInvalidCertificates() throws Exception {
-        FB2GHUtils.trustInvalidCertificates();
-        InputStream is = null;
-        try {
-            is = new URL("https://self-signed.badssl.com/").openStream();
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
     }
 
     @Test
