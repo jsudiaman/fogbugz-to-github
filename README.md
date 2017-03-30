@@ -103,7 +103,7 @@ This project uses [SLF4J](http://www.slf4j.org), which allows end users to choos
 ### My FogBugz server uses a self-signed SSL certificate. Why can't I access it?
 Somewhere in the stack trace, you should see: `javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed...`
 
-If that's the case, it means that the JRE does not trust your public certificate. This can be resolved using the following commands:
+In this case, the JRE does not trust your public certificate. This can be resolved using the following commands:
 ```bash
 # Fill these out. (You should be able to download the certificate using your web browser.)
 export CACERTS=<PATH_TO_YOUR_JRE>/jre/lib/security/cacerts
