@@ -100,16 +100,17 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 
 This project uses [SLF4J](http://www.slf4j.org), which allows end users to choose a logging facility at runtime. If you don't care about logging and want to disable this message, simply add [slf4j-nop](http://search.maven.org/#artifactdetails%7Corg.slf4j%7Cslf4j-nop%7C1.7.21%7Cjar) to your CLASSPATH. If you want to use SLF4J's logger, use [slf4j-simple](http://search.maven.org/#artifactdetails%7Corg.slf4j%7Cslf4j-simple%7C1.7.21%7Cjar). For more options, see [SLF4J user manual](http://www.slf4j.org/manual.html).
 
-### I can't access my self-signed FogBugz instance!
-If you are seeing something like `javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed...` it can be resolved using the following commands:
+### My FogBugz server uses a self-signed SSL certificate. Why can't I access it?
+Somewhere in the stack trace, you should see: `javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed...`
 
+If that's the case, it means that the JRE does not trust your public certificate. This can be resolved using the following commands:
 ```bash
 # Fill these out. (You should be able to download the certificate using your web browser.)
-export CACERTS=<JAVA_HOME>/jre/lib/security/cacerts
+export CACERTS=<PATH_TO_YOUR_JRE>/jre/lib/security/cacerts
 export CERT=<PATH_TO_YOUR_CERTIFICATE>
 
 # If you are asked for a keystore password, the default is 'changeit'.
 sudo keytool -import -file $CERT -alias fogbugz_cert -keystore $CACERTS
 ```
 
-If security is not an issue, you may alternatively use this [quick fix](https://gist.github.com/sudiamanj/62b332afc5c93e24ca4a0ffb358e931a). (Of course, if security is not an issue, then why bother with HTTPS in the first place?)
+Alternatively, if security is not an issue, you may use this [quick fix](https://gist.github.com/sudiamanj/62b332afc5c93e24ca4a0ffb358e931a) instead. (Of course, if security is not an issue, then why bother with HTTPS in the first place?)
