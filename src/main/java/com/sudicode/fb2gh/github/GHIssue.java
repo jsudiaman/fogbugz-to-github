@@ -257,4 +257,20 @@ public class GHIssue {
         }
     }
 
+    /**
+     * Get the ID of this issue.
+     *
+     * @return ID of issue
+     * @throws FB2GHException if a GitHub error occurs
+     */
+    public int getId() throws FB2GHException {
+        try {
+            return issue.json().getInt("id");
+        } catch (AssertionError e) {
+            throw GHUtils.rethrow(e);
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
 }
