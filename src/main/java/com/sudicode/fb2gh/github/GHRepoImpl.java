@@ -42,6 +42,12 @@ class GHRepoImpl implements GHRepo {
     }
 
     @Override
+    public GHMilestone getMilestone(final int number) throws FB2GHException {
+        Milestone milestone = repo.milestones().get(number);
+        return new GHMilestone(milestone);
+    }
+
+    @Override
     public List<GHMilestone> getMilestones() throws FB2GHException {
         try {
             List<GHMilestone> milestones = new ArrayList<>();

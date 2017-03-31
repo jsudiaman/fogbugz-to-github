@@ -40,6 +40,11 @@ public class OfflineGHRepo implements GHRepo {
     }
 
     @Override
+    public GHMilestone getMilestone(int number) throws FB2GHException {
+        return milestones.get(number - 1);
+    }
+
+    @Override
     public List<GHMilestone> getMilestones() {
         return milestones;
     }

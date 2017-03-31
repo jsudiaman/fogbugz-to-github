@@ -19,6 +19,15 @@ public interface GHRepo {
     GHMilestone addMilestone(final String title) throws FB2GHException;
 
     /**
+     * Get a single milestone.
+     *
+     * @param number The number of the milestone
+     * @return The milestone
+     * @throws FB2GHException if a GitHub error occurs
+     */
+    GHMilestone getMilestone(int number) throws FB2GHException;
+
+    /**
      * Get all milestones within this repository.
      *
      * @return A list of the milestones.
