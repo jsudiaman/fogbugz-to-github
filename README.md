@@ -99,7 +99,7 @@ Somewhere in the stack trace, you should see `javax.net.ssl.SSLHandshakeExceptio
 In this case, the JRE does not trust your public certificate. This can be resolved using the following commands:
 ```bash
 # Fill these out. (You should be able to download the certificate using your web browser.)
-export CACERTS=<PATH_TO_YOUR_JRE>/jre/lib/security/cacerts
+export CACERTS=<PATH_TO_YOUR_JRE>/lib/security/cacerts
 export CERT=<PATH_TO_YOUR_CERTIFICATE>
 
 # If you are asked for a keystore password, the default is 'changeit'.
