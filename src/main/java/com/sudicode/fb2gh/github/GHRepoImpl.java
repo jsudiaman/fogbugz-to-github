@@ -1,14 +1,21 @@
 package com.sudicode.fb2gh.github;
 
+import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableMap;
 import com.jcabi.github.Label;
 import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
+import com.jcabi.http.Request;
+import com.jcabi.http.response.JsonResponse;
+import com.jcabi.http.response.RestResponse;
 import com.sudicode.fb2gh.FB2GHException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,6 +122,53 @@ class GHRepoImpl implements GHRepo {
     @Override
     public String getName() {
         return repo.coordinates().repo();
+    }
+
+    @Beta
+    @Override
+    public GHProject getProject(final String name) throws FB2GHException {
+        List<GHProject> projects = getProjects(name);
+        if (projects.isEmpty()) {
+            throw new FB2GHException(String.format("Project '%s' not found.", name));
+        } else if (projects.size() > 1) {
+            throw new FB2GHException(String.format("Multiple projects named '%s' were found, return value is ambiguous.", name));
+        }
+        return projects.get(0);
+    }
+
+    @Beta
+    @Override
+    public List<GHProject> getProjects(final String name) throws FB2GHException {
+        List<GHProject> projects = new ArrayList<>();
+
+        // Entry point for the projects API.
+        Request baseRequest = repo.github().entry().reset("Accept").header("Accept", "application/vnd.github.inertia-preview+json");
+
+        // Get projects.
+        try {
+            logger.info("Searching for projects named '{}'", name);
+            JsonArray array = baseRequest.uri().path(String.format("/repos/%s/%s/projects", getOwner(), getName())).back()
+                    .method(Request.GET)
+                    .fetch()
+                    .as(RestResponse.class)
+                    .assertStatus(HttpURLConnection.HTTP_OK)
+                    .as(JsonResponse.class)
+                    .json()
+                    .readArray();
+            for (JsonObject obj : array.getValuesAs(JsonObject.class)) {
+                String projectName = obj.getString("name");
+                if (name.equals(projectName)) {
+                    projects.add(new GHProject(baseRequest, obj.getInt("id"), projectName));
+                }
+            }
+        } catch (AssertionError e) {
+            throw GHUtils.rethrow(e);
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+
+        logger.info("Found projects: {}", projects);
+        return projects;
     }
 
     @Override

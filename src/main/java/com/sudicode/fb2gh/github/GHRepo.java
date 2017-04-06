@@ -79,4 +79,23 @@ public interface GHRepo {
      */
     String getName();
 
+    /**
+     * Get a project by name. Throws an exception if there are multiple projects with the same name - in such cases,
+     * use {@link GHRepo#getProjects(String)} instead.
+     *
+     * @param name The name of the project
+     * @return The project
+     * @throws FB2GHException if a GitHub error occurs
+     */
+    GHProject getProject(String name) throws FB2GHException;
+
+    /**
+     * Get all projects with the given name.
+     *
+     * @param name The name of the project(s)
+     * @return A list of the project(s)
+     * @throws FB2GHException if a GitHub error occurs
+     */
+    List<GHProject> getProjects(String name) throws FB2GHException;
+
 }

@@ -96,4 +96,14 @@ public class OfflineGHRepo implements GHRepo {
         return impl.getName();
     }
 
+    @Override
+    public GHProject getProject(String name) throws FB2GHException {
+        return impl.getProject(name);
+    }
+
+    @Override
+    public List<GHProject> getProjects(String name) throws FB2GHException {
+        return impl.getProjects(name);
+    }
+
 }
