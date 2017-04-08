@@ -32,13 +32,15 @@ public class GHMilestone {
      * Constructor.
      *
      * @param milestone The {@link Milestone} instance to access.
-     * @throws FB2GHException if an I/O error occurs
+     * @throws FB2GHException if a GitHub error occurs
      */
     GHMilestone(final Milestone milestone) throws FB2GHException {
         try {
             Milestone.Smart smartMilestone = new Milestone.Smart(milestone);
             this.number = smartMilestone.number();
             this.title = smartMilestone.title();
+        } catch (AssertionError e) {
+            throw GHUtils.rethrow(e);
         } catch (IOException e) {
             throw new FB2GHException(e);
         }

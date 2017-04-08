@@ -17,8 +17,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -139,6 +141,44 @@ public class MigratorTest {
         migrator.migrate();
 
         assertThat(postMigrate.get(), is(equalTo(true)));
+    }
+
+    @Test
+    public void migrateWithExceptionHandler() throws Exception {
+        // Generate FBCase which throws an exception when accessed
+        FB2GHException accessException = new FB2GHException("Accessed a mock case!");
+        FBCase mockCase = mock(FBCase.class, invocation -> {
+            throw accessException;
+        });
+        caseList.add(0, mockCase);
+
+        // Test exception handler
+        AtomicReference<Exception> exceptionHandled = new AtomicReference<>();
+        new Migrator.Builder(fogBugz, caseList, ghRepo)
+                .exceptionHandler(exceptionHandled::set)
+                .build()
+                .migrate();
+        assertThat(exceptionHandled.get(), is(equalTo(accessException)));
+
+        // Ensure that the rest of the cases were migrated
+        assertThat(ghRepo.getIssue(1), is(notNullValue()));
+    }
+
+    @Test
+    public void migrateWithoutExceptionHandler() throws Exception {
+        // Generate FBCase which throws an exception when accessed
+        FBCase mockCase = mock(FBCase.class, invocation -> {
+            throw new RuntimeException();
+        });
+
+        // Test without exception handler
+        try {
+            new Migrator.Builder(fogBugz, Collections.singletonList(mockCase), ghRepo)
+                    .build()
+                    .migrate();
+            fail("Expected RuntimeException");
+        } catch (RuntimeException expected) {
+        }
     }
 
 }

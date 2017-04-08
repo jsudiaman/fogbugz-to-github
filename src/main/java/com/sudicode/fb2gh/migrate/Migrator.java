@@ -11,6 +11,7 @@ import com.sudicode.fb2gh.github.GHIssue;
 import com.sudicode.fb2gh.github.GHLabel;
 import com.sudicode.fb2gh.github.GHMilestone;
 import com.sudicode.fb2gh.github.GHRepo;
+import lombok.Lombok;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,7 @@ public class Migrator {
     private final long postDelay;
     private final Predicate<FBCase> migrateIf;
     private final BiConsumer<FBCase, GHIssue> afterMigrate;
+    private final Consumer<Exception> exceptionHandler;
 
     /**
      * Constructor.
@@ -79,6 +82,8 @@ public class Migrator {
                 : fbCase -> true;
         afterMigrate = builder.afterMigrate != null ? builder.afterMigrate
                 : (fbCase, ghIssue) -> FB2GHUtils.nop();
+        exceptionHandler = builder.exceptionHandler != null ? builder.exceptionHandler
+                : Lombok::sneakyThrow;
     }
 
     /**
@@ -95,6 +100,7 @@ public class Migrator {
         private long postDelay = DEFAULT_POST_DELAY;
         private Predicate<FBCase> migrateIf;
         private BiConsumer<FBCase, GHIssue> afterMigrate;
+        private Consumer<Exception> exceptionHandler;
 
         /**
          * Constructor.
@@ -189,6 +195,20 @@ public class Migrator {
             return this;
         }
 
+        /**
+         * If migrating a case causes an {@link Exception} to be thrown, catch and handle it using the given
+         * {@link Consumer}. If no further exceptions are thrown, the migration process will continue as normal after
+         * being handled in this way. By default, {@link Exception Exceptions} are propagated upwards as is (thus
+         * ending the migration process).
+         *
+         * @param exceptionHandler {@link Consumer} to use.
+         * @return This object
+         */
+        public Builder exceptionHandler(final Consumer<Exception> exceptionHandler) {
+            this.exceptionHandler = exceptionHandler;
+            return this;
+        }
+
         @Override
         public Migrator build() {
             return new Migrator(this);
@@ -209,62 +229,66 @@ public class Migrator {
         }
 
         for (FBCase fbCase : cases) {
-            // Skip if case shouldn't be migrated
-            if (!migrateIf.test(fbCase)) {
-                continue;
-            }
-
-            // Labels to attach to issue
-            List<GHLabel> issueLabels = fbCaseLabeler.getLabels(fbCase);
-
-            // If labels don't exist, create them
-            for (GHLabel label : issueLabels) {
-                if (!FB2GHUtils.containsIgnoreCase(labelNames, label.getName())) {
-                    ghRepo.addLabel(label);
-                    labelNames.add(label.getName());
+            try {
+                // Skip if case shouldn't be migrated
+                if (!migrateIf.test(fbCase)) {
+                    continue;
                 }
-            }
 
-            // If milestone doesn't exist, create it
-            String milestoneTitle = fbCase.getMilestoneName();
-            GHMilestone ghMilestone;
-            if (milestones.containsKey(milestoneTitle)) {
-                ghMilestone = milestones.get(milestoneTitle);
-            } else {
-                ghMilestone = ghRepo.addMilestone(milestoneTitle);
-                milestones.put(milestoneTitle, ghMilestone);
-            }
+                // Labels to attach to issue
+                List<GHLabel> issueLabels = fbCaseLabeler.getLabels(fbCase);
 
-            // Get title and description
-            List<FBCaseEvent> events = fbCase.getEvents();
-            String title = fbCase.getTitle();
-            String description = convertToComment(events.get(0));
+                // If labels don't exist, create them
+                for (GHLabel label : issueLabels) {
+                    if (!FB2GHUtils.containsIgnoreCase(labelNames, label.getName())) {
+                        ghRepo.addLabel(label);
+                        labelNames.add(label.getName());
+                    }
+                }
 
-            // Post the issue, along with remaining events (if any)
-            GHIssue issue = ghRepo.addIssue(title, description);
-            FB2GHUtils.sleepQuietly(postDelay);
-            issue.addLabels(issueLabels);
-            issue.setMilestone(ghMilestone);
-            for (int i = 1; i < events.size(); i++) {
-                issue.addComment(convertToComment(events.get(i)));
+                // If milestone doesn't exist, create it
+                String milestoneTitle = fbCase.getMilestoneName();
+                GHMilestone ghMilestone;
+                if (milestones.containsKey(milestoneTitle)) {
+                    ghMilestone = milestones.get(milestoneTitle);
+                } else {
+                    ghMilestone = ghRepo.addMilestone(milestoneTitle);
+                    milestones.put(milestoneTitle, ghMilestone);
+                }
+
+                // Get title and description
+                List<FBCaseEvent> events = fbCase.getEvents();
+                String title = fbCase.getTitle();
+                String description = convertToComment(events.get(0));
+
+                // Post the issue, along with remaining events (if any)
+                GHIssue issue = ghRepo.addIssue(title, description);
                 FB2GHUtils.sleepQuietly(postDelay);
-            }
-            if (closeIf.test(fbCase)) {
-                issue.close();
-            }
+                issue.addLabels(issueLabels);
+                issue.setMilestone(ghMilestone);
+                for (int i = 1; i < events.size(); i++) {
+                    issue.addComment(convertToComment(events.get(i)));
+                    FB2GHUtils.sleepQuietly(postDelay);
+                }
+                if (closeIf.test(fbCase)) {
+                    issue.close();
+                }
 
-            // Set assignee
-            if (usernameMap.containsKey(fbCase.getAssignee())) {
-                issue.assignTo(usernameMap.get(fbCase.getAssignee()));
-            }
+                // Set assignee
+                if (usernameMap.containsKey(fbCase.getAssignee())) {
+                    issue.assignTo(usernameMap.get(fbCase.getAssignee()));
+                }
 
-            // Post-migration action
-            afterMigrate.accept(fbCase, issue);
+                // Post-migration action
+                afterMigrate.accept(fbCase, issue);
 
-            logger.info("Migrated case '{}'", title);
-            if (Thread.interrupted()) {
-                logger.info("Migration interrupted.");
-                break;
+                logger.info("Migrated case '{}'", title);
+                if (Thread.interrupted()) {
+                    logger.info("Migration interrupted.");
+                    break;
+                }
+            } catch (FB2GHException | RuntimeException e) {
+                exceptionHandler.accept(e);
             }
         }
     }
