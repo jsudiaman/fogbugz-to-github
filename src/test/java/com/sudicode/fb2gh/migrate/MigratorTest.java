@@ -153,11 +153,16 @@ public class MigratorTest {
         caseList.add(0, mockCase);
 
         // Test exception handler
+        AtomicReference<FBCase> failedCase = new AtomicReference<>();
         AtomicReference<Exception> exceptionHandled = new AtomicReference<>();
         new Migrator.Builder(fogBugz, caseList, ghRepo)
-                .exceptionHandler(exceptionHandled::set)
+                .exceptionHandler((fbCase, e) -> {
+                    failedCase.set(fbCase);
+                    exceptionHandled.set(e);
+                })
                 .build()
                 .migrate();
+        assertThat(failedCase.get(), is(equalTo(mockCase)));
         assertThat(exceptionHandled.get(), is(equalTo(accessException)));
 
         // Ensure that the rest of the cases were migrated

@@ -23,17 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * <p>
  * Migrates FogBugz cases to GitHub issues.
- * </p>
  * <p>
  * This class cannot be instantiated using a traditional constructor. To instantiate, use the builder, like so:
- * </p>
  * <pre>
  * Migrator migrator = new Migrator.Builder(fogBugz, cases, ghRepo) // Required
  *     .fbAttachmentConverter(fbAttachmentConverter)                // Optional
@@ -55,7 +51,7 @@ public class Migrator {
     private final long postDelay;
     private final Predicate<FBCase> migrateIf;
     private final BiConsumer<FBCase, GHIssue> afterMigrate;
-    private final Consumer<Exception> exceptionHandler;
+    private final BiConsumer<FBCase, Exception> exceptionHandler;
 
     /**
      * Constructor.
@@ -83,7 +79,9 @@ public class Migrator {
         afterMigrate = builder.afterMigrate != null ? builder.afterMigrate
                 : (fbCase, ghIssue) -> FB2GHUtils.nop();
         exceptionHandler = builder.exceptionHandler != null ? builder.exceptionHandler
-                : Lombok::sneakyThrow;
+                : (fbCase, e) -> {
+            throw Lombok.sneakyThrow(e);
+        };
     }
 
     /**
@@ -100,7 +98,7 @@ public class Migrator {
         private long postDelay = DEFAULT_POST_DELAY;
         private Predicate<FBCase> migrateIf;
         private BiConsumer<FBCase, GHIssue> afterMigrate;
-        private Consumer<Exception> exceptionHandler;
+        private BiConsumer<FBCase, Exception> exceptionHandler;
 
         /**
          * Constructor.
@@ -197,14 +195,15 @@ public class Migrator {
 
         /**
          * If migrating a case causes an {@link Exception} to be thrown, catch and handle it using the given
-         * {@link Consumer}. If no further exceptions are thrown, the migration process will continue as normal after
+         * {@link BiConsumer}. If no further exceptions are thrown, the migration process will continue as normal after
          * being handled in this way. By default, {@link Exception Exceptions} are propagated upwards as is (thus
          * ending the migration process).
          *
-         * @param exceptionHandler {@link Consumer} to use.
+         * @param exceptionHandler {@link BiConsumer} to use. The {@link BiConsumer} receives (1) the FogBugz case that
+         *                         was attempted to be migrated, and (2) the exception thrown.
          * @return This object
          */
-        public Builder exceptionHandler(final Consumer<Exception> exceptionHandler) {
+        public Builder exceptionHandler(final BiConsumer<FBCase, Exception> exceptionHandler) {
             this.exceptionHandler = exceptionHandler;
             return this;
         }
@@ -288,7 +287,7 @@ public class Migrator {
                     break;
                 }
             } catch (FB2GHException | RuntimeException e) {
-                exceptionHandler.accept(e);
+                exceptionHandler.accept(fbCase, e);
             }
         }
     }
