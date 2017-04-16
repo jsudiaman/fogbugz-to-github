@@ -34,7 +34,7 @@ public class FogBugzImplTest {
      *
      * @param mappingBuilder The mapping
      */
-    private void supposeThat(final MappingBuilder mappingBuilder) {
+    private void givenThat(final MappingBuilder mappingBuilder) {
         server.givenThat(mappingBuilder);
     }
 
@@ -62,7 +62,7 @@ public class FogBugzImplTest {
 
     @Test
     public void testListProjects() throws Exception {
-        supposeThat(aRequest()
+        givenThat(aRequest()
                 .withQueryParam("cmd", equalTo("listProjects"))
                 .willReturn(theContentsOf("Projects.xml")));
 
@@ -74,7 +74,7 @@ public class FogBugzImplTest {
 
     @Test
     public void testBadToken() throws Exception {
-        supposeThat(aRequest()
+        givenThat(aRequest()
                 .willReturn(theContentsOf("Error3.xml")));
 
         try {
@@ -87,7 +87,7 @@ public class FogBugzImplTest {
 
     @Test
     public void testBadCredentials() throws Exception {
-        supposeThat(aRequest()
+        givenThat(aRequest()
                 .withQueryParam("cmd", equalTo("logon"))
                 .willReturn(theContentsOf("Error1.xml")));
 
@@ -101,7 +101,7 @@ public class FogBugzImplTest {
 
     @Test
     public void testListMilestones() throws Exception {
-        supposeThat(aRequest()
+        givenThat(aRequest()
                 .withQueryParam("cmd", equalTo("listFixFors"))
                 .willReturn(theContentsOf("Milestones.xml")));
 
@@ -114,7 +114,7 @@ public class FogBugzImplTest {
 
     @Test
     public void testListAreas() throws Exception {
-        supposeThat(aRequest()
+        givenThat(aRequest()
                 .withQueryParam("cmd", equalTo("listAreas"))
                 .willReturn(theContentsOf("Areas.xml")));
 
@@ -127,7 +127,7 @@ public class FogBugzImplTest {
 
     @Test
     public void testGetCase() throws Exception {
-        supposeThat(aRequest()
+        givenThat(aRequest()
                 .withQueryParam("cmd", equalTo("search"))
                 .withQueryParam("q", equalTo("123"))
                 .willReturn(theContentsOf("Cases.xml")));
@@ -145,7 +145,7 @@ public class FogBugzImplTest {
 
     @Test
     public void testListCheckins() throws Exception {
-        supposeThat(aRequest()
+        givenThat(aRequest()
                 .withQueryParam("cmd", equalTo("listCheckins"))
                 .withQueryParam("ixBug", equalTo("123"))
                 .willReturn(theContentsOf("Checkins.xml")));
