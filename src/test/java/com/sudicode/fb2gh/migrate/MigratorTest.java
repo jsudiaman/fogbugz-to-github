@@ -16,9 +16,12 @@ import org.junit.Test;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -55,6 +58,8 @@ public class MigratorTest {
     @Test
     public void migrate() throws Exception {
         Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
+        DateFormat dateFormat = Reflect.on(migrator).call("getDateFormat").get();
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         migrator.migrate();
 
         // Repo milestones
@@ -65,13 +70,13 @@ public class MigratorTest {
 
         // Issue title and body
         assertThat(issue.getTitle(), is(equalTo("Sample Bug")));
-        assertThat(issue.getBody(), is(equalTo("<strong>Opened by Alice Adams</strong> 2007-06-27T16:37:13Z<hr>Something is wrong with our product.")));
+        assertThat(issue.getBody(), is(equalTo("<strong>Opened by Alice Adams</strong> 6/27/2007 4:37 PM UTC<hr>Something is wrong with our product.")));
 
         // Issue comments
         List<String> comments = issue.getComments();
-        assertThat(comments.get(0), is(equalTo("<strong>Assigned to Bob Brown by Alice Adams</strong> 2007-06-27T16:37:13Z")));
-        assertThat(comments.get(1), is(equalTo("<strong>Resolved (Won't Fix) and assigned to Alice Adams by Alice Adams</strong> 2009-01-07T22:04:31Z<br>Status changed from 'Active' to 'Resolved (Won't Fix)'.")));
-        assertThat(comments.get(2), is(equalTo("<strong>Closed by Alice Adams</strong> 2009-01-07T22:04:31Z")));
+        assertThat(comments.get(0), is(equalTo("<strong>Assigned to Bob Brown by Alice Adams</strong> 6/27/2007 4:37 PM UTC")));
+        assertThat(comments.get(1), is(equalTo("<strong>Resolved (Won't Fix) and assigned to Alice Adams by Alice Adams</strong> 1/7/2009 10:04 PM UTC<br>Status changed from 'Active' to 'Resolved (Won't Fix)'.")));
+        assertThat(comments.get(2), is(equalTo("<strong>Closed by Alice Adams</strong> 1/7/2009 10:04 PM UTC")));
 
         // Issue labels
         assertThat(issue.getLabels(), contains(new GHLabel("bug")));

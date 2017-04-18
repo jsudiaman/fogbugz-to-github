@@ -17,11 +17,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -40,6 +45,7 @@ public class Migrator {
 
     private static final long DEFAULT_POST_DELAY = 100;
     private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
+    private static final DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private final FogBugz fogBugz;
     private final Iterable<FBCase> cases;
@@ -52,6 +58,11 @@ public class Migrator {
     private final Predicate<FBCase> migrateIf;
     private final BiConsumer<FBCase, GHIssue> afterMigrate;
     private final BiConsumer<FBCase, Exception> exceptionHandler;
+    private final DateFormat dateFormat;
+
+    static {
+        getUtcFormat().setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     /**
      * Constructor.
@@ -82,6 +93,8 @@ public class Migrator {
                 : (fbCase, e) -> {
             throw Lombok.sneakyThrow(e);
         };
+        dateFormat = builder.dateFormat != null ? builder.dateFormat
+                : new SimpleDateFormat("M/d/yyyy h:mm a z");
     }
 
     /**
@@ -99,6 +112,7 @@ public class Migrator {
         private Predicate<FBCase> migrateIf;
         private BiConsumer<FBCase, GHIssue> afterMigrate;
         private BiConsumer<FBCase, Exception> exceptionHandler;
+        private DateFormat dateFormat;
 
         /**
          * Constructor.
@@ -208,6 +222,21 @@ public class Migrator {
             return this;
         }
 
+        /**
+         * Format timestamps using the given {@link DateFormat}. By default,
+         * they will be formatted as follows:
+         * <code>4/18/2017 1:29 PM EDT</code>. (Note that the time zone will
+         * vary based on the JVM default.)
+         *
+         * @param dateFormat
+         *            {@link DateFormat} to use.
+         * @return This object
+         */
+        public Builder dateFormat(final DateFormat dateFormat) {
+            this.dateFormat = dateFormat;
+            return this;
+        }
+
         @Override
         public Migrator build() {
             return new Migrator(this);
@@ -295,13 +324,22 @@ public class Migrator {
     /**
      * Represent the given {@link FBCaseEvent} as a GitHub issue comment.
      *
-     * @param event The {@link FBCaseEvent}
+     * @param event
+     *            The {@link FBCaseEvent}
      * @return The comment
+     * @throws FB2GHException
+     *             if there is an API issue.
      */
-    private String convertToComment(final FBCaseEvent event) {
+    private String convertToComment(final FBCaseEvent event) throws FB2GHException {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<strong>").append(event.getDescription()).append("</strong> ").append(event.getDateTime());
+        Date date;
+        try {
+            date = getUtcFormat().parse(event.getDateTime());
+        } catch (ParseException e) {
+            throw new FB2GHException(e);
+        }
+        sb.append("<strong>").append(event.getDescription()).append("</strong> ").append(getDateFormat().format(date));
 
         if (StringUtils.chomp(event.getChanges()).length() > 0) {
             sb.append("<br>").append(StringUtils.chomp(event.getChanges()));
@@ -329,6 +367,20 @@ public class Migrator {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * @return {@link DateFormat} used to parse FogBugz timestamps.
+     */
+    private static synchronized DateFormat getUtcFormat() {
+        return utcFormat;
+    }
+
+    /**
+     * @return {@link DateFormat} used to format FogBugz timestamps.
+     */
+    private synchronized DateFormat getDateFormat() {
+        return dateFormat;
     }
 
 }
