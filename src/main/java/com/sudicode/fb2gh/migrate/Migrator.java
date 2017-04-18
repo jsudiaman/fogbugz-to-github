@@ -303,7 +303,7 @@ public class Migrator {
                 }
 
                 // Set assignee
-                if (usernameMap.containsKey(fbCase.getAssignee())) {
+                if (issue.isOpen() && usernameMap.containsKey(fbCase.getAssignee())) {
                     issue.assignTo(usernameMap.get(fbCase.getAssignee()));
                 }
 
