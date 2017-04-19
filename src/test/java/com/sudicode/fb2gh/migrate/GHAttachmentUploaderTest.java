@@ -74,7 +74,7 @@ public class GHAttachmentUploaderTest {
 
     @Test
     public void testConvertLarge() {
-        assertThat(ghAttachmentUploader.convert(fogBugz, resource("10MB.zip")), is(equalTo("Upload failed!")));
+        assertThat(ghAttachmentUploader.convert(fogBugz, resource("50MB.zip")), is(equalTo("Upload failed!")));
     }
 
 }

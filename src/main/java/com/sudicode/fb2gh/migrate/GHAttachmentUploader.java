@@ -53,7 +53,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
     /**
      * File types supported by GitHub.
      */
-    private static final String SUPPORTED_FILE_TYPES = "png|gif|jpg|docx|pptx|xlsx|txt|pdf|zip|gz";
+    private static final String SUPPORTED_FILE_TYPES = "png|gif|jpg|txt|pdf|zip|gz";
 
     private final int timeoutInSeconds;
     private final WebDriver webDriver;
@@ -164,8 +164,9 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
                 temp = FB2GHUtils.createTempZipFile(temp);
             }
 
-            // GitHub won't accept files over 10MB
-            if (temp.length() >= tenMB) {
+            // GitHub won't accept files over 25MB
+            long twentyFiveMB = 25L * 1000000;
+            if (temp.length() >= twentyFiveMB) {
                 logger.error("File '{}' too large.", temp.getAbsolutePath());
                 return fallback.convert(fogBugz, fbAttachment);
             }
