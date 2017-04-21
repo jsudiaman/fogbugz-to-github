@@ -42,6 +42,8 @@ final class GHUtils {
      * @throws FB2GHException normally
      */
     static RuntimeException rethrow(final AssertionError e) throws FB2GHException {
+        logger.debug("Rethrowing AssertionError as FB2GHException.", e);
+
         try {
             // Parse e.getMessage() for GitHub's JSON response.
             String error = e.getMessage();

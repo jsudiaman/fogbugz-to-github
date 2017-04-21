@@ -28,7 +28,7 @@ migrator.migrate();
 ```
 
 ## Dependency Information
-Apache Maven
+Maven
 ```xml
 <repositories>
     <repository>
@@ -44,6 +44,16 @@ Apache Maven
         <version>1.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
+```
+
+Gradle
+```groovy
+repositories {
+    maven { url "https://github.com/sudiamanj/maven-repo/raw/master/" }
+}
+dependencies {
+    compile group: 'com.sudicode', name: 'fb2gh', version:'1.0-SNAPSHOT'
+}
 ```
 
 ## Configuration

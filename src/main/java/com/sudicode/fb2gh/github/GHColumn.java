@@ -2,17 +2,22 @@ package com.sudicode.fb2gh.github;
 
 import com.google.common.annotations.Beta;
 import com.jcabi.http.Request;
+import com.jcabi.http.response.JsonResponse;
 import com.jcabi.http.response.RestResponse;
 import com.sudicode.fb2gh.FB2GHException;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * GitHub column.
+ * GitHub project column.
  */
 @Beta
 @EqualsAndHashCode
@@ -30,7 +35,7 @@ public class GHColumn {
      * @param id          Column ID
      * @param name        Column name
      */
-    GHColumn(final Request baseRequest, final int id, String name) {
+    GHColumn(final Request baseRequest, final int id, final String name) {
         this.baseRequest = baseRequest;
         this.id = id;
         this.name = name;
@@ -52,6 +57,34 @@ public class GHColumn {
                     .fetch()
                     .as(RestResponse.class)
                     .assertStatus(HttpURLConnection.HTTP_CREATED);
+        } catch (AssertionError e) {
+            throw GHUtils.rethrow(e);
+        } catch (IOException e) {
+            throw new FB2GHException(e);
+        }
+    }
+
+    /**
+     * List project cards.
+     *
+     * @return The project cards
+     * @throws FB2GHException if a GitHub error occurs
+     */
+    public List<GHCard> listCards() throws FB2GHException {
+        try {
+            List<GHCard> cards = new ArrayList<>();
+            JsonArray array = baseRequest.uri().path(String.format("/projects/columns/%d/cards", id)).back()
+                    .method(Request.GET)
+                    .fetch()
+                    .as(RestResponse.class)
+                    .assertStatus(HttpURLConnection.HTTP_OK)
+                    .as(JsonResponse.class)
+                    .json()
+                    .readArray();
+            for (JsonObject obj : array.getValuesAs(JsonObject.class)) {
+                cards.add(new GHCard(baseRequest, obj.getInt("id")));
+            }
+            return cards;
         } catch (AssertionError e) {
             throw GHUtils.rethrow(e);
         } catch (IOException e) {

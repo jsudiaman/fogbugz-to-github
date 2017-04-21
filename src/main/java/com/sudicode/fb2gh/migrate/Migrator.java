@@ -45,7 +45,11 @@ public class Migrator {
 
     private static final long DEFAULT_POST_DELAY = 100;
     private static final Logger logger = LoggerFactory.getLogger(Migrator.class);
-    private static final DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final ThreadLocal<DateFormat> utcFormat = ThreadLocal.withInitial(() -> {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return simpleDateFormat;
+    });
 
     private final FogBugz fogBugz;
     private final Iterable<FBCase> cases;
@@ -58,11 +62,7 @@ public class Migrator {
     private final Predicate<FBCase> migrateIf;
     private final BiConsumer<FBCase, GHIssue> afterMigrate;
     private final BiConsumer<FBCase, Exception> exceptionHandler;
-    private final DateFormat dateFormat;
-
-    static {
-        getUtcFormat().setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+    private final ThreadLocal<DateFormat> dateFormat;
 
     /**
      * Constructor.
@@ -93,8 +93,8 @@ public class Migrator {
                 : (fbCase, e) -> {
             throw Lombok.sneakyThrow(e);
         };
-        dateFormat = builder.dateFormat != null ? builder.dateFormat
-                : new SimpleDateFormat("M/d/yyyy h:mm a z");
+        dateFormat = ThreadLocal.withInitial(() -> builder.dateFormat != null ? builder.dateFormat
+                : new SimpleDateFormat("M/d/yyyy h:mm a z"));
     }
 
     /**
@@ -223,13 +223,14 @@ public class Migrator {
         }
 
         /**
-         * Format timestamps using the given {@link DateFormat}. By default,
-         * they will be formatted as follows:
-         * <code>4/18/2017 1:29 PM EDT</code>. (Note that the time zone will
-         * vary based on the JVM default.)
+         * Format timestamps using the given {@link DateFormat}. By default, they will be formatted as follows:
+         * <code>4/18/2017 1:29 PM EDT</code>. (The time zone will vary based on the JVM default.)
+         * <p>
+         * Note: The default {@link DateFormat} is thread-safe. Should this method be invoked, the new
+         * {@link DateFormat} may no longer be thread-safe. If using this configuration option, it is recommended to
+         * avoid multithreaded access of the resulting {@link Migrator}.
          *
-         * @param dateFormat
-         *            {@link DateFormat} to use.
+         * @param dateFormat {@link DateFormat} to use.
          * @return This object
          */
         public Builder dateFormat(final DateFormat dateFormat) {
@@ -324,11 +325,9 @@ public class Migrator {
     /**
      * Represent the given {@link FBCaseEvent} as a GitHub issue comment.
      *
-     * @param event
-     *            The {@link FBCaseEvent}
+     * @param event The {@link FBCaseEvent}
      * @return The comment
-     * @throws FB2GHException
-     *             if there is an API issue.
+     * @throws FB2GHException if there is an API issue.
      */
     private String convertToComment(final FBCaseEvent event) throws FB2GHException {
         StringBuilder sb = new StringBuilder();
@@ -372,15 +371,15 @@ public class Migrator {
     /**
      * @return {@link DateFormat} used to parse FogBugz timestamps.
      */
-    private static synchronized DateFormat getUtcFormat() {
-        return utcFormat;
+    private static DateFormat getUtcFormat() {
+        return utcFormat.get();
     }
 
     /**
      * @return {@link DateFormat} used to format FogBugz timestamps.
      */
-    private synchronized DateFormat getDateFormat() {
-        return dateFormat;
+    private DateFormat getDateFormat() {
+        return dateFormat.get();
     }
 
 }

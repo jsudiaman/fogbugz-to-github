@@ -16,8 +16,8 @@ import org.junit.Test;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -189,6 +189,27 @@ public class MigratorTest {
             fail("Expected RuntimeException");
         } catch (RuntimeException expected) {
         }
+    }
+
+    @Test
+    public void migrateWithDateFormat() throws Exception {
+        // Create a DateFormat
+        DateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmssZ");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // Migrate using the DateFormat
+        Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo)
+                .dateFormat(dateFormat)
+                .build();
+        migrator.migrate();
+
+        GHIssue issue = ghRepo.getIssue(1);
+
+        // Issue timestamps
+        List<String> comments = issue.getComments();
+        assertThat(comments.get(0), containsString("070627163713+0000"));
+        assertThat(comments.get(1), containsString("090107220431+0000"));
+        assertThat(comments.get(2), containsString("090107220431+0000"));
     }
 
 }
