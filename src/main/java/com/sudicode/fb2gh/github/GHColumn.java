@@ -45,18 +45,24 @@ public class GHColumn {
      * Create a project card.
      *
      * @param issue The issue to associate with this card
+     * @return The created {@link GHCard}
      * @throws FB2GHException if a GitHub error occurs
      */
-    public void createCard(GHIssue issue) throws FB2GHException {
+    public GHCard createCard(final GHIssue issue) throws FB2GHException {
         try {
-            baseRequest.uri().path(String.format("/projects/columns/%d/cards", id)).back()
+            int cardId = baseRequest.uri().path(String.format("/projects/columns/%d/cards", id)).back()
                     .method(Request.POST)
                     .body()
                     .set(Json.createObjectBuilder().add("content_id", issue.getId()).add("content_type", "Issue").build())
                     .back()
                     .fetch()
                     .as(RestResponse.class)
-                    .assertStatus(HttpURLConnection.HTTP_CREATED);
+                    .assertStatus(HttpURLConnection.HTTP_CREATED)
+                    .as(JsonResponse.class)
+                    .json()
+                    .readObject()
+                    .getInt("id");
+            return new GHCard(baseRequest, cardId);
         } catch (AssertionError e) {
             throw GHUtils.rethrow(e);
         } catch (IOException e) {
