@@ -4,17 +4,22 @@ install: true
 addons:
   sonarqube:
     token:
-      secure: "mW5xr3I+oxk2CtqfG3vM7srmbNDwa1omMt52BbCoCBrqx684ojFd+9bWMK6nAGlkIMhbaNK5L3WJPQ07g5GaxVjsR1HyAx7keglSMfVg5vGSytm5mX+ZWGjIA5m+EG8vSQzOOJV+gN9iuZF2hTX1lKZfQFvH0/1/g0kpYofzC2QpFFACjiSEsEKY/7YpO8H6jc+c27POBUV0Ed65A68hn12Bq9rZN8Q9MqZ0wp9W3NW+2YnhDpZRWKkBikWWHXnaZ/V7z5PFD7rf4qatX5tc907t+x+wReKrROtyvW9w0DG2WQrDeUBxUiHj/QEWb/6EVwxuyqLY+CQO7EghMudSTkTAfYUjlk0VJMC3KT/CyZfrDqU/MUqWf2BOyTD3v7wrZe2TouaxjlHx3Casect3vn00YxexiQsXHXKLndXArBK7TzL+pnSEqJnvZX7pbRuHAr7+9l8f/5AmFhrJpjg+2Oih8VYomD+U03BbNLuPH+Er5emRL8256a+A+ih2HGRWT33yoXWuertAyR9FF/74ZBelcA3SCTryKo/CGHLvvC217g9qVCylJlpKLWJzfOi7fVoa44PPF5Oia78zHZYGw1GqOuJGSyHIoxyrFTpO7lp1DTaOd7UT5AEK5k0wMmOI2Z133TvazDnJSonn4s270SZW7LADknvztQXAYD+d2Y0="
-  firefox: "52.0"
+      secure: mW5xr3I+oxk2CtqfG3vM7srmbNDwa1omMt52BbCoCBrqx684ojFd+9bWMK6nAGlkIMhbaNK5L3WJPQ07g5GaxVjsR1HyAx7keglSMfVg5vGSytm5mX+ZWGjIA5m+EG8vSQzOOJV+gN9iuZF2hTX1lKZfQFvH0/1/g0kpYofzC2QpFFACjiSEsEKY/7YpO8H6jc+c27POBUV0Ed65A68hn12Bq9rZN8Q9MqZ0wp9W3NW+2YnhDpZRWKkBikWWHXnaZ/V7z5PFD7rf4qatX5tc907t+x+wReKrROtyvW9w0DG2WQrDeUBxUiHj/QEWb/6EVwxuyqLY+CQO7EghMudSTkTAfYUjlk0VJMC3KT/CyZfrDqU/MUqWf2BOyTD3v7wrZe2TouaxjlHx3Casect3vn00YxexiQsXHXKLndXArBK7TzL+pnSEqJnvZX7pbRuHAr7+9l8f/5AmFhrJpjg+2Oih8VYomD+U03BbNLuPH+Er5emRL8256a+A+ih2HGRWT33yoXWuertAyR9FF/74ZBelcA3SCTryKo/CGHLvvC217g9qVCylJlpKLWJzfOi7fVoa44PPF5Oia78zHZYGw1GqOuJGSyHIoxyrFTpO7lp1DTaOd7UT5AEK5k0wMmOI2Z133TvazDnJSonn4s270SZW7LADknvztQXAYD+d2Y0=
+  firefox: '52.0'
 jdk:
-  - oraclejdk8
+- oraclejdk8
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
 cache:
   directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.sonar/cache'
+  - $HOME/.m2/repository
+  - $HOME/.sonar/cache
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- sleep 3
+env:
+  global:
+    secure: FwmcxYlkzcy9cNu09PHKRF5vvsPGGFxDYc2u64oWHZYz5zMPpfAP5VMSVFPmso1uE2ReBNIQRFQ16zHpshdWjzClHw2k7s0fIDETMjTR2N23FaOEcMZjEl01GAh4VRulHuhRlF9ZusTPVeGpHc9swudev9JUm4wKlsXZPdhwlfinNvGdsG08kVDiExQA1X3hJWgaQ7hrNAYqp+hXxeIZ+9QkoXAx7uyzGk18+PlISLD+mkSOYx4EJH7tvWQyc2nEEtzP7pLjQu5O8TmVd8A63+21HQsfUunGtOSF6B+RBKsMgKTg77xcqXIRnQvYDU0FcKbsPPfz+e/hi9WMLkpoyA4gJzvpPZYYWy9Buf/bfU0DfO6ffo5Uvh9nLr7HaFJDa8YS1xbHQWFnowipi7tLmem1PHG07VGYp+wSjon6WkoRF4OEdp7q0PGs2VetVFTaJsi0Zss44U9U49le5IO3X/J5XBJbY29Z+DC3Y2SFC9iyVuAVcC7esMPu78FBNUledfEjql/LuzDnDqJFTGBusHFja6ykWE6Jj6HdMjwEbeNBLUGci6ioxIZTQSKBWWmYeOWswBwgkO0cpUIdo0VI6nGCyccDShYYjC4QdK9Xo1A9dFh0EPoMJYGU6lrbcPhhjwWgA+mvrK0rvys5LZ9LHwj5Okaen3ZLp2cOrZK6jtY=
+after_success:
+- .util/push-javadoc-to-gh-pages.sh
