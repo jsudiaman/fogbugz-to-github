@@ -51,7 +51,7 @@ repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 dependencies {
-    compile group: 'com.sudicode', name: 'fogbugz-to-github', version:'1.0-SNAPSHOT'
+    compile group: 'com.sudicode', name: 'fogbugz-to-github', version: '1.0-SNAPSHOT'
 }
 ```
 
