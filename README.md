@@ -32,15 +32,14 @@ Maven
 ```xml
 <repositories>
     <repository>
-        <id>sudiamanj</id>
-        <name>maven-repo</name>
-        <url>https://github.com/sudiamanj/maven-repo/raw/master/</url>
+        <id>oss.sonatype.org</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
     </repository>
 </repositories>
 <dependencies>
     <dependency>
         <groupId>com.sudicode</groupId>
-        <artifactId>fb2gh</artifactId>
+        <artifactId>fogbugz-to-github</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
@@ -49,10 +48,10 @@ Maven
 Gradle
 ```groovy
 repositories {
-    maven { url "https://github.com/sudiamanj/maven-repo/raw/master/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 dependencies {
-    compile group: 'com.sudicode', name: 'fb2gh', version:'1.0-SNAPSHOT'
+    compile group: 'com.sudicode', name: 'fogbugz-to-github', version:'1.0-SNAPSHOT'
 }
 ```
 

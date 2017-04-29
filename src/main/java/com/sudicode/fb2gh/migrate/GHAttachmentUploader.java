@@ -13,8 +13,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -124,7 +122,7 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
         webDriver.findElement(By.id("login_field")).sendKeys(ghUsername);
         webDriver.findElement(By.id("password")).sendKeys(ghPassword);
         webDriver.findElement(By.name("commit")).click();
-        wait.until(ExpectedConditions.urlToBe("https://github.com/"));
+        wait.until(webDriver -> "https://github.com/".equals(webDriver.getCurrentUrl()));
         webDriver.get(String.format("https://github.com/%s/%s/issues/new", ghRepo.getOwner(), ghRepo.getName()));
         logger.info("Constructed successfully");
     }
@@ -152,50 +150,59 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
         try {
             // Download FogBugz attachment
             String filename = fbAttachment.getFilename();
-            String extension = FilenameUtils.getExtension(filename);
             String fbURL = fbAttachment.getAbsoluteUrl(fogBugz);
             File temp = FB2GHUtils.createTempFile(filename);
             int timeoutInMillis = timeoutInSeconds * 1000;
             FileUtils.copyURLToFile(new URL(fbURL), temp, timeoutInMillis, timeoutInMillis);
 
-            // If file is incompatible, zip it
-            long tenMB = 10L * 1000000;
-            if (temp.length() == 0L || temp.length() >= tenMB || !extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
-                temp = FB2GHUtils.createTempZipFile(temp);
-            }
-
-            // GitHub won't accept files over 25MB
-            long twentyFiveMB = 25L * 1000000;
-            if (temp.length() >= twentyFiveMB) {
-                logger.error("File '{}' too large.", temp.getAbsolutePath());
-                return fallback.convert(fogBugz, fbAttachment);
-            }
-
-            // Upload to GH Issues
-            webDriver.findElement(By.id("issue_body")).clear();
-            webDriver.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser")).sendKeys(temp.getAbsolutePath());
-            String url = wait.ignoring(StringIndexOutOfBoundsException.class).until(new ExpectedCondition<String>() {
-                @Override
-                public String apply(final WebDriver webDriver) {
-                    String body = webDriver.findElement(By.id("issue_body")).getAttribute("value");
-
-                    // HTML
-                    if (body.startsWith("<img")) {
-                        Matcher matcher = Pattern.compile("src=\"(.*?)\"").matcher(body);
-                        return matcher.find() ? matcher.group(1) : null;
-                    }
-
-                    // Markdown
-                    body = body.substring(body.lastIndexOf('(') + 1, body.lastIndexOf(')'));
-                    return body.length() > 0 ? body : null;
-                }
-            });
-            logger.info("Uploaded file '{}' to URL '{}'", temp.getAbsolutePath(), url);
-            return url;
+            // Upload to GitHub Issues
+            return upload(temp);
         } catch (IOException | TimeoutException e) {
             logger.error("Could not convert: " + fbAttachment.getAbsoluteUrl(fogBugz), e);
             return fallback.convert(fogBugz, fbAttachment);
         }
+    }
+
+    /**
+     * Upload a file to GitHub Issues, zipping if necessary.
+     *
+     * @param file The file to upload
+     * @return URL of the uploaded file
+     * @throws IOException if an I/O error occurs
+     */
+    public String upload(File file) throws IOException {
+        String extension = FilenameUtils.getExtension(file.getName());
+
+        // If file is incompatible, zip it
+        long tenMB = 10L * 1000000;
+        if (file.length() == 0L || file.length() >= tenMB || !extension.toLowerCase().matches(SUPPORTED_FILE_TYPES)) {
+            file = FB2GHUtils.createTempZipFile(file);
+        }
+
+        // GitHub won't accept files over 25MB
+        long twentyFiveMB = 25L * 1000000;
+        if (file.length() >= twentyFiveMB) {
+            throw new IOException("File '" + file.getAbsolutePath() + "' too large.");
+        }
+
+        // Upload to GH Issues
+        webDriver.findElement(By.id("issue_body")).clear();
+        webDriver.findElement(By.cssSelector("input.manual-file-chooser.js-manual-file-chooser")).sendKeys(file.getAbsolutePath());
+        String url = wait.ignoring(StringIndexOutOfBoundsException.class).until(webDriver -> {
+            String body = webDriver.findElement(By.id("issue_body")).getAttribute("value");
+
+            // HTML
+            if (body.startsWith("<img")) {
+                Matcher matcher = Pattern.compile("src=\"(.*?)\"").matcher(body);
+                return matcher.find() ? matcher.group(1) : null;
+            }
+
+            // Markdown
+            body = body.substring(body.lastIndexOf('(') + 1, body.lastIndexOf(')'));
+            return body.length() > 0 ? body : null;
+        });
+        logger.info("Uploaded file '{}' to URL '{}'", file.getAbsolutePath(), url);
+        return url;
     }
 
     /**

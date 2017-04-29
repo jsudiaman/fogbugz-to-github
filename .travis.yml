@@ -1,6 +1,27 @@
 language: java
 sudo: false
-install: true
+install:
+- mvn --settings .travis/settings.xml install -DskipTests=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
+before_install:
+- if [ ! -z "$GPG_SECRET_KEYS" ]; then echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import; fi
+- if [ ! -z "$GPG_OWNERTRUST" ]; then echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust; fi
+deploy:
+  -
+    provider: script
+    script: .travis/deploy.sh
+    skip_cleanup: true
+    on:
+      repo: sudiamanj/fogbugz-to-github
+      branch: master
+      jdk: oraclejdk8
+  -
+    provider: script
+    script: .travis/deploy.sh
+    skip_cleanup: true
+    on:
+      repo: sudiamanj/fogbugz-to-github
+      tags: true
+      jdk: oraclejdk8
 addons:
   sonarqube:
     token:
@@ -22,4 +43,4 @@ env:
   global:
     secure: FwmcxYlkzcy9cNu09PHKRF5vvsPGGFxDYc2u64oWHZYz5zMPpfAP5VMSVFPmso1uE2ReBNIQRFQ16zHpshdWjzClHw2k7s0fIDETMjTR2N23FaOEcMZjEl01GAh4VRulHuhRlF9ZusTPVeGpHc9swudev9JUm4wKlsXZPdhwlfinNvGdsG08kVDiExQA1X3hJWgaQ7hrNAYqp+hXxeIZ+9QkoXAx7uyzGk18+PlISLD+mkSOYx4EJH7tvWQyc2nEEtzP7pLjQu5O8TmVd8A63+21HQsfUunGtOSF6B+RBKsMgKTg77xcqXIRnQvYDU0FcKbsPPfz+e/hi9WMLkpoyA4gJzvpPZYYWy9Buf/bfU0DfO6ffo5Uvh9nLr7HaFJDa8YS1xbHQWFnowipi7tLmem1PHG07VGYp+wSjon6WkoRF4OEdp7q0PGs2VetVFTaJsi0Zss44U9U49le5IO3X/J5XBJbY29Z+DC3Y2SFC9iyVuAVcC7esMPu78FBNUledfEjql/LuzDnDqJFTGBusHFja6ykWE6Jj6HdMjwEbeNBLUGci6ioxIZTQSKBWWmYeOWswBwgkO0cpUIdo0VI6nGCyccDShYYjC4QdK9Xo1A9dFh0EPoMJYGU6lrbcPhhjwWgA+mvrK0rvys5LZ9LHwj5Okaen3ZLp2cOrZK6jtY=
 after_success:
-- .util/push-javadoc-to-gh-pages.sh
+- .travis/push-javadoc-to-gh-pages.sh
