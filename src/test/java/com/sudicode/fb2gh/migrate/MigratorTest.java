@@ -3,6 +3,7 @@ package com.sudicode.fb2gh.migrate;
 import com.sudicode.fb2gh.FB2GHException;
 import com.sudicode.fb2gh.fogbugz.FBCase;
 import com.sudicode.fb2gh.fogbugz.FogBugz;
+import com.sudicode.fb2gh.github.GHComment;
 import com.sudicode.fb2gh.github.GHIssue;
 import com.sudicode.fb2gh.github.GHLabel;
 import com.sudicode.fb2gh.github.GHMilestone;
@@ -73,10 +74,10 @@ public class MigratorTest {
         assertThat(issue.getBody(), is(equalTo("<strong>Opened by Alice Adams</strong> 6/27/2007 4:37 PM UTC<hr>Something is wrong with our product.")));
 
         // Issue comments
-        List<String> comments = issue.getComments();
-        assertThat(comments.get(0), is(equalTo("<strong>Assigned to Bob Brown by Alice Adams</strong> 6/27/2007 4:37 PM UTC")));
-        assertThat(comments.get(1), is(equalTo("<strong>Resolved (Won't Fix) and assigned to Alice Adams by Alice Adams</strong> 1/7/2009 10:04 PM UTC<br>Status changed from 'Active' to 'Resolved (Won't Fix)'.")));
-        assertThat(comments.get(2), is(equalTo("<strong>Closed by Alice Adams</strong> 1/7/2009 10:04 PM UTC")));
+        List<GHComment> comments = issue.getComments();
+        assertThat(comments.get(0).getText(), is(equalTo("<strong>Assigned to Bob Brown by Alice Adams</strong> 6/27/2007 4:37 PM UTC")));
+        assertThat(comments.get(1).getText(), is(equalTo("<strong>Resolved (Won't Fix) and assigned to Alice Adams by Alice Adams</strong> 1/7/2009 10:04 PM UTC<br>Status changed from 'Active' to 'Resolved (Won't Fix)'.")));
+        assertThat(comments.get(2).getText(), is(equalTo("<strong>Closed by Alice Adams</strong> 1/7/2009 10:04 PM UTC")));
 
         // Issue labels
         assertThat(issue.getLabels(), contains(new GHLabel("bug")));
@@ -206,10 +207,10 @@ public class MigratorTest {
         GHIssue issue = ghRepo.getIssue(1);
 
         // Issue timestamps
-        List<String> comments = issue.getComments();
-        assertThat(comments.get(0), containsString("070627163713+0000"));
-        assertThat(comments.get(1), containsString("090107220431+0000"));
-        assertThat(comments.get(2), containsString("090107220431+0000"));
+        List<GHComment> comments = issue.getComments();
+        assertThat(comments.get(0).getText(), containsString("070627163713+0000"));
+        assertThat(comments.get(1).getText(), containsString("090107220431+0000"));
+        assertThat(comments.get(2).getText(), containsString("090107220431+0000"));
     }
 
 }

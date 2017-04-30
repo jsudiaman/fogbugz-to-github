@@ -89,18 +89,15 @@ public class GHIssue {
      * @return All comments on this issue.
      * @throws FB2GHException if a GitHub error occurs
      */
-    public List<String> getComments() throws FB2GHException {
+    public List<GHComment> getComments() throws FB2GHException {
         try {
-            List<String> list = new ArrayList<>();
+            List<GHComment> list = new ArrayList<>();
             for (Comment comment : issue.comments().iterate(new Date(0))) {
-                Comment.Smart smartComment = new Comment.Smart(comment);
-                list.add(smartComment.body());
+                list.add(new GHComment(comment));
             }
             return list;
         } catch (AssertionError e) {
             throw GHUtils.rethrow(e);
-        } catch (IOException e) {
-            throw new FB2GHException(e);
         }
     }
 
@@ -108,11 +105,12 @@ public class GHIssue {
      * Add a comment.
      *
      * @param comment The contents of the comment. Supports Markdown.
+     * @return The added comment.
      * @throws FB2GHException if a GitHub error occurs
      */
-    public void addComment(final String comment) throws FB2GHException {
+    public GHComment addComment(final String comment) throws FB2GHException {
         try {
-            issue.comments().post(comment);
+            return new GHComment(issue.comments().post(comment));
         } catch (AssertionError e) {
             throw GHUtils.rethrow(e);
         } catch (IOException e) {
