@@ -69,7 +69,7 @@ public class GHAttachmentUploaderTest {
 
     @Test
     public void testConvert() {
-        assertThat(ghAttachmentUploader.convert(fogBugz, resource("blank.jpg")), startsWith("https://cloud.githubusercontent.com/assets/"));
+        assertThat(ghAttachmentUploader.convert(fogBugz, resource("blank.jpg")), startsWith("https://user-images.githubusercontent.com/"));
     }
 
     @Test
