@@ -19,8 +19,8 @@
     </developers>
     <licenses>
         <license>
-            <name>The Unlicense</name>
-            <url>http://unlicense.org/</url>
+            <name>MIT</name>
+            <url>https://opensource.org/licenses/MIT</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
