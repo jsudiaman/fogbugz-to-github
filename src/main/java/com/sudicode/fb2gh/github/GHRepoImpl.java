@@ -124,55 +124,9 @@ class GHRepoImpl implements GHRepo {
         return repo.coordinates().repo();
     }
 
-    @Beta
-    @Override
-    public GHProject getProject(final String name) throws FB2GHException {
-        List<GHProject> projects = getProjects(name);
-        if (projects.isEmpty()) {
-            throw new FB2GHException(String.format("Project '%s' not found.", name));
-        } else if (projects.size() > 1) {
-            throw new FB2GHException(String.format("Multiple projects named '%s' were found, return value is ambiguous.", name));
-        }
-        return projects.get(0);
-    }
-
-    @Beta
-    @Override
-    public List<GHProject> getProjects(final String name) throws FB2GHException {
-        List<GHProject> projects = new ArrayList<>();
-
-        // Entry point for the projects API.
-        Request baseRequest = repo.github().entry().reset("Accept").header("Accept", "application/vnd.github.inertia-preview+json");
-
-        // Get projects.
-        try {
-            logger.info("Searching for projects named '{}'", name);
-            JsonArray array = baseRequest.uri().path(String.format("/repos/%s/%s/projects", getOwner(), getName())).back()
-                    .method(Request.GET)
-                    .fetch()
-                    .as(RestResponse.class)
-                    .assertStatus(HttpURLConnection.HTTP_OK)
-                    .as(JsonResponse.class)
-                    .json()
-                    .readArray();
-            for (JsonObject obj : array.getValuesAs(JsonObject.class)) {
-                String projectName = obj.getString("name");
-                if (name.equals(projectName)) {
-                    projects.add(new GHProject(baseRequest, obj.getInt("id"), projectName));
-                }
-            }
-        } catch (AssertionError e) {
-            throw GHUtils.rethrow(e);
-        } catch (IOException e) {
-            throw new FB2GHException(e);
-        }
-
-        logger.info("Found projects: {}", projects);
-        return projects;
-    }
-
     @Override
     public String toString() {
         return getOwner() + "/" + getName();
     }
+
 }
