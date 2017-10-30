@@ -1,21 +1,14 @@
 package com.sudicode.fb2gh.github;
 
-import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableMap;
 import com.jcabi.github.Label;
 import com.jcabi.github.Milestone;
 import com.jcabi.github.Repo;
-import com.jcabi.http.Request;
-import com.jcabi.http.response.JsonResponse;
-import com.jcabi.http.response.RestResponse;
 import com.sudicode.fb2gh.FB2GHException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
