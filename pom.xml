@@ -35,9 +35,9 @@
         </repository>
     </distributionManagement>
     <scm>
-        <connection>git@github.com:sudiamanj/fogbugz-to-github.git</connection>
-        <developerConnection>git@github.com:sudiamanj/fogbugz-to-github.git</developerConnection>
-        <url>https://github.com/sudiamanj/fogbugz-to-github</url>
+        <connection>scm:git:git://github.com/sudiamanj/fogbugz-to-github.git</connection>
+        <developerConnection>scm:git:ssh://github.com:sudiamanj/fogbugz-to-github.git</developerConnection>
+        <url>http://github.com/sudiamanj/fogbugz-to-github/tree/master</url>
     </scm>
     <build>
         <plugins>
@@ -122,22 +122,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-scm-plugin</artifactId>
-                <version>1.9.5</version>
-                <configuration>
-                    <connectionType>connection</connectionType>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-scm-plugin</artifactId>
-                <version>1.9.5</version>
-                <configuration>
-                    <connectionType>developerConnection</connectionType>
-                </configuration>
             </plugin>
         </plugins>
     </build>
