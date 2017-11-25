@@ -5,7 +5,7 @@
     <groupId>com.sudicode</groupId>
     <artifactId>fogbugz-to-github</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <name>fogbugz-to-github</name>
     <url>https://github.com/sudiamanj/fogbugz-to-github</url>
     <description>Migrates FogBugz cases to GitHub issues.</description>
