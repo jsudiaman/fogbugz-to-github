@@ -1,7 +1,8 @@
 # FogBugz to GitHub (FB2GH)
 
 ![Logo](https://raw.githubusercontent.com/sudiamanj/fogbugz-to-github/master/fb2gh-logo.png)  
-[![Build Status](https://travis-ci.org/sudiamanj/fogbugz-to-github.svg?branch=master)](https://travis-ci.org/sudiamanj/fogbugz-to-github) [![Quality Gate](https://sonarcloud.io/api/badges/measure?key=com.sudicode:fogbugz-to-github&metric=coverage)](https://sonarcloud.io/dashboard/index/com.sudicode:fogbugz-to-github) [![Javadoc](https://img.shields.io/badge/javadoc-html-blue.svg)](http://sudicode.com/fogbugz-to-github)  
+[![Build Status](https://travis-ci.org/sudiamanj/fogbugz-to-github.svg?branch=master)](https://travis-ci.org/sudiamanj/fogbugz-to-github) [![Quality Gate](https://sonarcloud.io/api/badges/measure?key=com.sudicode:fogbugz-to-github&metric=coverage)](https://sonarcloud.io/dashboard/index/com.sudicode:fogbugz-to-github) [![Maven Central](https://img.shields.io/maven-central/v/com.sudicode/fogbugz-to-github.svg)](http://search.maven.org/#artifactdetails%7Ccom.sudicode%7Cfogbugz-to-github%7C0.1.0%7Cjar) [![Javadoc](https://img.shields.io/badge/javadoc-html-blue.svg)](http://sudicode.com/fogbugz-to-github)
+
 **FB2GH** is designed to help you programmatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/).
 
 ## Usage
@@ -25,34 +26,6 @@ GHRepo ghRepo = github.getRepo(repoOwner, repoName); // GitHub repository to mig
 // Migrate caseList to ghRepo
 Migrator migrator = new Migrator.Builder(fogBugz, caseList, ghRepo).build();
 migrator.migrate();
-```
-
-## Dependency Information
-Maven
-```xml
-<repositories>
-    <repository>
-        <id>oss.sonatype.org</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </repository>
-</repositories>
-<dependencies>
-    <dependency>
-        <groupId>com.sudicode</groupId>
-        <artifactId>fogbugz-to-github</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
-</dependencies>
-```
-
-Gradle
-```groovy
-repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-}
-dependencies {
-    compile group: 'com.sudicode', name: 'fogbugz-to-github', version: '1.0-SNAPSHOT'
-}
 ```
 
 ## Configuration
