@@ -11,12 +11,10 @@ import com.sudicode.fb2gh.github.GHRepo;
 import com.sudicode.fb2gh.github.OfflineGHRepo;
 import org.joor.Reflect;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,19 +34,13 @@ import static org.mockito.Mockito.mock;
  */
 public class MigratorTest {
 
-    private static Unmarshaller jaxb;
-
     private FogBugz fogBugz;
     private List<FBCase> caseList;
     private GHRepo ghRepo;
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        jaxb = JAXBContext.newInstance(Class.forName("com.sudicode.fb2gh.fogbugz.FBResponse")).createUnmarshaller();
-    }
-
     @Before
     public void setUp() throws Exception {
+        Unmarshaller jaxb = JAXBContext.newInstance(Class.forName("com.sudicode.fb2gh.fogbugz.FBResponse")).createUnmarshaller();
         fogBugz = mock(FogBugz.class);
         caseList = Reflect.on(jaxb.unmarshal(getClass().getResource("Cases.xml")))
                 .call("getCases")
