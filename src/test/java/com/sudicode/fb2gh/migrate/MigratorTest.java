@@ -50,7 +50,7 @@ public class MigratorTest {
     @Before
     public void setUp() throws Exception {
         fogBugz = mock(FogBugz.class);
-        caseList = Reflect.on(jaxb.unmarshal(new StreamSource(getClass().getResourceAsStream("Cases.xml"))))
+        caseList = Reflect.on(jaxb.unmarshal(getClass().getResource("Cases.xml")))
                 .call("getCases")
                 .get();
         ghRepo = new OfflineGHRepo();
