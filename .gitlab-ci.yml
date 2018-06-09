@@ -3,7 +3,8 @@ image: maven:3.5.3-jdk-8
 cache:
   paths:
   - .m2/repository
+  - .sonar/cache
 
 build:
   script:
-  - mvn install
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.organization=sudiamanj-github -Dsonar.login=$SONAR_TOKEN
