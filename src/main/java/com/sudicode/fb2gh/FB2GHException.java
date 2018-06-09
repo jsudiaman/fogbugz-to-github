@@ -3,9 +3,8 @@ package com.sudicode.fb2gh;
 /**
  * Exception thrown by FB2GH.
  */
+@SuppressWarnings("serial")
 public class FB2GHException extends Exception {
-
-    private static final long serialVersionUID = 4405364101184407542L;
 
     /**
      * Construct a new <code>FB2GHException</code> with the specified message.
