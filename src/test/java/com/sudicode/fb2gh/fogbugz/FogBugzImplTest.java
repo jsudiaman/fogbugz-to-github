@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
@@ -22,12 +23,12 @@ import static org.junit.Assert.*;
 public class FogBugzImplTest {
 
     @Rule
-    public WireMockRule server = new WireMockRule();
+    public WireMockRule server = new WireMockRule(options().dynamicPort());
     private FogBugz fogBugz;
 
     @Before
     public void setUp() throws Exception {
-        fogBugz = new FogBugzImpl("http://localhost:8080", "token");
+        fogBugz = new FogBugzImpl("http://localhost:" + server.port(), "token");
     }
 
     /**

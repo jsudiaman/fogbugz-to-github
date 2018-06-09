@@ -51,7 +51,9 @@ public class GHAttachmentUploaderTest {
 
     @After
     public void tearDown() {
-        ghAttachmentUploader.close();
+        if (ghAttachmentUploader != null) {
+            ghAttachmentUploader.close();
+        }
     }
 
     /**
