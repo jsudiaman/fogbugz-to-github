@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.Matchers.is;
@@ -57,7 +58,7 @@ public class FogBugzImplTest {
     private ResponseDefinitionBuilder theContentsOf(String xmlFile) throws IOException {
         return aResponse()
                 .withHeader("Content-Type", "text/xml")
-                .withBody(IOUtils.toString(getClass().getResource(xmlFile)));
+                .withBody(IOUtils.toString(getClass().getResource(xmlFile), StandardCharsets.UTF_8));
     }
 
     @Test

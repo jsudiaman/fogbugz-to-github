@@ -22,7 +22,7 @@ public class FB2GHUtilsTest {
 
     @Test
     public void testConstructor() throws Exception {
-        Constructor constructor = FB2GHUtils.class.getDeclaredConstructor();
+        Constructor<?> constructor = FB2GHUtils.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         try {
             constructor.newInstance();
