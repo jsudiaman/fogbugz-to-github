@@ -1,7 +1,6 @@
 # FogBugz to GitHub (FB2GH)
 
-![Logo](https://raw.githubusercontent.com/sudiamanj/fogbugz-to-github/master/fb2gh-logo.png)  
-[![Build Status](https://travis-ci.org/sudiamanj/fogbugz-to-github.svg?branch=master)](https://travis-ci.org/sudiamanj/fogbugz-to-github) [![Quality Gate](https://img.shields.io/badge/sonarqube-fogbugz--to--github-blue.svg)](https://sonarcloud.io/dashboard/index/com.sudicode:fogbugz-to-github) [![Maven Central](https://img.shields.io/maven-central/v/com.sudicode/fogbugz-to-github.svg)](http://search.maven.org/#artifactdetails%7Ccom.sudicode%7Cfogbugz-to-github%7C0.1.0%7Cjar) [![Javadoc](https://img.shields.io/badge/javadoc-html-blue.svg)](http://sudicode.com/fogbugz-to-github)
+![Logo](/fb2gh-logo.png)
 
 **FB2GH** is designed to help you programmatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/).
 
@@ -88,4 +87,4 @@ export CERT=<PATH_TO_YOUR_CERTIFICATE>
 sudo keytool -import -file $CERT -alias fogbugz_cert -keystore $CACERTS
 ```
 
-Alternatively, if security is not an issue, you may use this [quick fix](https://gist.github.com/sudiamanj/62b332afc5c93e24ca4a0ffb358e931a) instead. (Of course, if security is not an issue, then why bother with HTTPS in the first place?)
+Alternatively, if security is not an issue, you may use this [quick fix](https://gitlab.com/jsudiaman/fogbugz-to-github/snippets/1722631) instead. (Of course, if security is not an issue, then why bother with HTTPS in the first place?)
