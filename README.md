@@ -78,7 +78,7 @@ This project uses [SLF4J](http://www.slf4j.org), which allows end users to choos
 Somewhere in the stack trace, you should see `javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed...`
 
 In this case, the JRE does not trust your public certificate. This can be resolved using the following commands:
-```bash
+```shell
 # Fill these out. (You should be able to download the certificate using your web browser.)
 export CACERTS=<PATH_TO_YOUR_JRE>/lib/security/cacerts
 export CERT=<PATH_TO_YOUR_CERTIFICATE>
