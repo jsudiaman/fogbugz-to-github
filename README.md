@@ -4,7 +4,7 @@
 
 **FB2GH** is designed to help you programmatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/).
 
-[![Build Status](https://travis-ci.org/sudiamanj/fogbugz-to-github.svg?branch=master)](https://travis-ci.org/sudiamanj/fogbugz-to-github) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sudiamanj_fogbugz-to-github&metric=coverage)](https://sonarcloud.io/dashboard?id=sudiamanj_fogbugz-to-github)
+[![Build Status](https://travis-ci.org/sudiamanj/fogbugz-to-github.svg?branch=master)](https://travis-ci.org/sudiamanj/fogbugz-to-github) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sudiamanj_fogbugz-to-github&metric=coverage)](https://sonarcloud.io/dashboard?id=sudiamanj_fogbugz-to-github) [![Javadoc](https://img.shields.io/badge/javadoc-latest-blue.svg?logo=java)](http://fb2gh.sudicode.com)
 
 ## Usage
 ```java
@@ -75,18 +75,3 @@ SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further detail
 ```
 
 This project uses [SLF4J](http://www.slf4j.org), which allows end users to choose a logging facility at runtime. If you don't care about logging and want to disable this message, simply add [slf4j-nop](http://search.maven.org/#artifactdetails%7Corg.slf4j%7Cslf4j-nop%7C1.7.21%7Cjar) as a dependency. If you want to use SLF4J's logger, use [slf4j-simple](http://search.maven.org/#artifactdetails%7Corg.slf4j%7Cslf4j-simple%7C1.7.21%7Cjar). For more options, see [SLF4J user manual](http://www.slf4j.org/manual.html).
-
-### My FogBugz server uses a self-signed SSL certificate. Why can't I access it?
-Somewhere in the stack trace, you should see `javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed...`
-
-In this case, the JRE does not trust your public certificate. This can be resolved using the following commands:
-```shell
-# Fill these out. (You should be able to download the certificate using your web browser.)
-export CACERTS=<PATH_TO_YOUR_JRE>/lib/security/cacerts
-export CERT=<PATH_TO_YOUR_CERTIFICATE>
-
-# If you are asked for a keystore password, the default is 'changeit'.
-sudo keytool -import -file $CERT -alias fogbugz_cert -keystore $CACERTS
-```
-
-Alternatively, if security is not an issue, you may use this [quick fix](https://gitlab.com/jsudiaman/fogbugz-to-github/snippets/1722631) instead. (Of course, if security is not an issue, then why bother with HTTPS in the first place?)
