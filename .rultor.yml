@@ -5,4 +5,4 @@ decrypt:
 release:
   script: |
     mvn versions:set "-DnewVersion=${tag}"
-    mvn clean deploy -Pjcabi --settings /home/r/settings.xml
+    mvn clean deploy -Pfogbugz-to-github --settings /home/r/settings.xml
