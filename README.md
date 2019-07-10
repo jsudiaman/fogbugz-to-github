@@ -4,6 +4,8 @@
 
 **FB2GH** is designed to help you programmatically migrate your [FogBugz cases](https://www.fogcreek.com/fogbugz/) into [GitHub issues](https://guides.github.com/features/issues/).
 
+[![Build Status](https://travis-ci.org/sudiamanj/fogbugz-to-github.svg?branch=master)](https://travis-ci.org/sudiamanj/fogbugz-to-github) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sudiamanj_fogbugz-to-github&metric=coverage)](https://sonarcloud.io/dashboard?id=sudiamanj_fogbugz-to-github)
+
 ## Usage
 ```java
 // Login to FogBugz
