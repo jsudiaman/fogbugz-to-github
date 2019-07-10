@@ -30,7 +30,7 @@ migrator.migrate();
 ```
 
 ## Configuration
-The `Migrator` class uses the [builder pattern](https://en.wikipedia.org/wiki/Builder_pattern) which makes it flexible in terms of customization.
+The `Migrator` class uses the builder pattern which makes it flexible in terms of customization.
 
 For instance, here's how to define your own labeling function:
 ```java
