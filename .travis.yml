@@ -1,0 +1,9 @@
+language: java
+addons:
+  sonarcloud:
+    organization: "sudiamanj-github"
+    token:
+      secure: "r85VgPtPQetKisEGg8t1mMf9TQNc0xrN6U77PE/DswlvogD/kVzOYZDGAz2XUFYbe/pofHAOXYTP8LfnfudfYlAgPlT3QkMvMJAjS5G1X6exnELsOEU30nh2oN/bFEDvkYDEIxB83bjeo3G6zmbC8vzCqyQYc8cDPZkdJOvIbh/ATYOYBJOngQzhsXnp9PMDOLuEykzVo3P34OF6Oe7mtBwuTqp4np8Wl5yuQmFcp4wPcx6iTvRMCy2TIpnvaKIiLfrgbFM7DtocE6ZdAKP7hphtN5it7TZaWbupx55iiqD6PeLpa9t9rZ7hSypfuXsgAnFO3fC+YtmjbgZFygsE6im1XocVJK5pX/pMUi/n33HF39k5vDw1PZ6CP8WWOe+ecLem7tffZX53gIX/0iaAzXIxkAkPhLZ8uAWHYycPYxN/xZWzutstctvHs9VNSfMBwnifzdkr+fWEtxx6LzRsVEMlFWgjZIJrY64g2j51NLqaFY8EBp4O3aufrjf55ioawNYhtHmTZxDcw0NoW6Ob6uRMnKYyTgscmMF4g5KojVhhlCk30ir8aK1eCtWte8m1iT8jsFP8dyWejOwW7sOKkyxqgfgHE1B2za6BMFYDI3ugvKzy70GpH06buaaY8JNVIX5CC9QpPSwJS5Ma8QogLwAnjbBSv9Bdm3zUNaFlnQ4="
+
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=sudiamanj_fogbugz-to-github
