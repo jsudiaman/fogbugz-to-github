@@ -17,6 +17,7 @@ env:
 deploy:
   provider: script
   script: make travis-deploy
+  skip_cleanup: true
   on:
     tags: true
 before_install:
