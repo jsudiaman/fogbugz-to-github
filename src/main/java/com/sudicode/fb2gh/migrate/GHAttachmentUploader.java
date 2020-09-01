@@ -245,32 +245,29 @@ public class GHAttachmentUploader implements FBAttachmentConverter, Closeable {
         }
 
         // Install driver file into temp directory
-        InputStream src = null;
-        OutputStream dest = null;
         try {
             // Create temp file
             File tmp = FB2GHUtils.createTempFile(driver + "driver-" + os);
 
             // Initialize streams
-            src = GHAttachmentUploader.class.getResourceAsStream(driver + "driver-" + os);
-            dest = new FileOutputStream(tmp);
+            try (
+                    InputStream src = GHAttachmentUploader.class.getResourceAsStream(driver + "driver-" + os);
+                    OutputStream dest = new FileOutputStream(tmp)
+            ) {
+                // Copy driver to temp file
+                IOUtils.copy(src, dest);
+                if (!tmp.setExecutable(true)) {
+                    logger.warn("Failed to set access permissions of file: {}", tmp);
+                }
 
-            // Copy driver to temp file
-            IOUtils.copy(src, dest);
-            if (!tmp.setExecutable(true)) {
-                logger.warn("Failed to set access permissions of file: {}", tmp);
+                // Set driver property
+                String key = "webdriver." + driver + ".driver";
+                String value = URLDecoder.decode(tmp.getAbsolutePath(), "UTF-8");
+                System.setProperty(key, value);
+                logger.info("System property '{}' was set to '{}'.", key, value);
             }
-
-            // Set driver property
-            String key = "webdriver." + driver + ".driver";
-            String value = URLDecoder.decode(tmp.getAbsolutePath(), "UTF-8");
-            System.setProperty(key, value);
-            logger.info("System property '{}' was set to '{}'.", key, value);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        } finally {
-            IOUtils.closeQuietly(src);
-            IOUtils.closeQuietly(dest);
         }
 
         // Return WebDriver
